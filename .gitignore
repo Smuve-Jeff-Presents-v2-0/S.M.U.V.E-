@@ -32,3 +32,4 @@ test-results/
 #Ignore vscode AI rules
 .github/instructions/codacy.instructions.md
 .codebuddy
+Build
