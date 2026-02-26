@@ -49,8 +49,8 @@
           min="-1"
           max="1"
           step="0.001"
-          [ngModel]="deckService.crossfade()"
-          (ngModelChange)="deckService.crossfade.set($event)"
+          [ngModel]="deckService.crossfader()"
+          (ngModelChange)="deckService.crossfader.set($event)"
         />
       </div>
       <div class="flex items-center justify-between text-[10px] opacity-70">
@@ -131,7 +131,7 @@
     <div class="flex items-center justify-around gap-2 text-sm">
       <button class="p-2 border border-white/10 rounded w-16">CUE</button>
       <button class="p-4 bg-emerald-500 text-black font-black rounded-full w-20 h-20 flex items-center justify-center text-xl shadow-[0_0_20px_rgba(16,185,129,0.4)]" (click)="deckService.togglePlay('A')">
-        <i class="fas" [ngClass]="{'fa-pause': deckService.deckA().isPlaying, 'fa-play': !deckService.deckA().isPlaying}"></i>
+        <i class="fas" [class.fa-pause]="deckService.deckA().isPlaying" [class.fa-play]="!deckService.deckA().isPlaying"></i>
       </button>
       <button class="p-2 border border-white/10 rounded w-16">SYNC</button>
     </div>
@@ -200,7 +200,7 @@
       <div class="flex items-center justify-around gap-2 text-sm">
         <button class="p-2 border border-white/10 rounded w-16">CUE</button>
         <button class="p-4 bg-emerald-500 text-black font-black rounded-full w-20 h-20 flex items-center justify-center text-xl shadow-[0_0_20px_rgba(16,185,129,0.4)]" (click)="deckService.togglePlay('B')">
-           <i class="fas" [ngClass]="{'fa-pause': deckService.deckB().isPlaying, 'fa-play': !deckService.deckB().isPlaying}"></i>
+           <i class="fas" [class.fa-pause]="deckService.deckB().isPlaying" [class.fa-play]="!deckService.deckB().isPlaying"></i>
         </button>
         <button class="p-2 border border-white/10 rounded w-16">SYNC</button>
       </div>
@@ -218,7 +218,8 @@
           min="0.5"
           max="1.5"
           step="0.0005"
-          [ngModel]="deckService.deckB().playbackRate" (ngModelChange)="setPlaybackRate('B', $event)"
+          [ngModel]="deckService.deckB().playbackRate"
+          (ngModelChange)="setPlaybackRate('B', $event)"
         />
         <select class="bg-black/40 border border-white/10 rounded px-1 py-0.5 text-[10px] w-20 text-white">
           <option>±8%</option>
