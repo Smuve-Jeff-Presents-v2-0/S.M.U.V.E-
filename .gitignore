@@ -31,4 +31,28 @@ test-results/
 
 #Ignore vscode AI rules
 .github/instructions/codacy.instructions.md
-.codebuddy
+
+# Build artifacts and dist outputs
+Build/
+dist/
+coverage/
+
+# Test and tooling caches/reports
+.playwright/
+playwright-report/
+.eslintcache
+.madge-cache/
+
+# Temporary files
+.tmp/
+.tmp-ng/
+.cache/
+
+# OS/Editor
+Thumbs.db
+# CodeBuddy
+.codebuddy/*
+!.codebuddy/skills/
+!.codebuddy/rules/
+!.codebuddy/prompts/
+!.codebuddy/config.json
