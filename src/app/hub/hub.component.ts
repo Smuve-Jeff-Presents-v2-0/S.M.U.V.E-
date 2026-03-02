@@ -19,6 +19,7 @@ import { AudioEngineService } from '../services/audio-engine.service';
 import { GameService } from './game.service';
 import { Game } from './game';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { NotificationService } from '../services/notification.service';
 
 @Component({
   selector: 'app-hub',
@@ -37,6 +38,7 @@ export class HubComponent implements OnInit, OnDestroy {
   private exportService = inject(ExportService);
   private audioEngine = inject(AudioEngineService);
   private gameService = inject(GameService);
+  private notificationService = inject(NotificationService);
 
   // Games Data
   public games = toSignal(this.gameService.listGames(), { initialValue: [] as Game[] });
@@ -68,7 +70,7 @@ export class HubComponent implements OnInit, OnDestroy {
   // Quick Start Actions
   onQuickStart() {
     if (!this.quickProfile().artistName) {
-      alert('Please enter your Artist Name to begin!');
+      this.notificationService.show('Please enter your Artist Name to begin!', 'warning');
       return;
     }
 
@@ -79,7 +81,7 @@ export class HubComponent implements OnInit, OnDestroy {
       primaryGenre: this.quickProfile().primaryGenre,
     });
 
-    // Smooth transition to full profile
+    this.notificationService.show('Profile Created Successfully!', 'success');
     this.router.navigate(['/profile']);
   }
 
@@ -89,6 +91,11 @@ export class HubComponent implements OnInit, OnDestroy {
   }
 
   async onUpload() {
+    if (!this.uiService.isOnline()) {
+      this.notificationService.show('Offline: Upload requires a connection', 'error');
+      return;
+    }
+
     try {
       const files = await this.fileLoader.pickLocalFiles('.mp3,.wav');
       if (files.length > 0) {
@@ -101,10 +108,11 @@ export class HubComponent implements OnInit, OnDestroy {
         if (!this.isRadioPlaying()) {
           this.toggleRadio();
         }
+        this.notificationService.show(`Loaded track: ${file.name}`, 'success');
       }
     } catch (error) {
       console.error('Error uploading file:', error);
-      alert('Failed to load audio file.');
+      this.notificationService.show('Failed to load audio file.', 'error');
     }
   }
 
@@ -112,7 +120,7 @@ export class HubComponent implements OnInit, OnDestroy {
     try {
       const buffer = this.audioEngine.getDeck('A').buffer;
       if (!buffer) {
-        alert('No track loaded to download!');
+        this.notificationService.show('No track loaded to download!', 'warning');
         return;
       }
 
@@ -124,9 +132,10 @@ export class HubComponent implements OnInit, OnDestroy {
       a.download = this.radioTrackName() + '.wav';
       a.click();
       URL.revokeObjectURL(url);
+      this.notificationService.show('Download started', 'success');
     } catch (error) {
       console.error('Error downloading file:', error);
-      alert('Failed to download audio file.');
+      this.notificationService.show('Failed to download audio file.', 'error');
     }
   }
 

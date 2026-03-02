@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, HostListener } from '@angular/core';
 import { MainViewMode, AppTheme } from './user-context.service';
 
 const THEMES: AppTheme[] = [
@@ -42,6 +42,8 @@ export class UIService {
   isChatbotOpen = signal(false);
   visualIntensity = signal(0);
 
+  isOnline = signal(navigator.onLine);
+
   private viewModes: MainViewMode[] = [
     'hub',
     'studio',
@@ -59,7 +61,14 @@ export class UIService {
   ];
   private currentViewIndex = 0;
 
-  constructor() {}
+  constructor() {
+    window.addEventListener('online', () => this.updateOnlineStatus(true));
+    window.addEventListener('offline', () => this.updateOnlineStatus(false));
+  }
+
+  private updateOnlineStatus(status: boolean) {
+    this.isOnline.set(status);
+  }
 
   toggleMainViewMode() {
     this.currentViewIndex = (this.currentViewIndex + 1) % this.viewModes.length;
