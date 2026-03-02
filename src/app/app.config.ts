@@ -2,6 +2,8 @@ import {
   ApplicationConfig,
   provideZoneChangeDetection,
   isDevMode,
+  ErrorHandler,
+  APP_INITIALIZER,
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
@@ -11,6 +13,8 @@ import {
   withInterceptorsFromDi,
 } from '@angular/common/http';
 import { provideAiService, API_KEY_TOKEN } from './services/ai.service';
+import { GlobalErrorHandler } from './services/error-handler.service';
+import { AutoSaveService } from './services/auto-save.service';
 
 import { routes } from './app.routes';
 
@@ -26,5 +30,14 @@ export const appConfig: ApplicationConfig = {
     }),
     provideAiService(),
     { provide: API_KEY_TOKEN, useValue: 'YOUR_MOCK_API_KEY_HERE_FOR_TESTING' },
+    { provide: ErrorHandler, useClass: GlobalErrorHandler },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (autoSave: AutoSaveService) => () => {
+        console.log('Auto-Save Service Initialized');
+      },
+      deps: [AutoSaveService],
+      multi: true,
+    },
   ],
 };

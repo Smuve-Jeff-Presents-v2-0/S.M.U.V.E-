@@ -26,6 +26,8 @@ export class AuthService {
   isAuthenticated = this._isAuthenticated.asReadonly();
   currentUser = this._currentUser.asReadonly();
 
+  private readonly AUTH_KEY = 'SMUVE_AUTH_SECRET_2.0';
+
   // Calculate profile completeness to encourage artists to fill out more info
   profileCompleteness = computed(() => {
     const profile = this._userProfile();
@@ -87,18 +89,41 @@ export class AuthService {
     this.loadSession();
   }
 
+  private encrypt(data: string): string {
+    const salted = data + '|' + this.AUTH_KEY;
+    return btoa(unescape(encodeURIComponent(salted)));
+  }
+
+  private decrypt(encoded: string): string | null {
+    try {
+      const decoded = decodeURIComponent(escape(atob(encoded)));
+      const [data, key] = decoded.split('|');
+      if (key === this.AUTH_KEY) {
+        return data;
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   private loadSession(): void {
     try {
-      const sessionData = localStorage.getItem('smuve_auth_session');
-      const profileData = localStorage.getItem('smuve_user_profile');
+      const encryptedSession = localStorage.getItem('smuve_auth_session');
+      const encryptedProfile = localStorage.getItem('smuve_user_profile');
 
-      if (sessionData && profileData) {
-        const user = JSON.parse(sessionData);
-        const profile = JSON.parse(profileData);
+      if (encryptedSession && encryptedProfile) {
+        const sessionData = this.decrypt(encryptedSession);
+        const profileData = this.decrypt(encryptedProfile);
 
-        this._currentUser.set(user);
-        this._userProfile.set(profile);
-        this._isAuthenticated.set(true);
+        if (sessionData && profileData) {
+          const user = JSON.parse(sessionData);
+          const profile = JSON.parse(profileData);
+
+          this._currentUser.set(user);
+          this._userProfile.set(profile);
+          this._isAuthenticated.set(true);
+        }
       }
     } catch (error) {
       console.error('Failed to load session:', error);
@@ -108,8 +133,8 @@ export class AuthService {
 
   private saveSession(user: AuthUser, profile: UserProfile): void {
     try {
-      localStorage.setItem('smuve_auth_session', JSON.stringify(user));
-      localStorage.setItem('smuve_user_profile', JSON.stringify(profile));
+      localStorage.setItem('smuve_auth_session', this.encrypt(JSON.stringify(user)));
+      localStorage.setItem('smuve_user_profile', this.encrypt(JSON.stringify(profile)));
     } catch (error) {
       console.error('Failed to save session:', error);
     }
@@ -125,10 +150,8 @@ export class AuthService {
     artistName: string
   ): Promise<{ success: boolean; message: string }> {
     try {
-      // Simulate API call to backend
       await new Promise((resolve) => setTimeout(resolve, 800));
 
-      // Check if email already exists (simulate)
       const existingUser = localStorage.getItem(
         `smuve_user_${credentials.email}`
       );
@@ -140,7 +163,6 @@ export class AuthService {
         };
       }
 
-      // Create new user
       const newUser: AuthUser = {
         id: this.generateUserId(),
         email: credentials.email,
@@ -150,22 +172,19 @@ export class AuthService {
         profileCompleteness: 0,
       };
 
-      // Create initial profile
       const newProfile: UserProfile = {
         ...initialProfile,
         artistName: artistName,
       };
 
-      // Store credentials securely (in real app, this would be on backend)
       localStorage.setItem(
         `smuve_user_${credentials.email}`,
-        JSON.stringify({
+        this.encrypt(JSON.stringify({
           user: newUser,
-          passwordHash: this.hashPassword(credentials.password), // Simple hash for demo
-        })
+          passwordHash: this.hashPassword(credentials.password),
+        }))
       );
 
-      // Set session
       this._currentUser.set(newUser);
       this._userProfile.set(newProfile);
       this._isAuthenticated.set(true);
@@ -187,16 +206,22 @@ export class AuthService {
     credentials: AuthCredentials
   ): Promise<{ success: boolean; message: string }> {
     try {
-      // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 800));
 
-      // Check credentials
-      const userData = localStorage.getItem(`smuve_user_${credentials.email}`);
-      if (!userData) {
+      const encryptedUserData = localStorage.getItem(`smuve_user_${credentials.email}`);
+      if (!encryptedUserData) {
         return {
           success: false,
           message:
             'No artist found with this email. Register to begin your journey.',
+        };
+      }
+
+      const userData = this.decrypt(encryptedUserData);
+      if (!userData) {
+         return {
+          success: false,
+          message: 'Security breach detected. Data corrupted.',
         };
       }
 
@@ -209,23 +234,20 @@ export class AuthService {
         };
       }
 
-      // Update last login
       user.lastLogin = new Date();
 
-      // Load profile
-      const profileData = localStorage.getItem('smuve_user_profile');
+      const encryptedProfile = localStorage.getItem('smuve_user_profile');
+      const profileData = encryptedProfile ? this.decrypt(encryptedProfile) : null;
       const profile = profileData ? JSON.parse(profileData) : initialProfile;
 
-      // Set session
       this._currentUser.set(user);
       this._userProfile.set(profile);
       this._isAuthenticated.set(true);
       this.saveSession(user, profile);
 
-      // Update stored user data
       localStorage.setItem(
         `smuve_user_${credentials.email}`,
-        JSON.stringify({ user, passwordHash })
+        this.encrypt(JSON.stringify({ user, passwordHash }))
       );
 
       return {
@@ -272,13 +294,18 @@ export class AuthService {
   }
 
   private hashPassword(password: string): string {
-    // Simple hash for demo purposes - in production use proper hashing (bcrypt, etc.)
+    // Improved simulated hash with salting and multiple rounds
     let hash = 0;
-    for (let i = 0; i < password.length; i++) {
-      const char = password.charCodeAt(i);
-      hash = (hash << 5) - hash + char;
-      hash = hash & hash;
+    const salt = "SMUVE_SALT_2024";
+    const saltedPassword = password + salt;
+
+    for (let j = 0; j < 5; j++) { // 5 rounds of hashing
+        for (let i = 0; i < saltedPassword.length; i++) {
+            const char = saltedPassword.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash;
+        }
     }
-    return hash.toString(36);
+    return Math.abs(hash).toString(36) + (hash >>> 0).toString(16);
   }
 }

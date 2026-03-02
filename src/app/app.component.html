@@ -1,72 +1,53 @@
-<!-- Subtle Background Gradient -->
-<div class="main-background"></div>
+<div
+  class="app-container"
+  [attr.data-theme]="uiService.activeTheme().name"
+  [ngClass]="'theme-' + uiService.activeTheme().primary"
+>
+  <div class="main-background"></div>
 
-<div class="app-container wow animate__animated animate__fadeIn">
-  <!-- Modern Header -->
+  <app-notification-toast></app-notification-toast>
+
+  <!-- Navigation Header -->
   <header class="app-header">
-    <div class="flex items-center gap-6">
-      <div class="nav-group">
-        <button
-          routerLink="/profile"
-          routerLinkActive="active"
-          class="nav-item"
-          title="Artist Profile"
-          aria-label="Navigate to Artist Profile"
-        >
+    <div class="nav-group">
+      <div class="logo-container" routerLink="/hub">
+        <div class="logo-icon">
+          <i class="fas fa-microchip"></i>
+        </div>
+        <div class="logo-text">
+          <span class="brand">S.M.U.V.E</span>
+          <span class="version">3.0</span>
+        </div>
+      </div>
+
+      <nav class="main-nav">
+        <a routerLink="/profile" routerLinkActive="active" class="nav-item">
           <i class="fas fa-user-circle"></i>
-        </button>
-        <button
-          routerLink="/hub"
-          routerLinkActive="active"
-          class="nav-item"
-          title="Hub"
-          aria-label="Navigate to Game and Interaction Hub"
-        >
+          <span>Artist Profile</span>
+        </a>
+        <a routerLink="/hub" routerLinkActive="active" class="nav-item">
           <i class="fas fa-th-large"></i>
-        </button>
-        <button
-          routerLink="/projects"
-          routerLinkActive="active"
-          class="nav-item"
-          title="Projects"
-          aria-label="Navigate to Projects"
-        >
-          <i class="fas fa-folder-open"></i>
-        </button>
-        <button
-          routerLink="/studio"
-          routerLinkActive="active"
-          class="nav-item"
-          title="The Studio"
-          aria-label="Navigate to Digital Audio Workstation"
-        >
+          <span>Hub</span>
+        </a>
+        <a routerLink="/studio" routerLinkActive="active" class="nav-item">
+          <i class="fas fa-music"></i>
+          <span>Studio</span>
+        </a>
+        <a routerLink="/practice" routerLinkActive="active" class="nav-item">
           <i class="fas fa-microphone-alt"></i>
-        </button>
+          <span>Practice</span>
+        </a>
+      </nav>
+    </div>
+
+    <div class="header-center">
+      <div class="view-mode-selector">
         <button
-          routerLink="/remix-arena"
-          routerLinkActive="active"
-          class="nav-item"
-          title="Remix Arena"
-          aria-label="Navigate to Collaboration Remix Arena"
+          (click)="uiService.toggleMainViewMode()"
+          class="mode-button"
+          title="Switch View"
         >
-          <i class="fas fa-gamepad"></i>
-        </button>
-        <button
-          routerLink="/image-video-lab"
-          routerLinkActive="active"
-          class="nav-item"
-          title="Image & Video Lab"
-          aria-label="Navigate to Image and Video Generation Lab"
-        >
-          <i class="fas fa-photo-video"></i>
-        </button>
-        <button
-          routerLink="/tha-spot"
-          routerLinkActive="active"
-          class="nav-item"
-          title="Tha Spot"
-          aria-label="Navigate to Tha Spot Interaction Hub"
-        >
+          <span class="mode-text">{{ uiService.mainViewMode() }}</span>
           <i class="fas fa-bolt"></i>
         </button>
       </div>
@@ -95,9 +76,9 @@
     </div>
 
     <div class="flex items-center gap-6">
-      <div class="status-indicator">
+      <div class="status-indicator" [class.offline]="!uiService.isOnline()">
         <div class="status-dot"></div>
-        <span class="status-text">Online</span>
+        <span class="status-text">{{ uiService.isOnline() ? 'Online' : 'Offline' }}</span>
       </div>
 
       <button
@@ -173,7 +154,7 @@
 
   <footer class="app-footer">
     <div class="footer-content">
-      <span>S.M.U.V.E 2.0</span>
+      <span>S.M.U.V.E 3.0</span>
       <span class="dot"></span>
       <span>Smuve Jeff Presents</span>
       <span class="dot"></span>
