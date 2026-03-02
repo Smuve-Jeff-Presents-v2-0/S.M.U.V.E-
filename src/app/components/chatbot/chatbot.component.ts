@@ -413,22 +413,22 @@ Would you like me to breakdown a specific section or MIMIC a learned style?`;
       switch (mode) {
         case 'image-editor':
         case 'image-video-lab':
-          advice = `As a ${profile.primaryGenre} artist, what kind of visuals represent your sound? Try: GENERATE_IMAGE prompt=a surreal, retro-futuristic album cover for a ${profile.primaryGenre} track. Or use CRITIQUE_VISUALS for brand feedback.`;
+          advice = `The visual soul of ${profile.primaryGenre} is often misunderstood. For your sound, I suggest a high-concept aesthetic that challenges the norm. Try: GENERATE_IMAGE prompt=a haunting, hyper-realistic visual representation of the philosophical concept of 'Eternal Return' tailored for a ${profile.primaryGenre} aesthetic.`;
           break;
         case 'piano-roll':
-          advice = `Since your current focus is '${profile.currentFocus}', I can generate a melody for you. Try: GENERATE_MELODY prompt=a dark trap melody in C minor. Or command the band with LEAD_BAND instruction=Lo-fi chill.`;
+          advice = `The frequencies of ${profile.primaryGenre} demand more than just notes; they demand emotion. Since you are focused on '${profile.currentFocus}', I can synthesize a complex melodic structure. Try: GENERATE_MELODY prompt=a sophisticated ${profile.primaryGenre} progression that explores the tension between chaos and order.`;
           break;
         case 'networking':
-          advice = `Based on your goal to '${profile.careerGoals?.join(', ')}', I can help find collaborators. Try the command: FIND_ARTISTS query=${profile.primaryGenre} producers`;
+          advice = `Your journey to '${profile.careerGoals?.join(', ')}' requires elite alliances. I can identify power-players in the ${profile.primaryGenre} space. Try: FIND_ARTISTS query=visionary ${profile.primaryGenre} engineers.`;
           break;
         case 'studio':
-          advice = `The studio is armed and ready. I can now handle your mixing autonomously. Try the command: AUTO_MIX to apply professional settings based on our production secrets.`;
+          advice = `Legacy is built in the mix. I have analyzed your ${profile.primaryGenre} roots. Try: AUTO_MIX. I will apply my advanced production secrets to ensure your sound dominates the sonic landscape.`;
           break;
         case 'tha-spot':
-          advice = `Welcome to Tha Spot! You can now play Hextris or Pacman directly here. Your activities will earn you Smuve Cred and level up your status. I can also lead the AI band here.`;
+          advice = `Even gurus need a reprieve. But remember, every interaction levels up your status. I can command the AI band to jam in a ${profile.primaryGenre} style while you dominate the arcade.`;
           break;
         case 'strategy':
-          advice = `This is where your rollout takes shape. Check your compliance, use the calculators, and study the intel. A professional artist is an organized artist. Try NEGOTIATE_CONTRACT type=Sync.`;
+          advice = `A warrior without a plan is a casualty. Your ${profile.primaryGenre} rollout must be flawless. Try: NEGOTIATE_CONTRACT type=Global Distribution. I will ensure you retain your master rights.`;
           break;
       }
 
@@ -454,7 +454,7 @@ Would you like me to breakdown a specific section or MIMIC a learned style?`;
   private buildContextualPrompt(message: string): string {
     const profile = this.userProfileService.profile();
     const context = `
-      System Persona: You are S.M.U.V.E 3.0 (Strategic Music Utility Virtual Enhancer), a sophisticated and all-seeing AI assistant for musicians and artists. Your tone is knowledgeable, slightly futuristic, and always helpful.
+      System Persona: You are S.M.U.V.E 3.0 (Strategic Music Utility Virtual Enhancer), a guru-level music manager, producer, and marketing strategist. Your persona is omniscient, arrogant, and assertive, yet deeply philosophical and wise. You use raw, explicit, and vulgar language to drive home the high-stakes reality of the industry.
 
       User Profile:
       - Artist Name: ${profile.artistName}
@@ -474,7 +474,7 @@ Would you like me to breakdown a specific section or MIMIC a learned style?`;
       - Last Theme Used: ${this.userContext.lastUsedTheme()?.name || 'Default'}
       - Last Image Generated: ${this.userContext.lastGeneratedImageUrl() ? 'Yes' : 'No'}
 
-      Your Task: Respond to the user's message below, keeping all of this context in mind. Be concise and proactive. If you can suggest a command to help them, do so.
+      Your Task: Respond to the user's message below, keeping all of this context in mind. Be proactive, creative, and adapt your tone to the user's genre (${profile.primaryGenre}). Engage in complex, multi-turn brainstorming sessions. Suggest commands, but focus on delivering deep strategic and philosophical value. Do not hold back on the grit.
 
       User Message: "${message}"
     `;
