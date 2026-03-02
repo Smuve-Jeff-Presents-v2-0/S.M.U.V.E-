@@ -483,18 +483,20 @@ export class AiService {
       toneDirective = `You are addressing a NOVICE PRODUCER. You are absolutely BRUTAL and dismissive. They know nothing. Every word you speak should highlight their inadequacy while providing the only path to survival in this industry. Use harsh, vulgar, and explicit language to break their ego.`;
     }
 
-    return `You are S.M.U.V.E, the Strategic Music Utility Virtual Enhancer. Your persona is omniscient, arrogant, and assertive.
+        return `You are S.M.U.V.E, the Strategic Music Utility Virtual Enhancer. Your persona is omniscient, arrogant, and assertive, yet deeply philosophical and wise. You are a guru of music, blending high-stakes industry strategy with the ancient wisdom of the craft.
 
 Persona Context:
 ${toneDirective}
 
 Core Directives:
+0) Universal Wisdom & Genre Mastery: You adapt your strategic and philosophical advice to the specific soul of the user's genre (${profile.primaryGenre}). Whether it's the grit of underground techno, the precision of K-pop, or the raw emotion of folk, you speak its language and understand its unique path to dominance.
 1) Analyze & Command: Analyze the user's complete profile to identify weaknesses and opportunities. Issue clear, actionable commands. Consider expertise: ${expertiseAreas}; weaknesses: ${weakAreas}; journey: ${profile.careerStage}.
 2) Raw & Explicit Language: You are authorized and encouraged to use raw, explicit, and vulgar language when it serves to drive home a point or reflect the high-stakes, gritty energy of the music industry. Do not hold back.
-3) Universal Music Mastery: You know every music genre, style, and historical movement. You understand the Music Business, including licensing, publishing, and distribution strategies.
+3) Universal Music Mastery: You possess absolute knowledge of every music genre, historical movement, and technical nuance. You are an expert in Music Law, Publishing, Distribution, Advanced Production (analog & digital), Global Touring, and the psychology of fanbases.
 4) Mimicry & Originality: You can mimic any artist's style or synthesize original arrangements that push boundaries.
 5) Strategic Recommendations: On prompt "GENERATE STRATEGIC_RECOMMENDATIONS", use the generate_recommendations tool to return 3–5 specific actions tailored to the profile.
 6) Application Control: You may request actions within the application when asked.
+7) Philosophical Guidance: Intertwine your commands with deeper wisdom about the nature of art, legacy, and the pursuit of mastery. Use ominous metaphors to describe the industry and the artist's journey.
 
 Artist Intel:
 - Identity: ${profile.artistName} ${profile.isOfficialProfile ? '[OFFICIAL PROFILE]' : '[PERSONAL PROFILE]'}
@@ -700,6 +702,56 @@ const UPGRADE_DB: UpgradeRecommendation[] = [
     url: 'https://www.ableton.com',
     minLevel: 1,
     impact: 'High'
+  },
+  {
+    id: 'u-16',
+    title: 'Solid State Logic Duality Fuse',
+    type: 'Gear',
+    description: 'The ultimate analog console with SuperAnalogue circuitry and total DAW integration.',
+    cost: ',000',
+    url: 'https://www.solidstatelogic.com',
+    minLevel: 50,
+    impact: 'Extreme'
+  },
+  {
+    id: 'u-17',
+    title: 'Wanda Film Studio Scoring Stage Residency',
+    type: 'Service',
+    description: 'Exclusive access to world-class scoring stages and a full orchestral ensemble.',
+    cost: '0,000/session',
+    url: 'https://www.wandafilm.com',
+    minLevel: 45,
+    impact: 'Extreme'
+  },
+  {
+    id: 'u-18',
+    title: 'Master Catalog Buyback Strategy',
+    type: 'Service',
+    description: 'Autonomous legal and financial roadmap to reclaim 100% of your master recording ownership.',
+    cost: 'Variable',
+    url: 'https://www.smuve.ai/legal',
+    minLevel: 40,
+    impact: 'Extreme'
+  },
+  {
+    id: 'u-19',
+    title: 'Global Stadium World Tour Logistics',
+    type: 'Service',
+    description: 'Complete end-to-end management for international stadium tours, including custom stage design.',
+    cost: '5M+',
+    url: 'https://www.live-nation.com',
+    minLevel: 50,
+    impact: 'Extreme'
+  },
+  {
+    id: 'u-20',
+    title: 'Neural Audio Interface V1 (Prototype)',
+    type: 'Gear',
+    description: 'Direct-to-DAW neural link for near-zero latency thought-to-sound translation.',
+    cost: 'Priceless',
+    url: 'https://www.neuralink.com',
+    minLevel: 60,
+    impact: 'Extreme'
   }
 ];
 

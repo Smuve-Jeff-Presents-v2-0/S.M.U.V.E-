@@ -59,5 +59,5 @@ export interface UpgradeRecommendation {
   minLevel: number;
   genres?: string[];
   url?: string;
-  impact: 'High' | 'Medium' | 'Low';
+  impact: 'Extreme' | 'High' | 'Medium' | 'Low';
 }
