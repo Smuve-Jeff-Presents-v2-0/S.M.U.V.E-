@@ -11,20 +11,16 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-  position: relative;
+  min-width: 0;
 }
 
-.timeline-header {
-  height: 32px;
-  background: rgba(15, 23, 42, 0.8);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  display: flex;
-  position: sticky;
-  top: 0;
-  z-index: 20;
+.timeline-viewport {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 100px 96px;
+  background-attachment: local;
+  min-width: 0;
 }
 
 .track-headers {
@@ -144,6 +140,21 @@
     width: 60px;
   }
   .track-info, .track-instrument {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .track-headers-column {
+    width: 100px !important;
+  }
+  .track-header {
+    padding: 0.5rem !important;
+  }
+  .track-header .w-32 {
+    width: 60px !important;
+  }
+  .track-header .flex.gap-1 {
     display: none;
   }
 }

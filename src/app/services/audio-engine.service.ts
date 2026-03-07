@@ -16,6 +16,8 @@ interface DeckChannel {
   filter: BiquadFilterNode;
   pan: StereoPannerNode;
   gain: GainNode;
+  sendA: GainNode;
+  sendB: GainNode;
   analyser: AnalyserNode;
   isPlaying: boolean;
   startTime: number;
@@ -24,6 +26,8 @@ interface DeckChannel {
   stems: Stems | null;
   loopEnabled: boolean;
   hotCues: (number | null)[];
+  sendA: GainNode;
+  sendB: GainNode;
 }
 
 @Injectable({
@@ -37,6 +41,8 @@ export class AudioEngineService {
   private limiter: DynamicsCompressorNode;
   private reverbConvolver: ConvolverNode;
   public reverbWet: GainNode;
+  private delayNode: DelayNode;
+  public delayWet: GainNode;
   private recordingDestination: MediaStreamAudioDestinationNode | null = null;
   private masterAnalyser: AnalyserNode;
 
@@ -68,6 +74,8 @@ export class AudioEngineService {
     this.limiter = this.ctx.createDynamicsCompressor();
     this.reverbConvolver = this.ctx.createConvolver();
     this.reverbWet = this.ctx.createGain();
+    this.delayNode = this.ctx.createDelay(2.0);
+    this.delayWet = this.ctx.createGain();
     this.masterAnalyser = this.ctx.createAnalyser();
 
     // Signal chain: ... -> masterGain -> compressor -> limiter -> masterAnalyser -> destination
@@ -75,6 +83,17 @@ export class AudioEngineService {
     this.compressor.connect(this.limiter);
     this.limiter.connect(this.masterAnalyser);
     this.masterAnalyser.connect(this.ctx.destination);
+
+    // FX Chain
+    this.reverbConvolver.connect(this.reverbWet);
+    this.reverbWet.connect(this.masterGain);
+
+    this.delayNode.connect(this.delayWet);
+    this.delayWet.connect(this.masterGain);
+
+    // Reverb chain
+    this.reverbConvolver.connect(this.reverbWet);
+    this.reverbWet.connect(this.masterGain);
 
     // Default FX setup
     this.compressor.threshold.value = -24;
@@ -111,6 +130,8 @@ export class AudioEngineService {
       filter: this.ctx.createBiquadFilter(),
       pan: this.ctx.createStereoPanner(),
       gain: this.ctx.createGain(),
+      sendA: this.ctx.createGain(),
+      sendB: this.ctx.createGain(),
       analyser: this.ctx.createAnalyser(),
       isPlaying: false,
       startTime: 0,
@@ -118,8 +139,13 @@ export class AudioEngineService {
       rate: 1.0,
       stems: null,
       loopEnabled: false,
-      hotCues: new Array(8).fill(null)
+      hotCues: new Array(8).fill(null),
+      sendA: this.ctx.createGain(),
+      sendB: this.ctx.createGain()
     };
+
+    deck.sendA.gain.value = 0;
+    deck.sendB.gain.value = 0;
 
     deck.eqLow.type = 'lowshelf';
     deck.eqLow.frequency.value = 250;
@@ -131,6 +157,9 @@ export class AudioEngineService {
 
     deck.analyser.fftSize = 1024;
 
+    deck.sendA.gain.value = 0;
+    deck.sendB.gain.value = 0;
+
     // Routing: Stems -> EQ -> Filter -> Pan -> Gain -> Analyser -> Master
     Object.values(deck.gains).forEach(g => g.connect(deck.eqLow));
     deck.eqLow.connect(deck.eqMid);
@@ -138,8 +167,21 @@ export class AudioEngineService {
     deck.eqHigh.connect(deck.filter);
     deck.filter.connect(deck.pan);
     deck.pan.connect(deck.gain);
+
+    // Sends
+    deck.gain.connect(deck.sendA);
+    deck.gain.connect(deck.sendB);
+    deck.sendA.connect(this.reverbConvolver);
+    deck.sendB.connect(this.delayNode);
+
     deck.gain.connect(deck.analyser);
     deck.analyser.connect(this.masterGain);
+
+    // Sends
+    deck.gain.connect(deck.sendA);
+    deck.sendA.connect(this.reverbConvolver);
+    deck.gain.connect(deck.sendB);
+    deck.sendB.connect(this.masterGain);
 
     if (id === 'A') this.deckA = deck;
     else this.deckB = deck;
@@ -225,6 +267,12 @@ export class AudioEngineService {
         (deck.sources as any)[k]!.playbackRate.setTargetAtTime(rate, this.ctx.currentTime, 0.05);
       }
     });
+  }
+
+  setDeckSend(id: DeckId, send: "A" | "B", gain: number) {
+    const deck = this.getDeck(id);
+    const node = send === "A" ? deck.sendA : deck.sendB;
+    node.gain.setTargetAtTime(gain, this.ctx.currentTime, 0.01);
   }
 
   setDeckGain(id: DeckId, gain: number) {

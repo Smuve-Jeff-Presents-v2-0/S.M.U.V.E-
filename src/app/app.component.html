@@ -8,6 +8,14 @@
   <div class="main-background"></div>
 
   <app-notification-toast></app-notification-toast>
+  <app-smuve-advisor></app-smuve-advisor>
+
+  <!-- Sidebar Overlay for Mobile -->
+  <div
+    *ngIf="isMobile() && isSidebarOpen()"
+    class="sidebar-overlay"
+    (click)="toggleSidebar()"
+  ></div>
 
   <!-- Sidebar Overlay for Mobile -->
   <div
@@ -76,6 +84,26 @@
          [title]="view.label">
         <i class="fas {{ view.icon }}"></i>
         <span *ngIf="isSidebarOpen() || isMobile()">{{ view.label }}</span>
+    <nav class="sidebar-nav">
+      <a routerLink="/hub" routerLinkActive="active" class="nav-item" title="Hub">
+        <i class="fas fa-th-large"></i>
+        <span *ngIf="isSidebarOpen() || isMobile()">Hub</span>
+      </a>
+      <a routerLink="/profile" routerLinkActive="active" class="nav-item" title="Artist Profile">
+        <i class="fas fa-user-circle"></i>
+        <span *ngIf="isSidebarOpen() || isMobile()">Artist Profile</span>
+      </a>
+      <a routerLink="/studio" routerLinkActive="active" class="nav-item" title="Studio">
+        <i class="fas fa-music"></i>
+        <span *ngIf="isSidebarOpen() || isMobile()">Studio</span>
+      </a>
+      <a routerLink="/practice" routerLinkActive="active" class="nav-item" title="Practice">
+        <i class="fas fa-microphone-alt"></i>
+        <span *ngIf="isSidebarOpen() || isMobile()">Practice</span>
+      </a>
+      <a routerLink="/tha-spot" routerLinkActive="active" class="nav-item" title="Tha Spot">
+        <i class="fas fa-bolt"></i>
+        <span *ngIf="isSidebarOpen() || isMobile()">Tha Spot</span>
       </a>
 
       <div class="nav-divider"></div>
@@ -90,6 +118,40 @@
         <i class="fas {{ view.icon }}"></i>
         <span *ngIf="isSidebarOpen() || isMobile()">{{ view.label }}</span>
       </a>
+      <!-- Dropdown for Additional Tools -->
+      <div class="nav-dropdown" [class.open]="isToolsDropdownOpen()">
+        <button (click)="toggleToolsDropdown()" class="nav-item dropdown-toggle" title="More Tools">
+          <i class="fas fa-plus-square"></i>
+          <span *ngIf="isSidebarOpen() || isMobile()">More Tools</span>
+          <i class="fas fa-chevron-down dropdown-arrow" *ngIf="isSidebarOpen() || isMobile()"></i>
+        </button>
+        <div class="dropdown-content" *ngIf="isToolsDropdownOpen() || !isSidebarOpen()">
+          <a routerLink="/career" routerLinkActive="active" class="dropdown-item">
+            <i class="fas fa-briefcase"></i>
+            <span *ngIf="isSidebarOpen() || isMobile()">Career Hub</span>
+          </a>
+          <a routerLink="/analytics" routerLinkActive="active" class="dropdown-item">
+            <i class="fas fa-chart-line"></i>
+            <span *ngIf="isSidebarOpen() || isMobile()">Analytics</span>
+          </a>
+          <a routerLink="/strategy" routerLinkActive="active" class="dropdown-item">
+            <i class="fas fa-chess"></i>
+            <span *ngIf="isSidebarOpen() || isMobile()">Strategy Hub</span>
+          </a>
+          <a routerLink="/projects" routerLinkActive="active" class="dropdown-item">
+            <i class="fas fa-project-diagram"></i>
+            <span *ngIf="isSidebarOpen() || isMobile()">Projects</span>
+          </a>
+          <a routerLink="/remix-arena" routerLinkActive="active" class="dropdown-item">
+            <i class="fas fa-compact-disc"></i>
+            <span *ngIf="isSidebarOpen() || isMobile()">Remix Arena</span>
+          </a>
+          <a routerLink="/image-video-lab" routerLinkActive="active" class="dropdown-item">
+            <i class="fas fa-video"></i>
+            <span *ngIf="isSidebarOpen() || isMobile()">Media Lab</span>
+          </a>
+        </div>
+      </div>
     </nav>
 
     <div class="sidebar-footer" *ngIf="!isMobile()">
@@ -129,6 +191,10 @@
                      (input)="filterViews($any($event.target).value)">
            </div>
            <div *ngFor="let config of filteredViews()"
+           <div class="px-4 py-2 border-b border-white/5 mb-2">
+              <span class="text-[8px] font-black uppercase tracking-[0.3em] text-emerald-500/60">System Navigator</span>
+           </div>
+           <div *ngFor="let config of uiService.getViewConfigs()"
                 (click)="navigateToView(config.mode)"
                 class="view-dropdown-item flex items-center justify-between"
                 [class.active]="uiService.mainViewMode() === config.mode">

@@ -227,7 +227,7 @@
   top: calc(100% + 10px);
   left: 50%;
   transform: translateX(-50%);
-  width: 280px;
+  width: 250px;
   max-height: 400px;
   background: #0f172a;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -239,7 +239,7 @@
 }
 
 .view-dropdown-item {
-  display: flex;
+  display: block;
   width: 100%;
   text-align: left;
   padding: 0.6rem 1rem;
@@ -464,6 +464,25 @@
 @media (max-width: 1024px) {
   .app-container {
     grid-template-columns: 0px 1fr;
+@media (max-width: 640px) {
+  .header-center {
+    gap: 0.5rem;
+  }
+  .mode-text {
+    display: none;
+  }
+  .view-mode-selector .mode-button {
+    padding: 0.4rem;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    justify-content: center;
+  }
+  .view-mode-selector .mode-button i {
+    margin: 0;
+  }
+  .view-dropdown-menu {
+    width: 90vw;
   }
 }
 

@@ -1,4 +1,5 @@
 import { Component, inject, effect, signal, HostListener, computed } from '@angular/core';
+import { Component, inject, effect, signal, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterOutlet, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -6,13 +7,14 @@ import { AuthService } from './services/auth.service';
 import { UIService, ViewConfig } from './services/ui.service';
 import { ChatbotComponent } from './components/chatbot/chatbot.component';
 import { NotificationToastComponent } from './components/notification-toast/notification-toast.component';
+import { SmuveAdvisorComponent } from './components/smuve-advisor/smuve-advisor.component';
 import { NotificationService } from './services/notification.service';
 import { MainViewMode } from './services/user-context.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, ChatbotComponent, NotificationToastComponent],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, ChatbotComponent, NotificationToastComponent, SmuveAdvisorComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
@@ -26,18 +28,6 @@ export class AppComponent {
   isToolsDropdownOpen = signal(false);
   isViewSelectorOpen = signal(false);
   isMobile = signal(false);
-  viewSearchQuery = signal('');
-
-  filteredViews = computed(() => {
-    const query = this.viewSearchQuery().toLowerCase();
-    const configs = this.uiService.getViewConfigs();
-    if (!query) return configs;
-    return configs.filter(v =>
-      v.label.toLowerCase().includes(query) ||
-      v.mode.toLowerCase().includes(query) ||
-      v.category.toLowerCase().includes(query)
-    );
-  });
 
   constructor() {
     this.checkMobile();
@@ -117,6 +107,7 @@ export class AppComponent {
   }
 
   @HostListener('document:click', ['$event'])
+  @HostListener('document:click', [''])
   onClickOutside(event: MouseEvent) {
     const target = event.target as HTMLElement;
     if (!target.closest('.view-mode-selector')) {
