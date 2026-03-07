@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { TransportBarComponent } from './transport-bar/transport-bar.component';
 import { MixerComponent } from './mixer/mixer.component';
 import { MasterControlsComponent } from './master-controls/master-controls.component';
-import { DjDeckComponent } from '../components/dj-deck/dj-deck.component';
+import { DjDeckComponent } from './dj-deck/dj-deck.component';
 import { ChannelRackComponent } from './channel-rack/channel-rack.component';
 import { ArrangementViewComponent } from './arrangement-view/arrangement-view.component';
 import { PianoRollComponent } from './piano-roll/piano-roll.component';

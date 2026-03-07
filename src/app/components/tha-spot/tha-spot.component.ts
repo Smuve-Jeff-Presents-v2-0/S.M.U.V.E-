@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, inject, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { VisualizerComponent } from '../visualizer/visualizer.component';
+
 import { AiService } from '../../services/ai.service';
 import { GameService } from '../../hub/game.service';
 import { UserProfileService, UserProfile } from '../../services/user-profile.service';
