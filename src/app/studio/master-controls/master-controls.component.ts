@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { InstrumentService } from '../instrument.service';
 import { ReputationService } from '../../services/reputation.service';
@@ -25,6 +25,12 @@ export class MasterControlsComponent {
   isFinishing = signal(false);
   isRecording = signal(false);
 
+  masterVolume = signal(0.8);
+  reverbMix = signal(0.1);
+
+  masterVolumePercent = computed(() => Math.round(this.masterVolume() * 100));
+  reverbMixPercent = computed(() => Math.round(this.reverbMix() * 100));
+
   private activeRecorder: any = null;
 
   toggleLimiter(): void {
@@ -44,11 +50,13 @@ export class MasterControlsComponent {
 
   updateMasterVolume(event: Event): void {
     const volume = (event.target as HTMLInputElement).valueAsNumber;
+    this.masterVolume.set(volume);
     this.instrumentService.setMasterVolume(volume * 100);
   }
 
   updateReverb(event: Event): void {
     const mix = (event.target as HTMLInputElement).valueAsNumber;
+    this.reverbMix.set(mix);
     this.instrumentService.setReverbMix(mix);
   }
 
