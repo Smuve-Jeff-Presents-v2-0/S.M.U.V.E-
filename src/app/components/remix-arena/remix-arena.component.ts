@@ -2,8 +2,8 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CollaborationService } from '../../services/collaboration.service';
-import { StemControlsComponent } from '../stem-controls/stem-controls.component';
-import { SampleLibraryComponent } from '../sample-library/sample-library.component';
+import { StemControlsComponent } from '../../studio/stem-controls/stem-controls.component';
+import { SampleLibraryComponent } from '../../studio/sample-library/sample-library.component';
 import { MusicManagerService } from '../../services/music-manager.service';
 import { LibraryService } from '../../services/library.service';
 
