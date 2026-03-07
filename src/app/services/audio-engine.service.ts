@@ -113,7 +113,7 @@ export class AudioEngineService {
 
   resume() { if (this.ctx.state === 'suspended') this.ctx.resume(); }
 
-  private initDeck(id: DeckId) {
+    private initDeck(id: DeckId) {
     const deck: DeckChannel = {
       id,
       buffer: null,
