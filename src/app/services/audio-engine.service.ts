@@ -150,6 +150,7 @@ export class AudioEngineService {
     this.delay.connect(this.delayWet);
     this.reverbConvolver.connect(this.reverbWet);
 
+    this.reverbConvolver.connect(this.reverbWet);
     this.reverbWet.connect(this.compressor);
     this.delayWet.connect(this.compressor);
     this.masterGain.connect(this.compressor);
@@ -217,6 +218,8 @@ export class AudioEngineService {
     stems.forEach((s) => deck.gains[s].connect(deck.pre));
 
     deck.pre.connect(deck.analyser);
+    deck.pre.connect(deck.sendA).connect(this.reverbConvolver);
+    deck.pre.connect(deck.sendB).connect(this.delay);
     deck.pre
       .connect(deck.eqLow)
       .connect(deck.eqMid)
@@ -310,6 +313,12 @@ export class AudioEngineService {
         (deck.sources as any)[k].playbackRate.setTargetAtTime(rate, this.ctx.currentTime, 0.05);
       }
     });
+  }
+
+  setDeckSend(id: DeckId, send: "A" | "B", gain: number) {
+    const deck = this.getDeck(id);
+    const node = send === "A" ? deck.sendA : deck.sendB;
+    node.gain.setTargetAtTime(gain, this.ctx.currentTime, 0.01);
   }
 
   setDeckGain(id: DeckId, gain: number) {
