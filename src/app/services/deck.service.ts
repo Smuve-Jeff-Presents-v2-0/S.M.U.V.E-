@@ -120,6 +120,15 @@ export class DeckService {
     else this.deckB.update(d => ({ ...d, gain }));
   }
 
+  sync(id: DeckId) {
+    const target = id === 'A' ? this.deckB() : this.deckA();
+    if (id === 'A') {
+      this.deckA.update(d => ({ ...d, bpm: target.bpm }));
+    } else {
+      this.deckB.update(d => ({ ...d, bpm: target.bpm }));
+    }
+  }
+
   syncProgress() {
     // In a real app we would use an analyzer for BPM detection
     // for now we just sync the positions and playing state

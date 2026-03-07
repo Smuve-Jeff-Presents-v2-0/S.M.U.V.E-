@@ -1,7 +1,7 @@
 <div class="flex flex-col min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-emerald-500/30 overflow-y-auto">
 
   <!-- TOP STACKED WAVEFORMS -->
-  <div class="h-40 w-full bg-black border-b border-emerald-500/20 flex flex-col gap-1 p-2 relative">
+  <div id="stackedWaveformContainer" class="h-40 w-full bg-black border-b border-emerald-500/20 flex flex-col gap-1 p-2 relative">
     <div class="absolute left-1/2 top-0 bottom-0 w-0.5 bg-red-500 z-10 shadow-[0_0_10px_rgba(239,68,68,0.5)]"></div>
 
     <!-- Waveform A -->
@@ -30,7 +30,7 @@
         </div>
         <div class="flex flex-col items-end gap-1">
            <div class="flex flex-col items-end gap-1"><div class="flex items-center gap-1 bg-black border border-emerald-500/20 rounded px-1"><button (click)="deckService.setBpm('A', deckService.deckA().bpm - 0.1)" class="text-slate-500 hover:text-white text-[10px]">-</button><button (click)="tapBpm('A')" class="text-[10px] font-mono text-emerald-400 active:text-white">{{ deckService.deckA().bpm | number:'1.0-1' }}</button><button (click)="deckService.setBpm('A', deckService.deckA().bpm + 0.1)" class="text-slate-500 hover:text-white text-[10px]">+</button></div><div class="flex gap-1"><button (click)="deckService.setBeatGridOffset('A', deckService.deckA().beatGridOffset - 0.01)" class="text-[8px] text-slate-600 hover:text-emerald-500">GRID <</button><button (click)="deckService.setBeatGridOffset('A', deckService.deckA().beatGridOffset + 0.01)" class="text-[8px] text-slate-600 hover:text-emerald-500">></button></div></div>
-          <div class="px-2 py-0.5 rounded bg-black border border-emerald-500/20 text-[8px] font-mono text-slate-400">{{ pitchAPercentage() }}</div>
+          <div class="px-2 py-0.5 rounded bg-black border border-emerald-500/20 text-[8px] font-mono text-slate-400">PITCH: {{ pitchAPercentage() }}</div>
         </div>
       </div>
 
@@ -85,7 +85,7 @@
         <button (click)="deckService.togglePlay('A')" class="flex-grow h-12 rounded bg-emerald-500 text-black font-black italic tracking-widest text-lg shadow-[0_0_20px_rgba(16,185,129,0.3)] active:scale-95 transition-all">
           <i class="fas" [class.fa-pause]="deckService.deckA().isPlaying" [class.fa-play]="!deckService.deckA().isPlaying"></i>
         </button>
-        <button class="w-12 h-10 rounded bg-slate-800 border border-white/10 text-[8px] font-black text-emerald-500 uppercase">SYNC</button>
+        <button (click)="sync('A')" class="w-12 h-10 rounded bg-slate-800 border border-white/10 text-[8px] font-black text-emerald-500 uppercase">SYNC</button>
       </div>
     </div>
 
@@ -150,7 +150,7 @@
         </div>
         <div class="flex flex-col items-start gap-1">
            <div class="flex flex-col items-start gap-1"><div class="flex items-center gap-1 bg-black border border-emerald-500/20 rounded px-1"><button (click)="deckService.setBpm('B', deckService.deckB().bpm - 0.1)" class="text-slate-500 hover:text-white text-[10px]">-</button><button (click)="tapBpm('B')" class="text-[10px] font-mono text-emerald-400 active:text-white">{{ deckService.deckB().bpm | number:'1.0-1' }}</button><button (click)="deckService.setBpm('B', deckService.deckB().bpm + 0.1)" class="text-slate-500 hover:text-white text-[10px]">+</button></div><div class="flex gap-1"><button (click)="deckService.setBeatGridOffset('B', deckService.deckB().beatGridOffset - 0.01)" class="text-[8px] text-slate-600 hover:text-emerald-500">GRID <</button><button (click)="deckService.setBeatGridOffset('B', deckService.deckB().beatGridOffset + 0.01)" class="text-[8px] text-slate-600 hover:text-emerald-500">></button></div></div>
-          <div class="px-2 py-0.5 rounded bg-black border border-emerald-500/20 text-[8px] font-mono text-slate-400">{{ pitchBPercentage() }}</div>
+          <div class="px-2 py-0.5 rounded bg-black border border-emerald-500/20 text-[8px] font-mono text-slate-400">PITCH: {{ pitchBPercentage() }}</div>
         </div>
       </div>
 
@@ -205,7 +205,7 @@
         <button (click)="deckService.togglePlay('B')" class="flex-grow h-12 rounded bg-emerald-500 text-black font-black italic tracking-widest text-lg shadow-[0_0_20px_rgba(16,185,129,0.3)] active:scale-95 transition-all">
           <i class="fas" [class.fa-pause]="deckService.deckB().isPlaying" [class.fa-play]="!deckService.deckB().isPlaying"></i>
         </button>
-        <button class="w-12 h-10 rounded bg-slate-800 border border-white/10 text-[8px] font-black text-emerald-500 uppercase">SYNC</button>
+        <button (click)="sync('B')" class="w-12 h-10 rounded bg-slate-800 border border-white/10 text-[8px] font-black text-emerald-500 uppercase">SYNC</button>
       </div>
     </div>
   </div>

@@ -110,37 +110,36 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
       return;
     }
 
-    const step = Math.ceil(data.length / canvas.width);
+    // Pro Scrolling Waveform Logic
+    const sampleRate = this.engine.getContext().sampleRate || 44100;
+    const windowSize = 4; // 4 seconds visible
+    const samplesInWindow = windowSize * sampleRate;
+    const step = samplesInWindow / canvas.width;
+    const currentSample = deck.progress * sampleRate;
+    const startSample = Math.floor(currentSample - (samplesInWindow / 2));
     const amp = canvas.height / 2;
 
     ctx.strokeStyle = id === 'A' ? '#10b981' : '#f59e0b';
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 2;
     ctx.beginPath();
-
     for (let i = 0; i < canvas.width; i++) {
-      let min = 1.0;
-      let max = -1.0;
-      for (let j = 0; j < step; j++) {
-        const datum = data[i * step + j];
-        if (datum < min) min = datum;
-        if (datum > max) max = datum;
-      }
-      ctx.moveTo(i, (1 + min) * amp);
-      ctx.lineTo(i, (1 + max) * amp);
+        const idx = Math.floor(startSample + i * step);
+        if (idx >= 0 && idx < data.length) {
+            const val = data[idx];
+            ctx.moveTo(i, amp - val * amp);
+            ctx.lineTo(i, amp + val * amp);
+        }
     }
     ctx.stroke();
 
-    // Playhead
-    const progress = deck.progress / (deck.duration || 1);
-    const x = progress * canvas.width;
+    // Playhead fixed in center
     ctx.strokeStyle = '#f43f5e';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, canvas.height);
+    ctx.moveTo(canvas.width / 2, 0);
+    ctx.lineTo(canvas.width / 2, canvas.height);
     ctx.stroke();
   }
-
   private drawMeters() {
     this.drawMeter('A', this.meterA?.nativeElement);
     this.drawMeter('B', this.meterB?.nativeElement);
@@ -249,5 +248,9 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
       a.download = `mix-${Date.now()}.webm`;
       a.click();
     });
+  }
+
+  sync(deck: 'A' | 'B') {
+    this.deckService.sync(deck);
   }
 }
