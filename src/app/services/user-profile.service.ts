@@ -417,6 +417,12 @@ export class UserProfileService {
     const updatedProfile = { ...currentProfile };
 
     if (upgrade.type === 'Software' || upgrade.type === 'Service') {
+      if (!updatedProfile.daw.includes(upgrade.title)) {
+        updatedProfile.daw = [...updatedProfile.daw, upgrade.title];
+      }
+      if (!updatedProfile.vst_plugins.includes(upgrade.title)) {
+        updatedProfile.vst_plugins = [...updatedProfile.vst_plugins, upgrade.title];
+      }
        if (!updatedProfile.daw.includes(upgrade.title)) {
          updatedProfile.daw = [...updatedProfile.daw, upgrade.title];
        }
