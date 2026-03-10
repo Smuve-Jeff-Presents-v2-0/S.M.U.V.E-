@@ -421,6 +421,15 @@ export class UserProfileService {
         updatedProfile.daw = [...updatedProfile.daw, upgrade.title];
       }
     } else if (upgrade.type === "Gear") {
+    if (upgrade.type === 'Software') {
+      if (!updatedProfile.vst_plugins.includes(upgrade.title)) {
+        updatedProfile.vst_plugins = [...updatedProfile.vst_plugins, upgrade.title];
+      }
+    } else if (upgrade.type === 'Gear') {
+      if (!updatedProfile.equipment.includes(upgrade.title)) {
+        updatedProfile.equipment = [...updatedProfile.equipment, upgrade.title];
+      }
+    } else {
       if (!updatedProfile.equipment.includes(upgrade.title)) {
         updatedProfile.equipment = [...updatedProfile.equipment, upgrade.title];
       }
