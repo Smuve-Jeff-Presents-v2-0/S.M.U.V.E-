@@ -18,6 +18,7 @@ import { ExportService } from '../services/export.service';
 import { AudioEngineService } from '../services/audio-engine.service';
 import { AfterViewInit } from '@angular/core';
 import { NotificationService } from '../services/notification.service';
+import { PlayerService } from '../services/player.service';
 
 @Component({
   selector: 'app-hub',
@@ -36,20 +37,13 @@ export class HubComponent implements OnInit, OnDestroy, AfterViewInit {
   private exportService = inject(ExportService);
   private audioEngine = inject(AudioEngineService);
   private notificationService = inject(NotificationService);
-
-  // Games Data
+  public playerService = inject(PlayerService);
 
   // Quick Start Form
   quickProfile = signal({
     artistName: '',
     primaryGenre: 'Hip Hop',
   });
-
-  // Radio State
-  isRadioPlaying = computed(() => this.deckService.deckA().isPlaying);
-  radioTrackName = computed(
-    () => this.deckService.deckA().track?.name || 'S.M.U.V.E Radio'
-  );
 
   genres = ['Hip Hop', 'R&B', 'Pop', 'Electronic', 'Rock', 'Jazz', 'Classical'];
 
@@ -74,7 +68,7 @@ export class HubComponent implements OnInit, OnDestroy, AfterViewInit {
     const dataArray = new Uint8Array(bufferLength);
 
     const update = () => {
-      if (this.isRadioPlaying()) {
+      if (this.playerService.isPlaying()) {
         analyser.getByteFrequencyData(dataArray);
 
         // Map the frequency data to our 24 bars
@@ -92,7 +86,8 @@ export class HubComponent implements OnInit, OnDestroy, AfterViewInit {
         this.visualizerData.set(newData);
       } else {
         // Idling animation if not playing
-        this.visualizerData.set(new Array(24).fill(20));
+        const idle = this.visualizerData().map(v => Math.max(20, v * 0.95));
+        this.visualizerData.set(idle);
       }
       this.animFrame = requestAnimationFrame(update);
     };
@@ -119,60 +114,6 @@ export class HubComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.notificationService.show('Profile Created Successfully!', 'success');
     this.router.navigate(['/profile']);
-  }
-
-  // Radio Actions
-  toggleRadio() {
-    this.deckService.togglePlay('A');
-  }
-
-  async onUpload() {
-    if (!this.uiService.isOnline()) {
-      this.notificationService.show('Offline: Upload requires a connection', 'error');
-      return;
-    }
-
-    try {
-      const files = await this.fileLoader.pickLocalFiles('.mp3,.wav');
-      if (files.length > 0) {
-        const file = files[0];
-        const buffer = await this.fileLoader.decodeToAudioBuffer(
-          this.audioEngine.getContext(),
-          file
-        );
-        this.deckService.loadDeckBuffer('A', buffer, file.name);
-        if (!this.isRadioPlaying()) {
-          this.toggleRadio();
-        }
-        this.notificationService.show(`Loaded track: ${file.name}`, 'success');
-      }
-    } catch (error) {
-      console.error('Error uploading file:', error);
-      this.notificationService.show('Failed to load audio file.', 'error');
-    }
-  }
-
-  async onDownload() {
-    try {
-      const buffer = this.audioEngine.getDeck('A').buffer;
-      if (!buffer) {
-        this.notificationService.show('No track loaded to download!', 'warning');
-        return;
-      }
-
-      const wavBuffer = this.exportService.audioBufferToWav(buffer);
-      const wavBlob = new Blob([wavBuffer], { type: 'audio/wav' });
-      const url = URL.createObjectURL(wavBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = this.radioTrackName() + '.wav';
-      a.click();
-      URL.revokeObjectURL(url);
-      this.notificationService.show('Download started', 'success');
-    } catch (error) {
-      console.error('Error downloading file:', error);
-      this.notificationService.show('Failed to download audio file.', 'error');
-    }
   }
 
   // AI Jam Actions
