@@ -26,8 +26,6 @@ interface DeckChannel {
   stems: Stems | null;
   loopEnabled: boolean;
   hotCues: (number | null)[];
-  sendA: GainNode;
-  sendB: GainNode;
 }
 
 @Injectable({
@@ -130,8 +128,6 @@ export class AudioEngineService {
       filter: this.ctx.createBiquadFilter(),
       pan: this.ctx.createStereoPanner(),
       gain: this.ctx.createGain(),
-      sendA: this.ctx.createGain(),
-      sendB: this.ctx.createGain(),
       analyser: this.ctx.createAnalyser(),
       isPlaying: false,
       startTime: 0,
@@ -143,7 +139,6 @@ export class AudioEngineService {
       sendA: this.ctx.createGain(),
       sendB: this.ctx.createGain()
     };
-
     deck.sendA.gain.value = 0;
     deck.sendB.gain.value = 0;
 
@@ -176,12 +171,6 @@ export class AudioEngineService {
 
     deck.gain.connect(deck.analyser);
     deck.analyser.connect(this.masterGain);
-
-    // Sends
-    deck.gain.connect(deck.sendA);
-    deck.sendA.connect(this.reverbConvolver);
-    deck.gain.connect(deck.sendB);
-    deck.sendB.connect(this.masterGain);
 
     if (id === 'A') this.deckA = deck;
     else this.deckB = deck;

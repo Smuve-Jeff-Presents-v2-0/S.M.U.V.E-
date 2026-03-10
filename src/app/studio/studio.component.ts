@@ -1,4 +1,5 @@
-import { Component, inject, signal, effect } from '@angular/core';
+import { Component, inject, signal, effect, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TransportBarComponent } from './transport-bar/transport-bar.component';
 import { MixerComponent } from './mixer/mixer.component';
@@ -28,8 +29,9 @@ import { MusicManagerService } from '../services/music-manager.service';
   templateUrl: './studio.component.html',
   styleUrls: ['./studio.component.css']
 })
-export class StudioComponent {
+export class StudioComponent implements OnInit {
   private readonly audioSession = inject(AudioSessionService);
+  private readonly route = inject(ActivatedRoute);
   public readonly musicManager = inject(MusicManagerService);
 
   activeView = signal<'daw' | 'dj' | 'mastering'>('daw');
@@ -38,6 +40,20 @@ export class StudioComponent {
   showPianoRoll = signal(false);
 
   isRecording = this.audioSession.isRecording;
+
+
+  ngOnInit() {
+    this.route.url.subscribe(url => {
+      const path = url[0]?.path;
+      if (path === 'dj') {
+        this.activeView.set('dj');
+      } else if (path === 'mastering') {
+        this.activeView.set('mastering');
+      } else {
+        this.activeView.set('daw');
+      }
+    });
+  }
 
   constructor() {
     effect(() => {
