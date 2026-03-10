@@ -33,6 +33,12 @@ export class PlayerService {
 
   isPlaying = computed(() => this.deckService.deckA().isPlaying);
   currentTrack = computed(() => this.playlist()[this.currentIndex()]);
+  isPlaying = computed(() => this.deckService.deckA().isPlaying);
+  currentTrack = signal<GlobalTrack | null>({
+    id: 'default',
+    title: 'S.M.U.V.E Radio Broadcast',
+    artist: 'AI SYNDICATE'
+  });
 
   progress = computed(() => {
     const d = this.deckService.deckA();
@@ -80,6 +86,13 @@ export class PlayerService {
     } else {
       console.log('PlayerService: Track has no buffer, skipping auto-load');
     }
+    console.log('PlayerService: Skipping to next track');
+    // Implement playlist logic if needed
+  }
+
+  previous() {
+    console.log('PlayerService: Returning to previous track');
+    // Implement playlist logic if needed
   }
 
   toggleShuffle() { this.isShuffle.set(!this.isShuffle()); }
@@ -95,6 +108,8 @@ export class PlayerService {
       );
 
       const newTrack: GlobalTrack = {
+      this.deckService.loadDeckBuffer('A', buffer, file.name);
+      this.currentTrack.set({
         id: Date.now().toString(),
         title: file.name.replace(/\.[^/.]+$/, ""),
         artist: 'Local Import',
@@ -104,6 +119,7 @@ export class PlayerService {
       this.playlist.update(p => [newTrack, ...p]);
       this.currentIndex.set(0);
       this.deckService.loadDeckBuffer('A', buffer, file.name);
+      });
       if (!this.isPlaying()) this.togglePlay();
     }
   }
@@ -117,6 +133,7 @@ export class PlayerService {
     const a = document.createElement('a');
     a.href = url;
     a.download = `${this.currentTrack()?.title || 'exported_track'}.wav`;
+    a.download = `${this.currentTrack()?.title}.wav`;
     a.click();
     URL.revokeObjectURL(url);
   }
