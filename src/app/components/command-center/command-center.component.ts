@@ -57,7 +57,8 @@ export class CommandCenterComponent implements OnInit, OnDestroy {
     }, 500);
   }
 
-    acquireUpgrade(rec: UpgradeRecommendation) {
+    async acquireUpgrade(rec: UpgradeRecommendation) {
+    await this.profileService.acquireUpgrade({ title: rec.title, type: rec.type });
     if (rec.url) {
       window.open(rec.url, '_blank');
     }

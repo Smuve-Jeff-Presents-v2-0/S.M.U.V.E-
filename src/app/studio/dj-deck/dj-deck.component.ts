@@ -12,7 +12,7 @@ import {
   AfterViewInit,
   HostListener
 } from '@angular/core';
-import { CommonModule, TitleCasePipe, DecimalPipe } from '@angular/common';
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { AppTheme } from '../../services/user-context.service';
 import { FileLoaderService } from '../../services/file-loader.service';
 import { ExportService } from '../../services/export.service';
@@ -27,7 +27,7 @@ import { UIService } from '../../services/ui.service';
   templateUrl: './dj-deck.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [CommonModule, FormsModule, TitleCasePipe, DecimalPipe],
+  imports: [CommonModule, FormsModule, DecimalPipe],
 })
 export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('waveformA') waveformA!: ElementRef<HTMLCanvasElement>;
