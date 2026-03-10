@@ -59,7 +59,7 @@ export class StudioComponent implements OnInit {
     effect(() => {
       const selectedId = this.musicManager.selectedTrackId();
       if (selectedId) {
-        this.showPianoRoll.set(true);
+        if (this.activeView() !== "dj") this.showPianoRoll.set(true);
       }
     });
   }

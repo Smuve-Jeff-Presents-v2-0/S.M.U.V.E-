@@ -412,6 +412,23 @@ export class UserProfileService {
     }
   }
 
+  async acquireUpgrade(upgrade: { title: string; type: string }): Promise<void> {
+    const currentProfile = this.profile();
+    const updatedProfile = { ...currentProfile };
+
+    if (upgrade.type === "Software" || upgrade.type === "Service") {
+      if (!updatedProfile.daw.includes(upgrade.title)) {
+        updatedProfile.daw = [...updatedProfile.daw, upgrade.title];
+      }
+    } else if (upgrade.type === "Gear") {
+      if (!updatedProfile.equipment.includes(upgrade.title)) {
+        updatedProfile.equipment = [...updatedProfile.equipment, upgrade.title];
+      }
+    }
+
+    await this.updateProfile(updatedProfile);
+  }
+
   async updateProfile(newProfile: UserProfile): Promise<void> {
     try {
       await this.databaseService.saveUserProfile(newProfile);

@@ -12,7 +12,7 @@ import {
   AfterViewInit,
   HostListener
 } from '@angular/core';
-import { CommonModule, TitleCasePipe, DecimalPipe } from '@angular/common';
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { AppTheme } from '../../services/user-context.service';
 import { FileLoaderService } from '../../services/file-loader.service';
 import { ExportService } from '../../services/export.service';
@@ -21,13 +21,15 @@ import { FormsModule } from '@angular/forms';
 import { DeckService } from '../../services/deck.service';
 import { AudioEngineService } from '../../services/audio-engine.service';
 import { UIService } from '../../services/ui.service';
+import { UserProfileService } from '../../services/user-profile.service';
+import { PlayerService } from '../../services/player.service';
 
 @Component({
   selector: 'app-dj-deck',
   templateUrl: './dj-deck.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [CommonModule, FormsModule, TitleCasePipe, DecimalPipe],
+  imports: [CommonModule, FormsModule, DecimalPipe],
 })
 export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('waveformA') waveformA!: ElementRef<HTMLCanvasElement>;
@@ -41,6 +43,7 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
   phantomPowerEnabled = signal(false);
   showSampleLibrary = signal(false);
   isMobile = signal(false);
+  masterVolume = signal(0.85);
 
   private recorder: MediaRecorder | null = null;
   recording = signal(false);
@@ -49,6 +52,17 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
   private syncInterval: any = null;
   performanceMode = signal<"cue" | "roll" | "sampler">("cue");
   private tapTimes: { [key: string]: number[] } = { A: [], B: [] };
+
+  public uiService = inject(UIService);
+  private profileService = inject(UserProfileService);
+  public playerService = inject(PlayerService);
+
+  hasNeuralStems = computed(() => {
+    const profile = this.profileService.profile();
+    return profile.daw.includes('Neural Audio Interface V1 (Prototype)') ||
+           profile.equipment.includes('Neural Audio Interface V1 (Prototype)') ||
+           profile.daw.includes('Sub-Atomic Kick Dominance Pack');
+  });
 
   pitchAPercentage = computed(
     () => `${(this.deckService.deckA().playbackRate * 100).toFixed(1)}%`
@@ -123,9 +137,8 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
       return;
     }
 
-    // Pro Scrolling Waveform Logic
     const sampleRate = this.engine.getContext().sampleRate || 44100;
-    const windowSize = 4; // 4 seconds visible
+    const windowSize = 4;
     const samplesInWindow = windowSize * sampleRate;
     const step = samplesInWindow / canvas.width;
     const currentSample = deck.progress * sampleRate;
@@ -145,7 +158,6 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     ctx.stroke();
 
-    // Playhead fixed in center
     ctx.strokeStyle = '#f43f5e';
     ctx.lineWidth = 3;
     ctx.beginPath();
@@ -153,6 +165,7 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
     ctx.lineTo(canvas.width / 2, canvas.height);
     ctx.stroke();
   }
+
   private drawMeters() {
     this.drawMeter('A', this.meterA?.nativeElement);
     this.drawMeter('B', this.meterB?.nativeElement);
@@ -175,7 +188,7 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     ctx.fillStyle = gradient;
-    const h = level * canvas.height;
+    const h = Math.min(canvas.height, level * canvas.height * 1.5);
     ctx.fillRect(0, canvas.height - h, canvas.width, h);
   }
 
@@ -212,11 +225,6 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
       const d = deck === 'A' ? this.deckService.deckA() : this.deckService.deckB();
       if (d.hotCues[index] === null) this.deckService.setHotCue(deck, index);
       else this.deckService.jumpToHotCue(deck, index);
-    } else if (mode === 'roll') {
-      const rollLengths = [0.0625, 0.125, 0.25, 0.5, 1, 2, 4, 8];
-      console.log(`Roll active: ${rollLengths[index]} beats on Deck ${deck}`);
-    } else if (mode === 'sampler') {
-      console.log(`Trigger Sample ${index + 1} on Deck ${deck}`);
     }
   }
 
@@ -242,6 +250,16 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
 
   setGain(deck: 'A' | 'B', val: any) {
     this.deckService.setDeckGain(deck, parseFloat(val));
+  }
+
+  setSend(deck: 'A' | 'B', send: 'A' | 'B', val: any) {
+    this.deckService.setDeckSend(deck, send, parseFloat(val));
+  }
+
+  setMasterVolume(val: any) {
+    const v = parseFloat(val);
+    this.masterVolume.set(v);
+    this.engine.setMasterOutputLevel(v);
   }
 
   startStopRecording() {
