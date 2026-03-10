@@ -37,8 +37,20 @@ export class PlayerService {
   currentTrack = signal<GlobalTrack | null>({
     id: 'default',
     title: 'S.M.U.V.E Radio Broadcast',
-    artist: 'AI SYNDICATE'
-  });
+  /**
+   * Keep DeckService's deck state (isPlaying/progress/etc) fresh across the app (e.g. Hub),
+   * since syncProgress() was previously only driven by the DJ deck component.
+   */
+  private readonly _progressSyncIntervalId: number | null = (() => {
+    // DeckService.syncProgress() signature varies; call defensively.
+    const sync = () => (this.deckService as any).syncProgress?.();
+    return typeof globalThis !== 'undefined' && typeof globalThis.setInterval === 'function'
+      ? globalThis.setInterval(sync, 100)
+      : null;
+  })();
+
+  isPlaying = computed(() => this.deckService.deckA().isPlaying);
+  currentTrack = computed(() => this.playlist()[this.currentIndex()]);
 
   progress = computed(() => {
     const d = this.deckService.deckA();
@@ -49,6 +61,8 @@ export class PlayerService {
   isRepeat = signal(false);
 
   togglePlay() {
+    // Ensure DeckState is up-to-date before togglePlay branches on isPlaying.
+    (this.deckService as any).syncProgress?.();
     this.deckService.togglePlay('A');
   }
 
