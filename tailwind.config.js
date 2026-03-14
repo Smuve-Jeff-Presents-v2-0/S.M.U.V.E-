@@ -36,11 +36,21 @@ export default {
         "extreme-surface": "#3a2a1f",
         "extreme-panel": "#2d1e16",
         "extreme-titanium-dark": "#1a1a1a",
+        vocal: {
+          primary: '#9d00ff',
+          'background-light': '#f7f5f8',
+          'background-dark': '#0a060c',
+          obsidian: '#140c1a',
+          titanium: '#2d2433',
+          oled: '#020102'
+        }
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
         mono: ['Fira Code', 'monospace'],
         display: ["Public Sans", 'Inter', 'sans-serif'],
+        display: ['Inter', 'sans-serif'],
+        'vocal-display': ['Public Sans', 'sans-serif'],
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out',

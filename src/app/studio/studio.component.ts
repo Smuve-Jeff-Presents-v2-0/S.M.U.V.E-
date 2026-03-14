@@ -16,6 +16,7 @@ import { AudioEngineService } from '../services/audio-engine.service';
 import { AiService } from '../services/ai.service';
 import { UIService } from '../services/ui.service';
 import { SynthesizerComponent } from './synthesizer/synthesizer.component';
+import { VocalSuiteComponent } from './vocal-suite/vocal-suite.component';
 
 @Component({
   selector: 'app-studio',
@@ -32,6 +33,7 @@ import { SynthesizerComponent } from './synthesizer/synthesizer.component';
     WaveformRendererComponent,
     SynthesizerComponent,
     MasteringSuiteComponent
+    VocalSuiteComponent
   ],
   templateUrl: './studio.component.html',
   styleUrls: ['./studio.component.css']
@@ -44,7 +46,7 @@ export class StudioComponent implements OnInit, OnDestroy, AfterViewInit {
   private readonly route = inject(ActivatedRoute);
   public readonly musicManager = inject(MusicManagerService);
 
-  activeView = signal<'dj' | 'piano-roll' | 'mixer' | 'performance' | 'mastering'>('dj');
+  activeView = signal<'dj' | 'piano-roll' | 'mixer' | 'performance' | 'mastering' | 'vocal-suite'>('dj');
   showMixer = signal(true);
   showRack = signal(true);
   showPianoRoll = signal(false);
@@ -57,7 +59,7 @@ export class StudioComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnInit() {
     this.route.url.subscribe(url => {
       const path = url[0]?.path;
-      if (path === 'dj' || path === 'mixer' || path === 'piano-roll') {
+      if (path === 'dj' || path === 'mixer' || path === 'piano-roll' || path === 'vocal-suite') {
         this.activeView.set(path as any);
       }
     });

@@ -58,6 +58,20 @@
         <button (click)="showMixer.set(!showMixer())" class="text-[10px] font-black uppercase tracking-widest transition-all" [class.text-primary]="showMixer()" [class.text-slate-500]="!showMixer()">Mixer</button>
         <button (click)="showRack.set(!showRack())" class="text-[10px] font-black uppercase tracking-widest transition-all" [class.text-primary]="showRack()" [class.text-slate-500]="!showRack()">Rack</button>
      </div>
+  <!-- VIEW TABS -->
+  <div class="flex items-center gap-2 px-8 py-4 bg-brand-surface/20 shrink-0 border-b border-white/10">
+     @for (view of ['dj', 'piano-roll', 'mixer', 'vocal-suite', 'performance', 'mastering']; track view) {
+        <button (click)="activeView.set($any(view))"
+                class="px-5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 border"
+                [class.bg-brand-primary/10]="activeView() === view"
+                [class.border-brand-primary/30]="activeView() === view"
+                [class.text-brand-primary]="activeView() === view"
+                [class.border-transparent]="activeView() !== view"
+                [class.text-silver-dim]="activeView() !== view"
+                [class.hover:text-white]="activeView() !== view">
+           {{ view.replace('-', ' ') }}
+        </button>
+     }
   </div>
 
   <!-- MAIN WORKSPACE -->
@@ -84,6 +98,16 @@
            <h2 class="text-xl font-black text-white uppercase tracking-widest mb-4">Performance Rehearsal Lab</h2>
            <p class="text-xs text-slate-400 leading-relaxed font-medium">Neural stage simulation is active. Connect hardware triggers to initialize the executive visual metronome and performance protocols.</p>
            <button (click)="uiService.navigateToView('practice')" class="mt-8 btn-elegant btn-elegant-primary text-[10px] font-black uppercase w-full py-3">Open Practice Space</button>
+     <div class="absolute inset-0 transition-opacity duration-500" [class.opacity-100]="activeView() === 'vocal-suite'" [class.pointer-events-none]="activeView() !== 'vocal-suite'" [class.opacity-0]="activeView() !== 'vocal-suite'">
+        <app-vocal-suite></app-vocal-suite>
+     </div>
+
+     <div class="absolute inset-0 flex items-center justify-center" *ngIf="activeView() === 'performance' || activeView() === 'mastering'">
+        <div class="text-center p-12 glass-panel rounded-3xl border border-white/10 max-w-md">
+           <i class="fas fa-microchip text-4xl text-brand-primary mb-6 animate-pulse-subtle"></i>
+           <h2 class="text-xl font-bold text-white uppercase tracking-widest mb-2">{{ activeView() | uppercase }} SUITE</h2>
+           <p class="text-xs text-silver-dim leading-relaxed">Neural calibration in progress. This high-fidelity environment requires specific gear upgrades to initialize full visual frequency analysis.</p>
+           <button (click)="uiService.navigateToView('career')" class="mt-6 btn-elegant btn-elegant-primary text-[10px] font-black uppercase w-full">View Strategic Upgrades</button>
         </div>
      </div>
 
