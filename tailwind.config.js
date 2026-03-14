@@ -25,12 +25,22 @@ export default {
           DEFAULT: '#cbd5e1', // Slate 300
           bright: '#f8fafc', // Slate 50
           dim: '#94a3b8', // Slate 400
-        }
+        },
+        "primary": "#ec5b13",
+        "background-light": "#f8f6f6",
+        "background-dark": "#221610",
+        "extreme-obsidian": "#0d0d0d",
+        "extreme-titanium": "#2a2a2a",
+        "accent-purple": "#a855f7",
+        "accent-magenta": "#d946ef",
+        "extreme-surface": "#3a2a1f",
+        "extreme-panel": "#2d1e16",
+        "extreme-titanium-dark": "#1a1a1a",
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
         mono: ['Fira Code', 'monospace'],
-        display: ['Inter', 'sans-serif'],
+        display: ["Public Sans", 'Inter', 'sans-serif'],
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out',
