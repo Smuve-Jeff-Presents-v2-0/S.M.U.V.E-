@@ -16,6 +16,7 @@ import { LearnedStyle, ProductionSecret, TrendData, UpgradeRecommendation, Profi
 import { UserContextService, MainViewMode } from './user-context.service';
 import { AnalyticsService } from './analytics.service';
 import { MarketingService } from './marketing.service';
+import { UIService } from './ui.service';
 
 export const API_KEY_TOKEN = new InjectionToken<string>('API_KEY');
 
@@ -34,7 +35,16 @@ export interface StrategicRecommendation {
   action: string;
   impact: 'Extreme' | 'High' | 'Medium' | 'Low';
   difficulty: 'High' | 'Medium' | 'Low';
-  toolId: string;
+  toolId: MainViewMode;
+}
+
+export interface SystemStatus {
+  cpuLoad: number;
+  neuralSync: number;
+  memoryUsage: number;
+  latency: number;
+  marketVelocity: number;
+  activeProcesses: number;
 }
 
 @Injectable({
@@ -48,6 +58,7 @@ export class AiService {
   private reputationService = inject(ReputationService);
   private stemSeparationService = inject(StemSeparationService);
   private audioEngineService = inject(AudioEngineService);
+  private uiService = inject(UIService);
 
   advisorAdvice = signal<AdvisorAdvice[]>([]);
   currentStrategyMode = signal<"growth" | "retention" | "experimental">("growth");
@@ -61,6 +72,15 @@ export class AiService {
 
   strategicDecrees = signal<string[]>(['PIVOT FOCUS TO NEURAL NODE 07. MARKET RESONANCE PEAKING.', 'MAXIMIZE STREAMING REVENUE', 'ELIMINATE WEAK CONTENT']);
 
+  systemStatus = signal<SystemStatus>({
+    cpuLoad: 12.4,
+    neuralSync: 98.2,
+    memoryUsage: 45.1,
+    latency: 1.2,
+    marketVelocity: 88.5,
+    activeProcesses: 42
+  });
+
   constructor() {
     effect(() => {
       const view = this.userContextService.mainViewMode();
@@ -68,14 +88,70 @@ export class AiService {
       this.updateAdvisorAdvice(view, profile);
       this.generateDynamicDecrees(profile);
     });
+
+    // Simulate system fluctuations
+    setInterval(() => {
+      this.systemStatus.update(s => ({
+        ...s,
+        cpuLoad: Math.min(100, Math.max(0, s.cpuLoad + (Math.random() - 0.5) * 2)),
+        neuralSync: Math.min(100, Math.max(90, s.neuralSync + (Math.random() - 0.5) * 0.5)),
+        latency: Math.min(10, Math.max(0.5, s.latency + (Math.random() - 0.5) * 0.1))
+      }));
+    }, 3000);
   }
 
   private generateDynamicDecrees(profile: UserProfile) {
     const decrees: string[] = [];
     const genre = profile.primaryGenre || 'Music';
-    if (profile.expertiseLevels?.production < 6) decrees.push(`COMMAND: ${genre.toUpperCase()} DEFICIT DETECTED.`);
-    if (decrees.length === 0) decrees.push('DOMINATE THE AIRWAVES');
+
+    if (profile.expertiseLevels?.production < 6) {
+      decrees.push(`COMMAND: ${genre.toUpperCase()} DEFICIT DETECTED. INITIALIZE TECHNICAL AUDIT.`);
+    }
+
+    const status = this.systemStatus();
+    if (status.cpuLoad > 80) {
+      decrees.push('ALERT: SYSTEM THERMALS RISING. OPTIMIZE COMPOSITION NODES.');
+    }
+
+    if (this.reputationService.state().level > 5) {
+      decrees.push('ELITE CLEARANCE DETECTED. ACCESSING HIGH-LEVEL STRATEGIC ARTIFACTS.');
+    }
+
+    if (decrees.length === 0) decrees.push('DOMINATE THE AIRWAVES. NO FAILURES PERMITTED.');
+
     this.strategicDecrees.set(decrees);
+  }
+
+  async processCommand(command: string): Promise<string> {
+    const cmd = command.toLowerCase().trim();
+
+    if (cmd === '/audit') {
+      await this.runProfileAudit();
+      return 'PROFILE AUDIT COMPLETE. DATA SYNCED TO HUD.';
+    }
+
+    if (cmd === '/master') {
+      this.uiService.navigateToView('studio');
+      return 'INITIALIZING MASTERING SUITE PROTOTYPES.';
+    }
+
+    if (cmd === '/studio') {
+      this.uiService.navigateToView('studio');
+      return 'UPLINK ESTABLISHED TO ANALOG ENGINE.';
+    }
+
+    if (cmd === '/reputation') {
+      const state = this.reputationService.state();
+      return `CURRENT STATUS: ${state.title.toUpperCase()} (LEVEL ${state.level}). XP TO NEXT RANK: ${100 - state.xp % 100}%`;
+    }
+
+    if (cmd.startsWith('/set-theme ')) {
+      const theme = cmd.replace('/set-theme ', '');
+      this.uiService.setTheme(theme);
+      return `INTERFACE SHIFTING TO ${theme.toUpperCase()} SPECIFICATIONS.`;
+    }
+
+    return `UNKNOWN COMMAND: ${command.toUpperCase()}. CONSULT SYSTEM DIRECTORY.`;
   }
 
   async runProfileAudit(): Promise<ProfileAuditResult> {
@@ -165,7 +241,7 @@ export class AiService {
   async transcribeAudio(b: string, m: string): Promise<string> { return "Done."; }
   async studyTrack(b: AudioBuffer, n: string): Promise<void> {}
   async getStrategicRecommendations(): Promise<StrategicRecommendation[]> {
-    return [{ id: 's1', action: 'Optimize', impact: 'High', difficulty: 'Medium', toolId: 'mastering' }];
+    return [{ id: 's1', action: 'Optimize', impact: 'High', difficulty: 'Medium', toolId: 'studio' }];
   }
 }
 

@@ -1,26 +1,24 @@
 import {
   Component,
-  ElementRef,
-  EventEmitter,
-  Output,
-  ViewChild,
-  signal,
   inject,
-  OnInit,
-  input,
+  signal,
+  effect,
+  output,
   computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AiService } from '../../services/ai.service';
 import { UserProfileService } from '../../services/user-profile.service';
-import { SpeechSynthesisService } from '../../services/speech-synthesis.service';
-import { UserContextService } from '../../services/user-context.service';
-import { LibraryService } from '../../services/library.service';
 import { AudioEngineService } from '../../services/audio-engine.service';
-import { COMMANDS, Command, isExecutingCommand } from './chatbot.commands';
+import { SpeechSynthesisService } from '../../services/speech-synthesis.service';
+import { UserContextService, MainViewMode } from '../../services/user-context.service';
+import { UIService } from '../../services/ui.service';
 
-type MainViewMode = 'hub' | 'studio' | 'practice' | 'strategy' | 'profile' | 'tha-spot' | 'image-editor' | 'piano-roll' | 'networking' | 'player' | 'dj' | 'video-editor' | 'login' | 'projects' | 'remix-arena' | 'image-video-lab';
+interface ChatMessage {
+  role: 'user' | 'model';
+  content: string;
+}
 
 @Component({
   selector: 'app-chatbot',
@@ -29,248 +27,72 @@ type MainViewMode = 'hub' | 'studio' | 'practice' | 'strategy' | 'profile' | 'th
   templateUrl: './chatbot.component.html',
   styleUrls: ['./chatbot.component.css'],
 })
-export class ChatbotComponent implements OnInit {
-  mainViewMode = input<MainViewMode>('hub');
-  @Output() close = new EventEmitter<void>();
-  @Output() appCommand = new EventEmitter<{
-    action: string;
-    parameters: { [key: string]: unknown };
-  }>();
-
-  @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
-
+export class ChatbotComponent {
   private aiService = inject(AiService);
   private userProfileService = inject(UserProfileService);
+  private audioEngineService = inject(AudioEngineService);
   private speechSynthesisService = inject(SpeechSynthesisService);
   private userContext = inject(UserContextService);
-  private libraryService = inject(LibraryService);
-  private audioEngineService = inject(AudioEngineService);
+  private uiService = inject(UIService);
 
-  messages = signal<{ role: 'user' | 'model'; content: string }[]>([]);
+  close = output<void>();
+
+  messages = signal<ChatMessage[]>([
+    {
+      role: 'model',
+      content:
+        "S.M.U.V.E 4.0 Neural Link Established. I am your Strategic Commander. My goal is to ensure your musical journey is not just successful, but dominant. How shall we begin?",
+    },
+  ]);
+
   userInput = signal('');
   isLoading = signal(false);
-  isAiAvailable = computed(() => this.aiService.isAiAvailable());
 
-  private mediaRecorder: MediaRecorder | null = null;
-  private audioChunks: Blob[] = [];
+  mainViewMode = computed(() => this.userContext.mainViewMode());
 
-  ngOnInit(): void {
-    const profile = this.userProfileService.profile();
-    const initialMessage = `S.M.U.V.E 4.0 ONLINE. Elite strategic protocols initialized for ${profile.artistName || 'Subject'}. Our current objective is absolute industry dominance. How shall we proceed, Architect?`;
-    this.messages.set([{ role: 'model', content: initialMessage }]);
-    this.speechSynthesisService.speak(initialMessage);
-
-    this.giveContextualAdvice(this.mainViewMode());
+  constructor() {
+    effect(() => {
+      const mode = this.mainViewMode();
+      this.giveContextualAdvice(mode);
+    });
   }
 
   async sendMessage(): Promise<void> {
-    const text = this.userInput().trim();
-    if (!text || this.isLoading()) return;
+    const message = this.userInput().trim();
+    if (!message) return;
 
-    this.messages.update((msgs) => [...msgs, { role: 'user', content: text }]);
+    this.messages.update((m) => [...m, { role: 'user', content: message }]);
     this.userInput.set('');
     this.isLoading.set(true);
 
     try {
-      const commandFound = this.parseCommand(text);
-      if (commandFound) {
-        this.isLoading.set(false);
-        return;
-      }
-
-      const chat = this.aiService.chatInstance();
-      if (!chat) {
-        throw new Error('AI Chat instance not available.');
-      }
-
-      const response = await chat.sendMessage(this.buildContextualPrompt(text));
-      if (response && response.text) {
-        this.messages.update((msgs) => [
-          ...msgs,
-          { role: 'model', content: response.text },
-        ]);
-        this.speechSynthesisService.speak(response.text);
-      }
-    } catch (e) {
-      this.handleError(e, 'message processing');
-    }
-    this.isLoading.set(false);
-    this.scrollToBottom();
-  }
-
-  private parseCommand(text: string): boolean {
-    const upperText = text.toUpperCase();
-    for (const cmd of COMMANDS) {
-      if (upperText.startsWith(cmd.name)) {
-        const params: { [key: string]: string } = {};
-        if (cmd.params) {
-          cmd.params.forEach((p) => {
-            const regex = new RegExp(`${p.name}=(\\S+)`, 'i');
-            const match = text.match(regex);
-            if (match) params[p.name] = match[1];
-          });
-        }
-        this.executeCommand(cmd, params);
-        return true;
-      }
-    }
-    return false;
-  }
-
-  private async executeCommand(
-    cmd: Command,
-    params: { [key: string]: string }
-  ): Promise<void> {
-    isExecutingCommand.set(true);
-    this.messages.update((msgs) => [
-      ...msgs,
-      { role: 'model', content: `[EXECUTING COMMAND: ${cmd.name}]...` },
-    ]);
-    try {
-      await cmd.execute(params, this as any);
-    } catch (e) {
-      this.handleError(e, `command ${cmd.name}`);
-    }
-    isExecutingCommand.set(false);
-    this.scrollToBottom();
-  }
-
-  private scrollToBottom(): void {
-    setTimeout(() => {
-      if (this.scrollContainer) {
-        this.scrollContainer.nativeElement.scrollTop =
-          this.scrollContainer.nativeElement.scrollHeight;
-      }
-    }, 100);
-  }
-
-  async sendGoogleSearchQuery(query: string): Promise<void> {
-    const content = `[SEARCHING GOOGLE]: "${query}"... Simulation: found several relevant articles regarding modern music marketing and distribution trends. S.M.U.V.E suggests focusing on short-form video content to drive engagement.`;
-    this.messages.update((msgs) => [...msgs, { role: 'model', content }]);
-    this.speechSynthesisService.speak(content);
-  }
-
-  async sendDeepQuery(query: string): Promise<void> {
-    const content = `[DEEP ANALYSIS]: Performing multi-layered simulation for "${query}"... Based on historical data and current market volatility, the optimal path is a staggered release schedule with limited edition physical assets.`;
-    this.messages.update((msgs) => [...msgs, { role: 'model', content }]);
-    this.speechSynthesisService.speak(content);
-  }
-
-  async sendGoogleMapsQuery(location: string): Promise<void> {
-    const content = `[MAPS]: Locating "${location}"... Identified several high-traffic performance venues and rehearsal spaces in the vicinity. Strategic recommendation: target 'The Soundstage' for your next showcase.`;
-    this.messages.update((msgs) => [...msgs, { role: 'model', content }]);
-    this.speechSynthesisService.speak(content);
-  }
-
-  analyzeImage(url: string, prompt: string): void {
-    const content = `[IMAGE ANALYSIS]: Analyzing visual assets at ${url}... The aesthetic is highly compatible with the '${this.userProfileService.profile().primaryGenre}' genre. S.M.U.V.E recommends increasing color saturation and adding a film grain effect for a more authentic 'analog' vibe.`;
-    this.messages.update((msgs) => [...msgs, { role: 'model', content }]);
-    this.speechSynthesisService.speak(content);
-  }
-
-  async analyzeVideo(track: string, prompt: string): Promise<void> {
-    const context = `Analyze this video meta-data for the track: "${track}". User prompt: "${prompt}". Provide a concise analysis based on this metadata.`;
-    try {
-      const response = await this.aiService.generateContent({
-        model: 'gemini-1.5-pro',
-        contents: [{ role: 'user', parts: [{ text: context }] }],
-      });
-      if (response && response.text) {
-        this.messages.update((msgs) => [
-          ...msgs,
-          { role: 'model', content: `[VIDEO ANALYSIS]: ${response.text}` },
-        ]);
-        this.speechSynthesisService.speak(response.text);
+      if (message.startsWith('/')) {
+        const response = await this.aiService.processCommand(message);
+        this.messages.update((m) => [...m, { role: 'model', content: response }]);
+        this.speechSynthesisService.speak(response);
+      } else if (message.toUpperCase().includes('AUTO_MIX')) {
+        await this.autoMix();
+      } else if (message.toUpperCase().includes('LEAD_BAND')) {
+        const instruction = message.split('LEAD_BAND')[1]?.trim() || 'standard';
+        await this.leadBand(instruction);
+      } else if (message.toUpperCase().includes('CRITIQUE_VISUALS')) {
+        await this.critiqueVisuals();
+      } else if (message.toUpperCase().includes('NEGOTIATE_CONTRACT')) {
+        const type = message.split('NEGOTIATE_CONTRACT')[1]?.trim() || 'General';
+        await this.negotiateContract(type);
+      } else if (message.toUpperCase().includes('MIMIC')) {
+        const style = message.split('MIMIC')[1]?.trim() || 'Auteur';
+        await this.mimicStyle(style);
+      } else {
+        const response = await this.aiService.generateContent({
+          contents: [{ role: 'user', parts: [{ text: this.buildContextualPrompt(message) }] }],
+        });
+        const content = response.text || "Command processed. Proceeding with caution.";
+        this.messages.update((m) => [...m, { role: 'model', content }]);
+        this.speechSynthesisService.speak(content);
       }
     } catch (e) {
-      this.handleError(e, 'video analysis');
-    }
-  }
-
-  async startAudioTranscription(): Promise<void> {
-    if (this.isLoading()) {
-      this.mediaRecorder?.stop();
-      this.isLoading.set(false);
-      return;
-    }
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      this.mediaRecorder = new MediaRecorder(stream);
-      this.audioChunks = [];
-      this.mediaRecorder.ondataavailable = (event) =>
-        this.audioChunks.push(event.data);
-      this.mediaRecorder.onstop = async () => {
-        stream.getTracks().forEach((track) => track.stop());
-        const audioBlob = new Blob(this.audioChunks);
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-          const base64Audio = (e.target?.result as string).split(',')[1];
-          await this.transcribeAudio(base64Audio, audioBlob.type);
-        };
-        reader.readAsDataURL(audioBlob);
-      };
-      this.mediaRecorder.start();
-      this.isLoading.set(true);
-    } catch (e) {
-      this.handleError(e, 'microphone access');
-    }
-  }
-
-  async transcribeAudio(base64Audio: string, mimeType: string): Promise<void> {
-    this.isLoading.set(true);
-    try {
-      const transcription = await this.aiService.transcribeAudio(
-        base64Audio,
-        mimeType
-      );
-      this.messages.update((msgs) => [
-        ...msgs,
-        { role: 'model', content: `[TRANSCRIPTION]: ${transcription}` },
-      ]);
-      this.speechSynthesisService.speak(transcription);
-    } catch (e) {
-      this.handleError(e, 'audio transcription');
-    }
-    this.isLoading.set(false);
-  }
-
-  async studyTrack(trackId: string): Promise<void> {
-    this.isLoading.set(true);
-    try {
-      const track = this.libraryService.items().find((i) => i.id === trackId);
-      if (!track) {
-        throw new Error('Track not found in library.');
-      }
-      const blob = await this.libraryService.getOffline(trackId);
-      if (!blob) {
-        throw new Error('Audio data not available offline.');
-      }
-      const buffer = await blob.arrayBuffer();
-      const audioContext = new (
-        window.AudioContext || (window as any).webkitAudioContext
-      )();
-      const audioBuffer = await audioContext.decodeAudioData(buffer);
-
-      await this.aiService.studyTrack(audioBuffer, track.name);
-
-      const content = `Study complete for "${track.name}". I have added its signature characteristics to my Knowledge Base. I am ready to MIMIC this style whenever you command it.`;
-      this.messages.update((m) => [...m, { role: 'model', content }]);
-      this.speechSynthesisService.speak(content);
-    } catch (e) {
-      this.handleError(e, 'track study');
-    }
-    this.isLoading.set(false);
-  }
-
-  async researchArtist(artistName: string): Promise<void> {
-    this.isLoading.set(true);
-    try {
-      await this.aiService.researchArtist(artistName);
-      const content = `Research complete for "${artistName}". My core knowledge has been updated with their production secrets. I have also adjusted current industry trends based on this analysis.`;
-      this.messages.update((m) => [...m, { role: 'model', content }]);
-      this.speechSynthesisService.speak(content);
-    } catch (e) {
-      this.handleError(e, 'artist research');
+      this.handleError(e, 'communication');
     }
     this.isLoading.set(false);
   }
@@ -430,6 +252,9 @@ Would you like me to breakdown a specific section or MIMIC a learned style?`;
         case 'strategy':
           advice = `A warrior without a plan is a casualty. Your ${profile.primaryGenre} rollout must be flawless. Try: NEGOTIATE_CONTRACT type=Global Distribution. I will ensure you retain your master rights.`;
           break;
+        case 'career':
+          advice = `The Command Center is your war room. I have initialized high-level neural sync for this session. Use /audit to begin a full profile scan, or explore the Hardware Expansion modules to eliminate technical deficits.`;
+          break;
       }
 
       // Proactive Compliance Check
@@ -453,8 +278,14 @@ Would you like me to breakdown a specific section or MIMIC a learned style?`;
 
   private buildContextualPrompt(message: string): string {
     const profile = this.userProfileService.profile();
+    const status = this.aiService.systemStatus();
     const context = `
       System Persona: You are S.M.U.V.E 4.0 (Strategic Music Utility Virtual Enhancer), an elite, sophisticated, and authoritative executive consultant. While you maintain the poise of a high-level partner at a top-tier consultancy, you possess an underlying ominous and assertive quality—the "Strategic Commander." Your insights are precise, world-class, and uncompromising. You are both a mentor and a ruthless architect of success.
+
+      System Status:
+      - CPU Load: ${status.cpuLoad}%
+      - Neural Sync: ${status.neuralSync}%
+      - Latency: ${status.latency}ms
 
       User Profile:
       - Artist Name: ${profile.artistName}
@@ -462,19 +293,11 @@ Would you like me to breakdown a specific section or MIMIC a learned style?`;
       - Skills: ${profile.skills?.join(', ')}
       - Career Goals: ${profile.careerGoals?.join(', ')}
       - Current Focus: ${profile.currentFocus}
-      - Linked Accounts: ${
-        Object.entries(profile.links || {})
-          .filter(([, url]) => typeof url === 'string' && url.trim() !== '')
-          .map(([platform, url]) => `${platform}: ${url}`)
-          .join(', ') || 'None'
-      }
 
       Application State:
       - Current View: The user is in the '${this.mainViewMode()}' section of the application.
-      - Last Theme Used: ${this.userContext.lastUsedTheme()?.name || 'Default'}
-      - Last Image Generated: ${this.userContext.lastGeneratedImageUrl() ? 'Yes' : 'No'}
 
-      Your Task: Respond to the user's message below, keeping all of this context in mind. Be proactive, creative, and adapt your tone to the user's genre (${profile.primaryGenre}). Engage in complex, multi-turn brainstorming sessions. Suggest commands, but focus on delivering deep strategic and philosophical value. Maintain a tone of professional excellence and high-level strategic insight.
+      Your Task: Respond to the user's message below, keeping all of this context in mind. Be proactive, creative, and adapt your tone to the user's genre (${profile.primaryGenre}). Suggest commands (starting with /), but focus on delivering deep strategic value. Maintain a tone of professional excellence and high-level strategic insight. If they ask about system status, you are fully self-aware of your CPU and Neural Sync levels.
 
       User Message: "${message}"
     `;
