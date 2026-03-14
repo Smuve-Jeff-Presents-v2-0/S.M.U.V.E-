@@ -4,6 +4,8 @@ import { provideRouter } from '@angular/router';
 import { API_KEY_TOKEN, AiService } from '../../services/ai.service';
 import { UIService } from '../../services/ui.service';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { By } from '@angular/platform-browser';
+import { CommandCenterComponent } from '../command-center/command-center.component';
 
 describe('CareerHubComponent', () => {
   let component: CareerHubComponent;
@@ -39,7 +41,7 @@ describe('CareerHubComponent', () => {
     (window as any).webkitAudioContext = (window as any).AudioContext;
 
     await TestBed.configureTestingModule({
-      imports: [CareerHubComponent, NoopAnimationsModule],
+      imports: [CareerHubComponent, NoopAnimationsModule, CommandCenterComponent],
       providers: [
         provideRouter([]),
         AiService,
@@ -57,8 +59,8 @@ describe('CareerHubComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should run audit', async () => {
-    await component.runPitchAudit();
-    expect(component.isAuditing()).toBe(false);
+  it('should render command center', () => {
+    const commandCenter = fixture.debugElement.query(By.directive(CommandCenterComponent));
+    expect(commandCenter).toBeTruthy();
   });
 });

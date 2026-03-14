@@ -21,6 +21,7 @@ export class CommandCenterComponent implements OnInit, OnDestroy {
 
   recommendations = computed(() => this.aiService.getUpgradeRecommendations());
   strategicRecs = signal<StrategicRecommendation[]>([]);
+  isPoweringUp = signal(false);
 
   // Terminal state
   terminalLines = signal<string[]>([]);
@@ -63,17 +64,45 @@ export class CommandCenterComponent implements OnInit, OnDestroy {
     }, 500);
   }
 
-    async acquireUpgrade(rec: UpgradeRecommendation) {
+  async handleCommand(command: string) {
+    if (!command.trim()) return;
+
+    this.terminalLines.update(lines => [...lines, `USER: ${command.toUpperCase()}`]);
+
+    const response = await this.aiService.processCommand(command);
+
+    // Simulate thinking delay
+    setTimeout(() => {
+      this.terminalLines.update(lines => [...lines, `SMUVE: ${response}`]);
+
+      // Auto-scroll terminal (logic usually in component or via directive,
+      // but for this mock we just update the signal)
+    }, 400);
+  }
+
+  async acquireUpgrade(rec: UpgradeRecommendation) {
+    this.isPoweringUp.set(true);
+
     await this.profileService.acquireUpgrade({ title: rec.title, type: rec.type });
-    if (rec.url) {
-      window.open(rec.url, '_blank');
-    }
+
+    this.terminalLines.update(lines => [...lines, `ALERT: INTEGRATING ${rec.title.toUpperCase()}. SYNCING NEURAL PATHWAYS.`]);
+
+    setTimeout(() => {
+      this.isPoweringUp.set(false);
+      if (rec.url) {
+        window.open(rec.url, '_blank');
+      }
+    }, 1200);
   }
 
   initializeOperation(srec: StrategicRecommendation) {
-    if (srec.toolId) {
-      this.uiService.navigateToView(srec.toolId as any);
-    }
+    this.terminalLines.update(lines => [...lines, `INITIALIZING OPERATION: ${srec.action.toUpperCase()}...`]);
+
+    setTimeout(() => {
+      if (srec.toolId) {
+        this.uiService.navigateToView(srec.toolId as any);
+      }
+    }, 800);
   }
 
   getImpactColor(impact: string): string {
