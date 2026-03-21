@@ -66,13 +66,21 @@
        </div>
 
        <!-- SUB-GRID: Live Modules -->
-       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div (click)="uiService.navigateToView('studio')" class="card-elegant p-8 group cursor-pointer border-brand-primary/10">
              <div class="w-12 h-12 rounded-2xl bg-brand-primary/10 border border-brand-primary/20 flex items-center justify-center text-brand-primary mb-6 group-hover:scale-110 transition-transform">
                 <i class="fas fa-music text-xl"></i>
              </div>
              <h3 class="text-xl font-bold text-white uppercase tracking-tight mb-2 group-hover:text-brand-primary transition-colors">Initialize Studio</h3>
              <p class="text-xs text-silver-dim leading-relaxed">Enter the production matrix with ultra-low latency hardware monitoring and neural mastering.</p>
+          </div>
+
+          <div (click)="uiService.navigateToView('knowledge-base')" class="card-elegant p-8 group cursor-pointer border-brand-primary/10 bg-brand-primary/5">
+             <div class="w-12 h-12 rounded-2xl bg-brand-primary/20 border border-brand-primary/30 flex items-center justify-center text-brand-primary mb-6 group-hover:scale-110 transition-transform">
+                <i class="fas fa-vault text-xl"></i>
+             </div>
+             <h3 class="text-xl font-bold text-white uppercase tracking-tight mb-2 group-hover:text-brand-primary transition-colors">Neural Vault</h3>
+             <p class="text-xs text-silver-dim leading-relaxed">Access your archived strategic intelligence, learned styles, and proprietary production secrets.</p>
           </div>
 
           <div (click)="uiService.navigateToView('tha-spot')" class="card-elegant p-8 group cursor-pointer border-brand-secondary/10">

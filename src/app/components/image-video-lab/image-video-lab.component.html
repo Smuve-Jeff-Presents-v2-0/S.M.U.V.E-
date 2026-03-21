@@ -21,8 +21,8 @@
              <i class="fas text-xl" [class.fa-pause]="videoEngine.isPlaying()" [class.fa-play]="!videoEngine.isPlaying()"></i>
           </button>
        </div>
-       <button class="btn-elegant btn-elegant-primary text-[10px] font-black tracking-widest px-8">
-          EXPORT 4K
+       <button (click)="exportVideo()" [disabled]="isExporting()" class="btn-elegant btn-elegant-primary text-[10px] font-black tracking-widest px-8">
+          {{ isExporting() ? "EXPORTING..." : "EXPORT VIDEO" }}
        </button>
     </div>
   </header>

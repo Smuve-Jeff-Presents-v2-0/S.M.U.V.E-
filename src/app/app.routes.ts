@@ -12,6 +12,7 @@ export const routes: Routes = [
   { path: 'career', loadComponent: () => import('./components/career-hub/career-hub.component').then(m => m.CareerHubComponent) },
   { path: 'projects', loadComponent: () => import('./components/projects/projects.component').then(m => m.ProjectsComponent) },
   { path: 'release-pipeline', loadComponent: () => import('./components/release-pipeline/release-pipeline.component').then(m => m.ReleasePipelineComponent) },
+  { path: 'knowledge-base', loadComponent: () => import('./components/knowledge-base/knowledge-base.component').then(m => m.KnowledgeBaseComponent) },
   { path: 'lyric-editor', loadComponent: () => import('./components/lyric-editor/lyric-editor.component').then(m => m.LyricEditorComponent) },
   { path: 'remix-arena', loadComponent: () => import('./components/remix-arena/remix-arena.component').then(m => m.RemixArenaComponent) },
   { path: 'image-video-lab', loadComponent: () => import('./components/image-video-lab/image-video-lab.component').then(m => m.ImageVideoLabComponent) },
