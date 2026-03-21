@@ -15,6 +15,8 @@ export interface ProductionSecret {
   content: string;
   category: 'production' | 'marketing' | 'business' | 'legal' | 'technical';
   metadata: any;
+  details?: string;
+  impact?: string;
 }
 
 export interface TrendData {
@@ -23,6 +25,8 @@ export interface TrendData {
   velocity: number;
   category: string;
   metadata: any;
+  relevance?: number;
+  actionableInsight?: string;
 }
 
 export interface UpgradeRecommendation {
@@ -104,4 +108,29 @@ export interface MarketAlert {
   severity: 'Critical' | 'Warning' | 'Info';
   timestamp: number;
   category: string;
+}
+
+export interface SystemStatus {
+  cpuLoad: number;
+  neuralSync: number;
+  memoryUsage: number;
+  latency: number;
+  marketVelocity: number;
+  activeProcesses: number;
+}
+
+export interface StrategicRecommendation {
+  id: string;
+  action: string;
+  impact: string;
+  difficulty: string;
+  toolId: string;
+}
+
+export interface AdvisorAdvice {
+  id: string;
+  title: string;
+  content: string;
+  type: string;
+  priority: string;
 }

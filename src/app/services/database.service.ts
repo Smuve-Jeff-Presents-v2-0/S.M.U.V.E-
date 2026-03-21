@@ -1,8 +1,9 @@
-import { LoggingService } from './logging.service';
 import { Injectable, inject } from '@angular/core';
 import { UserProfile } from './user-profile.service';
+import { LoggingService } from './logging.service';
 import { AuthService } from './auth.service';
-import { APP_SECURITY_CONFIG } from '../app.security';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -10,48 +11,36 @@ import { APP_SECURITY_CONFIG } from '../app.security';
 export class DatabaseService {
   private logger = inject(LoggingService);
   private authService = inject(AuthService);
-  private readonly SECRET_KEY = APP_SECURITY_CONFIG.encryption_key;
-
-  constructor() {}
-
-  private encrypt(data: string): string {
-    const salted = data + '|' + this.SECRET_KEY;
-    return btoa(unescape(encodeURIComponent(salted)));
-  }
-
-  private decrypt(encoded: string): string | null {
-    try {
-      const decoded = decodeURIComponent(escape(atob(encoded)));
-      const [data, key] = decoded.split('|');
-      if (key === this.SECRET_KEY) {
-        return data;
-      }
-      return null;
-    } catch (e) {
-      this.logger.error('Decryption failed', e);
-      return null;
-    }
-  }
+  private http = inject(HttpClient);
+  private API_URL = 'https://smuve-v4-backend-9951606049235487441.onrender.com/api';
 
   async saveUserProfile(profile: UserProfile): Promise<void> {
     const user = this.authService.currentUser();
     if (user) {
-      const encryptedData = this.encrypt(JSON.stringify(profile));
-      localStorage.setItem('smuve_user_profile', encryptedData);
-      this.logger.info('User profile saved securely to localStorage');
+      try {
+        await firstValueFrom(this.http.post(`${this.API_URL}/profile`, {
+          userId: user.id,
+          profileData: profile
+        }));
+        this.logger.info('User profile saved securely to Render Postgres');
+      } catch (error) {
+        this.logger.error('Failed to save profile to backend', error);
+        localStorage.setItem('smuve_user_profile_backup', JSON.stringify(profile));
+      }
     }
   }
 
   async loadUserProfile(): Promise<UserProfile | null> {
     const user = this.authService.currentUser();
     if (user) {
-      const profileData = localStorage.getItem('smuve_user_profile');
-      if (profileData) {
-        const decryptedData = this.decrypt(profileData);
-        if (decryptedData) {
-          this.logger.info('User profile loaded securely for user:', user.id);
-          return JSON.parse(decryptedData);
-        }
+      try {
+        const profile = await firstValueFrom(this.http.get<UserProfile>(`${this.API_URL}/profile/${user.id}`));
+        this.logger.info('User profile loaded securely from Render Postgres');
+        return profile;
+      } catch (error) {
+        this.logger.error('Failed to load profile from backend', error);
+        const backup = localStorage.getItem('smuve_user_profile_backup');
+        return backup ? JSON.parse(backup) : null;
       }
     }
     return null;

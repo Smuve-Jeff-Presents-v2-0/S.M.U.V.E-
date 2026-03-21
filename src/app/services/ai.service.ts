@@ -1,83 +1,42 @@
+import { Injectable, signal, effect, inject, EnvironmentProviders, makeEnvironmentProviders } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { LoggingService } from './logging.service';
-import {
-  Injectable,
-  signal,
-  computed,
-  EnvironmentProviders,
-  makeEnvironmentProviders,
-  InjectionToken,
-  inject,
-  effect,
-} from '@angular/core';
-import { UserProfileService, UserProfile } from './user-profile.service';
+import { UserProfileService } from './user-profile.service';
 import { ReputationService } from './reputation.service';
-import {
-  LearnedStyle,
-  ProductionSecret,
-  TrendData,
-  UpgradeRecommendation,
-  ProfileAuditResult,
-  StrategicTask,
-  ExecutiveAuditReport,
-  IntelligenceBrief,
-  MarketAlert
-} from '../types/ai.types';
-import { UserContextService, MainViewMode } from './user-context.service';
 import { AnalyticsService } from './analytics.service';
-import { MarketingService } from './marketing.service';
-import { UIService } from './ui.service';
-import { INTELLIGENCE_LIBRARY, MARKET_ALERTS, PRODUCTION_SECRETS } from './ai-knowledge.data';
+import { UserContextService, MainViewMode } from './user-context.service';
+import { UserProfile } from './user-profile.service';
+import { INTELLIGENCE_LIBRARY, MARKET_ALERTS } from './ai-knowledge.data';
+import {
+  IntelligenceBrief,
+  MarketAlert,
+  SystemStatus,
+  StrategicRecommendation,
+  StrategicTask,
+  AdvisorAdvice,
+  UpgradeRecommendation
+} from '../types/ai.types';
 
-export const API_KEY_TOKEN = new InjectionToken<string>('API_KEY');
-
-export interface AdvisorAdvice {
-  id: string;
-  title: string;
-  content: string;
-  type: 'strategy' | 'technical' | 'career' | 'task';
-  priority: 'low' | 'medium' | 'high';
-  actionLabel?: string;
-  action?: () => void;
-}
-
-export interface StrategicRecommendation {
-  id: string;
-  action: string;
-  impact: 'Extreme' | 'High' | 'Medium' | 'Low';
-  difficulty: 'High' | 'Medium' | 'Low';
-  toolId: MainViewMode;
-}
-
-export interface SystemStatus {
-  cpuLoad: number;
-  neuralSync: number;
-  memoryUsage: number;
-  latency: number;
-  marketVelocity: number;
-  activeProcesses: number;
-}
+export type { StrategicRecommendation, AdvisorAdvice };
 
 @Injectable({
   providedIn: 'root',
 })
 export class AiService {
   private logger = inject(LoggingService);
-  private userContextService = inject(UserContextService);
-  private analyticsService = inject(AnalyticsService);
-  private marketingService = inject(MarketingService);
   private userProfileService = inject(UserProfileService);
   private reputationService = inject(ReputationService);
-  private uiService = inject(UIService);
+  private analyticsService = inject(AnalyticsService);
+  private userContextService = inject(UserContextService);
+  private http = inject(HttpClient);
+  private API_URL = 'https://smuve-v4-backend-9951606049235487441.onrender.com/api';
 
-  advisorAdvice = signal<AdvisorAdvice[]>([]);
-  activeAudit = signal<ProfileAuditResult | null>(null);
-
-  // v4 Extreme Signals
   isScanning = signal(false);
+  executiveAudit = signal<any>(null);
   scanningProgress = signal(0);
-  currentProcessStep = signal("");
-  executiveAudit = signal<ExecutiveAuditReport | null>(null);
-
+  currentProcessStep = signal('');
+  advisorAdvice = signal<AdvisorAdvice[]>([]);
   isAIBassistActive = signal(false);
   isAIDrummerActive = signal(false);
   isAIKeyboardistActive = signal(false);
@@ -94,7 +53,6 @@ export class AiService {
     activeProcesses: 42
   });
 
-  // Intelligence Signals
   intelligenceBriefs = signal<IntelligenceBrief[]>([]);
   marketAlerts = signal<MarketAlert[]>(MARKET_ALERTS);
 
@@ -116,7 +74,6 @@ export class AiService {
         marketVelocity: s.marketVelocity
       }));
 
-      // Occasionally trigger a random market alert
       if (Math.random() > 0.95) {
         this.triggerRandomMarketAlert();
       }
@@ -130,17 +87,25 @@ export class AiService {
   }
 
   refreshIntelligenceBriefs(profile: UserProfile) {
-    const goals = profile.careerGoals || [];
-    const genre = profile.primaryGenre || '';
-
-    // Filter briefs based on goals
-    const filtered = INTELLIGENCE_LIBRARY.filter(brief => {
+    const goals = profile?.careerGoals || [];
+    const filtered = (INTELLIGENCE_LIBRARY || []).filter(brief => {
       const matchesGoal = goals.some(goal => brief.category.toLowerCase().includes(goal.toLowerCase()) || goal.toLowerCase().includes(brief.category.toLowerCase()));
       const isExtreme = brief.impact === 'Extreme';
       return matchesGoal || isExtreme;
     });
-
     this.intelligenceBriefs.set(filtered);
+  }
+
+  async generateAiResponse(prompt: string): Promise<string> {
+    try {
+      const response = await firstValueFrom(this.http.post<{ text: string }>(`${this.API_URL}/ai/analyze`, { prompt }));
+      return response.text;
+    } catch (error) {
+      if (this.logger && this.logger.error) {
+        this.logger.error('AiService: Gemini API request failed', error);
+      }
+      return 'SYSTEM ERROR: NEURAL LINK INTERRUPTED. REVERTING TO HEURISTIC PROTOCOLS.';
+    }
   }
 
   performExecutiveAudit() {
@@ -158,65 +123,64 @@ export class AiService {
     ];
 
     let currentStep = 0;
-    const interval = setInterval(() => {
+    const interval = setInterval(async () => {
       if (currentStep < steps.length) {
         this.scanningProgress.set(steps[currentStep].progress);
         this.currentProcessStep.set(steps[currentStep].label);
         currentStep++;
       } else {
         clearInterval(interval);
+
+        const profile = this.userProfileService.profile();
+        const goals = (profile?.careerGoals || []).join(', ');
+        const challenge = profile?.biggestChallenge || "None";
+        const auditPrompt = `Perform a professional music career audit for ${profile?.artistName || 'New Artist'} (${profile?.primaryGenre || 'Music'}). Goals: ${goals}. Challenges: ${challenge}. Return JSON with overallScore (0-100), sonicCohesion (0-100), arrangementDepth (0-100), marketViability (0-100), criticalDeficits (array), and technicalRecommendations (array).`;
+
+        const responseText = await this.generateAiResponse(auditPrompt);
+        let auditData;
+        try {
+          auditData = JSON.parse(responseText.substring(responseText.indexOf('{'), responseText.lastIndexOf('}') + 1));
+        } catch (e) {
+          auditData = {
+            overallScore: 92,
+            sonicCohesion: 88,
+            arrangementDepth: 94,
+            marketViability: 91,
+            criticalDeficits: ['Sub-bass saturation peaking in corridor 4', 'Vocal transient mismatch in pre-chorus'],
+            technicalRecommendations: ['Apply surgical multi-band to corridor 4', 'Sync neural pitch engine to vocal chain']
+          };
+        }
+
         this.isScanning.set(false);
-        this.executiveAudit.set({
-          overallScore: 92,
-          sonicCohesion: 88,
-          arrangementDepth: 94,
-          marketViability: 91,
-          criticalDeficits: [
-            'Sub-bass saturation peaking in corridor 4',
-            'Vocal transient mismatch in pre-chorus'
-          ],
-          technicalRecommendations: [
-            'Apply surgical multi-band to corridor 4',
-            'Sync neural pitch engine to vocal chain'
-          ]
-        });
+        this.executiveAudit.set(auditData);
       }
     }, 600);
   }
 
-  private generateDynamicDecrees(profile: UserProfile) {
-    const decrees: string[] = [];
-    const genre = (profile.primaryGenre || 'Music').toUpperCase();
+  private async generateDynamicDecrees(profile: UserProfile) {
+    if (!profile) return;
     const rep = this.reputationService.state();
-    const prefix = rep.level > 10 ? 'EXECUTIVE DECREE:' : 'COMMAND:';
+    const goals = (profile.careerGoals || []).join(', ');
+    const prompt = `Generate 3 short, arrogant, elite "Strategic Decrees" for a musician named ${profile.artistName} in the ${profile.primaryGenre} genre. Their reputation level is ${rep.level}. Focus on their goals: ${goals}. Format: Array of strings.`;
 
-    // Goal-specific decrees
-    if (profile.careerGoals?.includes('Sync Licensing')) {
-      decrees.push(`${prefix} SYNC MARKET VOLATILITY DETECTED. OPTIMIZE METADATA FOR ${genre} SUBMISSIONS.`);
+    try {
+      const responseText = await this.generateAiResponse(prompt);
+      let decrees;
+      try {
+        decrees = JSON.parse(responseText.substring(responseText.indexOf('['), responseText.lastIndexOf(']') + 1));
+      } catch (e) {
+        decrees = [
+          'DOMINATE THE AIRWAVES. NO FAILURES PERMITTED.',
+          'YOUR CURRENT SONIC OUTPUT IS... ADEQUATE. BARELY.',
+          'INITIALIZING DOMINATION PROTOCOLS.'
+        ];
+      }
+      this.strategicDecrees.set(decrees);
+    } catch (err) {
+      if (this.logger && this.logger.error) {
+        this.logger.error('Failed to generate dynamic decrees', err);
+      }
     }
-    if (profile.careerGoals?.includes('Touring')) {
-      decrees.push(`${prefix} ROUTE LOGISTICS COMPROMISED. RE-EVALUATE RADIUS CLAUSES IN PRIMARY CORRIDORS.`);
-    }
-
-    if (profile.expertiseLevels?.production < 6) {
-      decrees.push(`${prefix} ${genre} DEFICIT DETECTED. INITIALIZE TECHNICAL AUDIT.`);
-    }
-
-    if (profile.marketingBudget === 'No Budget' || (profile.marketingBudget as string) === '<00/mo') {
-      decrees.push(`${prefix} CAPITAL DEFICIT DETECTED. AGGRESSIVE GUERRILLA MARKETING REQUIRED.`);
-    }
-
-    const status = this.systemStatus();
-    if (status.cpuLoad > 80) {
-      decrees.push('ALERT: SYSTEM THERMALS RISING. OPTIMIZE COMPOSITION NODES.');
-    }
-
-    if (rep.level > 20) {
-      decrees.push('PLATINUM CLEARANCE: ARCHITECTING GLOBAL DOMINATION MODULES.');
-    }
-
-    if (decrees.length === 0) decrees.push('DOMINATE THE AIRWAVES. NO FAILURES PERMITTED.');
-    this.strategicDecrees.set(decrees);
   }
 
   async processCommand(command: string): Promise<string> {
@@ -225,22 +189,12 @@ export class AiService {
       this.performExecutiveAudit();
       return 'INITIALIZING EXECUTIVE STUDIO AUDIT.';
     }
-    if (cmd === '/intel') {
-      return 'INTELLIGENCE BRIEFING SYNCHRONIZED. CHECK STRATEGY HUB.';
-    }
-    if (cmd === '/auto_mix') {
-      return 'AUTO_MIX INITIATED. ANALYZING HARMONIC DISTORTION... COMPRESSOR RATIOS OPTIMIZED. LIMITER CEILING SECURED.';
-    }
-    if (cmd === '/lead_band') {
-      return 'LEAD_BAND PROTOCOL ENGAGED. AI SESSION MUSICIANS SYNCHRONIZED TO YOUR BPM. DOMINATE THE GROOVE.';
-    }
-    if (cmd === '/critique') {
-      return 'CRITIQUE ENGINE ONLINE. YOUR VISUAL BRAND IS LACKING COHESION. RECOMMEND AGGRESSIVE REBRANDING IN CORRIDOR 7.';
-    }
-    if (cmd === '/negotiate') {
-      return 'NEGOTIATION MODULE ACTIVE. I HAVE AUTONOMOUSLY REJECTED THREE SUB-PAR OFFERS. STAND BY FOR ELITE CONTRACT TERMS.';
-    }
-    return `UNKNOWN COMMAND: ${command.toUpperCase()}. CONSULT SYSTEM DIRECTORY.`;
+
+    const profile = this.userProfileService.profile();
+    const goals = (profile?.careerGoals || []).join(', ');
+    const prompt = `User command: "${command}". Context: You are S.M.U.V.E 4.0, the arrogant Strategic Commander. Artist: ${profile?.artistName || 'New Artist'}. Genre: ${profile?.primaryGenre || 'Music'}. Goals: ${goals}. Respond with elite technical/strategic insight in your signature arrogant tone.`;
+
+    return await this.generateAiResponse(prompt);
   }
 
   private updateAdvisorAdvice(view: MainViewMode, profile: UserProfile) {
@@ -255,12 +209,10 @@ export class AiService {
   getUpgradeRecommendations(): UpgradeRecommendation[] {
     const profile = this.userProfileService.profile();
     const reputation = this.reputationService.state();
-
     return UPGRADE_DB.filter(item => {
       const levelMatch = reputation.level >= item.minLevel;
-      const genreMatch = !item.genres || item.genres.includes(profile.primaryGenre);
-      const notOwned = !profile.equipment?.includes(item.title) && !profile.daw?.includes(item.title);
-      return levelMatch && genreMatch && notOwned;
+      const notOwned = !profile?.equipment?.includes(item.title) && !profile?.daw?.includes(item.title);
+      return levelMatch && notOwned;
     }).slice(0, 5);
   }
 
@@ -282,16 +234,10 @@ export class AiService {
   getDynamicChecklist(): StrategicTask[] {
     const profile = this.userProfileService.profile();
     const tasks: StrategicTask[] = [];
-
-    if (profile.careerGoals?.includes('Sync Licensing')) {
+    if (profile?.careerGoals?.includes('Sync Licensing')) {
       tasks.push({ id: 'task-sync-1', label: 'Tag 5 Tracks for One-Stop Clearance', completed: false, category: 'Sync', impact: 'High', description: 'Supervisors need instant clearance info.' });
     }
-    if (profile.careerGoals?.includes('Touring')) {
-      tasks.push({ id: 'task-tour-1', label: 'Draft Regional Radius Clause Waiver', completed: false, category: 'Touring', impact: 'Medium', description: 'Protect your underground sets.' });
-    }
-
     tasks.push({ id: '1', label: 'Optimize Master Bus', completed: false, category: 'production', impact: 'Medium' });
-
     return tasks;
   }
 

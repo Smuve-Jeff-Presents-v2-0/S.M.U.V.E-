@@ -24,7 +24,7 @@ export type MainViewMode =
   | 'strategy'
   | 'analytics'
   | 'practice'
-  | 'career';
+  | 'career' | 'knowledge-base';
 
 export type { MainViewMode as ViewMode };
 

@@ -5,12 +5,15 @@
       <p class="text-slate-400">Collaborate on remixes in real-time with the S.M.U.V.E 4.0 engine.</p>
     </div>
     <div class="flex gap-4">
-      <button class="px-6 py-2 bg-brand-primary text-black font-bold uppercase text-xs skew-x-[-15deg] hover:skew-x-0 transition-all">
-        SHARE SESSION
+      <button (click)="startSession()" class="px-6 py-2 bg-brand-primary text-black font-bold uppercase text-xs skew-x-[-15deg] hover:skew-x-0 transition-all">
+        START P2P SESSION
+      </button>
+      <button (click)="joinSession()" class="px-6 py-2 bg-brand-secondary text-white font-bold uppercase text-xs skew-x-[-15deg] hover:skew-x-0 transition-all">
+        JOIN P2P SESSION
       </button>
       <div class="flex items-center gap-2">
         <div class="w-2 h-2 rounded-full bg-brand-primary animate-pulse-subtle"></div>
-        <span class="text-[10px] font-bold uppercase tracking-widest text-brand-primary">3 ACTIVE</span>
+        <span class="text-[10px] font-bold uppercase tracking-widest text-brand-primary">ACTIVE</span>
       </div>
     </div>
   </header>
