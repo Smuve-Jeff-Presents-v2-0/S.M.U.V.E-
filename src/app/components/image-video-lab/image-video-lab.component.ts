@@ -6,6 +6,7 @@ import { AiService } from '../../services/ai.service';
 import { UserContextService } from '../../services/user-context.service';
 import { ReputationService } from '../../services/reputation.service';
 import { VideoEngineService, VideoClip } from '../../services/video-engine.service';
+import { ExportService } from '../../services/export.service';
 
 @Component({
   selector: 'app-image-video-lab',
@@ -20,11 +21,13 @@ export class ImageVideoLabComponent implements OnDestroy, AfterViewInit {
   private userContext = inject(UserContextService);
   private reputationService = inject(ReputationService);
   public videoEngine = inject(VideoEngineService);
+  private exportService = inject(ExportService);
 
   @ViewChild('previewCanvas') previewCanvas!: ElementRef<HTMLCanvasElement>;
 
   imagePrompt = signal('');
   isGenerating = signal(false);
+  isExporting = signal(false);
   generatedImageUrl = signal<string | null>(null);
   highQualityEnhancer = signal(false);
 
@@ -72,7 +75,6 @@ export class ImageVideoLabComponent implements OnDestroy, AfterViewInit {
     const ctx = this.canvasCtx;
     const canvas = this.previewCanvas.nativeElement;
 
-    // Clear canvas with deep slate
     ctx.fillStyle = '#020617';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -81,10 +83,6 @@ export class ImageVideoLabComponent implements OnDestroy, AfterViewInit {
 
     if (activeClips.length > 0) {
       activeClips.forEach(clip => {
-        // Aesthetic Functional Implementation:
-        // Instead of a solid block, we draw a dynamic tech-noir pattern
-        // to represent the media being "processed"
-
         const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
         if (clip.type === 'video') {
             grad.addColorStop(0, '#10b98122');
@@ -99,7 +97,6 @@ export class ImageVideoLabComponent implements OnDestroy, AfterViewInit {
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Pattern
         ctx.strokeStyle = '#10b98111';
         ctx.beginPath();
         for(let x=0; x<canvas.width; x+=40) {
@@ -125,34 +122,42 @@ export class ImageVideoLabComponent implements OnDestroy, AfterViewInit {
   private drawHUD(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) {
     ctx.strokeStyle = '#10b98144';
     ctx.lineWidth = 1;
-
-    // Tactical Corners
     const size = 30;
     const p = 10;
-
-    // Top Left
     ctx.beginPath();
     ctx.moveTo(p, p + size); ctx.lineTo(p, p); ctx.lineTo(p + size, p);
     ctx.stroke();
-
-    // Bottom Right
     ctx.beginPath();
     ctx.moveTo(canvas.width - p, canvas.height - p - size);
     ctx.lineTo(canvas.width - p, canvas.height - p);
     ctx.lineTo(canvas.width - p - size, canvas.height - p);
     ctx.stroke();
-
-    // Scanlines
     ctx.fillStyle = 'rgba(16, 185, 129, 0.03)';
     for (let i = 0; i < canvas.height; i += 4) {
       ctx.fillRect(0, i, canvas.width, 1);
     }
-
-    // System Status
     ctx.fillStyle = '#10b981';
     ctx.font = '8px monospace';
     ctx.textAlign = 'left';
     ctx.fillText('REC ●', canvas.width - 50, 25);
+  }
+
+  async exportVideo() {
+    if (this.isExporting()) return;
+    this.isExporting.set(true);
+    this.aiFeedback.set("INITIALIZING MULTI-STREAM EXPORT. STAND BY FOR ELITE CAPTURE.");
+    const { recorder, result } = await this.exportService.startVideoExport(this.previewCanvas.nativeElement);
+    this.videoEngine.currentTime.set(0);
+    this.videoEngine.togglePlay();
+    setTimeout(() => {
+      recorder.stop();
+      this.videoEngine.togglePlay();
+      result.then(blob => {
+        this.exportService.downloadBlob(blob, "smuve_4_export_" + Date.now() + ".webm");
+        this.isExporting.set(false);
+        this.aiFeedback.set("VIDEO EXPORT CAPTURE COMPLETE. DOWNLOAD INITIALIZED.");
+      });
+    }, 10000);
   }
 
   async onFileUpload(event: any) {
@@ -174,7 +179,6 @@ export class ImageVideoLabComponent implements OnDestroy, AfterViewInit {
   async generateImage() {
     if (!this.imagePrompt()) return;
     this.isGenerating.set(true);
-    this.generatedImageUrl.set(null);
     const fullPrompt = `Tech-noir aesthetic, ${this.imagePrompt()}`;
     try {
       const url = await this.aiService.generateImage(fullPrompt);

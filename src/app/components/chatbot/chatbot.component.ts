@@ -40,6 +40,10 @@ export class ChatbotComponent implements OnInit, AfterViewChecked {
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
 
   close = output<void>();
+  onClose(): void {
+    this.speechSynthesisService.cancel();
+    this.close.emit();
+  }
   messages = signal<ChatMessage[]>([]);
   userInput = signal('');
   isLoading = signal(false);

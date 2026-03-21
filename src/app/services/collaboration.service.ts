@@ -10,7 +10,7 @@ export class CollaborationService {
   currentSession = signal<any>(null);
 
   async startSession(user: AuthUser, projectState: any): Promise<string> {
-    const sessionId = Math.random().toString(36).substr(2, 9);
+    const sessionId = this.generateSecureId();
     this.logger.system(`INITIALIZING WEBRTC P2P SESSION: ${sessionId}`);
     this.currentSession.set({ sessionId, participants: [user], projectState });
     return sessionId;
@@ -30,5 +30,11 @@ export class CollaborationService {
     if (channel && channel.readyState === 'open') {
       channel.send(JSON.stringify({ action: 'update', payload: projectState }));
     }
+  }
+
+  private generateSecureId(): string {
+    const array = new Uint32Array(4);
+    window.crypto.getRandomValues(array);
+    return Array.from(array, dec => dec.toString(16)).join('');
   }
 }
