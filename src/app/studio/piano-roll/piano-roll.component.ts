@@ -123,37 +123,40 @@ export class PianoRollComponent {
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
     const step = Math.floor(x / this.cellWidth);
+    const rawStep = Math.floor(x / this.cellWidth);
+    const step = Math.max(0, Math.min(this.cells.length - 1, rawStep));
+
     const displayKeys = this.getDisplayKeys();
     const keyIndex = Math.floor(y / this.rowHeight);
+    if (keyIndex < 0 || keyIndex >= displayKeys.length) return;
+
     let pitch = displayKeys[keyIndex];
 
     const target = event.target as HTMLElement;
     if (target.classList.contains('grid-background') || target.classList.contains('grid-cell')) {
        if (this.editMode() === 'select' && event.shiftKey) {
-         // Start marquee selection (clear previous selection)
-         this.selectedNoteIds.set(new Set());
          this.isSelecting = true;
          this.selectionBox.set({ x, y, w: 0, h: 0, active: true });
          this.startX = event.clientX;
          this.startY = event.clientY;
-       } else if (this.editMode() === 'draw' || this.editMode() === 'select' || this.editMode() === 'chord') {
+       } else if (this.editMode() === 'draw' || this.editMode() === 'select') {
          this.selectedNoteIds.set(new Set());
 
          if (!this.isDrumTrack() && this.snapToScale() && !this.isInScale(pitch)) {
-           const scaleNotes = this.selectedScale().intervals.map(i => (i + this.selectedRoot()) % 12);
-           let minDist = 12;
-           let targetPitch = pitch;
-
-           for (let i = -6; i <= 6; i++) {
-             const p = pitch + i;
-             const pitchClass = p % 12 < 0 ? (p % 12) + 12 : (p % 12);
-             if (scaleNotes.includes(pitchClass) && Math.abs(i) < minDist) {
-               minDist = Math.abs(i);
-               targetPitch = p;
-             }
-           }
-
-           pitch = targetPitch;
+            const scaleNotes = this.selectedScale().intervals.map(i => (i + this.selectedRoot()) % 12);
+            let minDist = 12;
+            let targetPitch = pitch;
+            for (let i = -6; i <= 6; i++) {
+               const p = pitch + i;
+               const pitchClass = p % 12 < 0 ? (p % 12) + 12 : p % 12;
+               if (scaleNotes.includes(pitchClass)) {
+                  if (Math.abs(i) < minDist) {
+                    minDist = Math.abs(i);
+                    targetPitch = p;
+                  }
+               }
+            }
+            pitch = targetPitch;
          }
 
          const track = this.selectedTrack();
