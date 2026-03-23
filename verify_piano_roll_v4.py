@@ -2,16 +2,18 @@ import asyncio
 from playwright.async_api import async_playwright
 
 async def run():
-    async def wait_for_server(url, timeout=60):
-        import time
-        start_time = time.time()
-        while time.time() - start_time < timeout:
-            try:
-                import urllib.request
-                urllib.request.urlopen(url)
-                return True
-            except Exception:
-                await asyncio.sleep(1)
+    async def wait_for_server(url, timeout=60, interval=1.0):
+        deadline = time.monotonic() + timeout
+        async with httpx.AsyncClient(follow_redirects=True, timeout=5.0) as client:
+            while time.monotonic() < deadline:
+                try:
+                    resp = await client.get(url)
+                    # Consider the server "up" if we get any non-5xx response.
+                    if resp.status_code < 500:
+                        return True
+                except (httpx.RequestError, httpx.TimeoutException):
+                    pass
+                await asyncio.sleep(interval)
         return False
 
     if not await wait_for_server("http://localhost:4200"):
