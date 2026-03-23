@@ -1,3 +1,4 @@
+import { BusinessPipeline, ProData } from "../types/business.types";
 import { LoggingService } from './logging.service';
 import { MarketingCampaign } from '../types/marketing.types';
 import { Injectable, signal, effect, inject } from '@angular/core';
@@ -97,6 +98,8 @@ export interface ArtistTask {
 export interface UserProfile {
   settings: AppSettings;
   catalog: CatalogItem[];
+  businessPipelines?: BusinessPipeline[];
+  proData?: ProData;
   tasks: ArtistTask[];
   marketingCampaigns: MarketingCampaign[];
   // === BASIC INFO ===
