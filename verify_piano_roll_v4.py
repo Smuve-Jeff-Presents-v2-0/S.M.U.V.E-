@@ -10,7 +10,7 @@ async def run():
                 import urllib.request
                 urllib.request.urlopen(url)
                 return True
-            except:
+            except Exception:
                 await asyncio.sleep(1)
         return False
 
