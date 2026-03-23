@@ -103,3 +103,44 @@
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
 }
+
+.grid-cols-16 {
+  grid-template-columns: repeat(16, minmax(0, 1fr));
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Tool styles */
+.cursor-crosshair {
+  cursor: crosshair;
+}
+
+
+.midi-note.from-emerald-400 {
+  --tw-gradient-from: #34d399;
+  --tw-gradient-to: #059669;
+}
+
+/* Scrollbar styling */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(236, 91, 19, 0.2);
+  border-radius: 2px;
+}
+
+@keyframes slide-in {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}

@@ -30,6 +30,31 @@ export class AppComponent {
   router = inject(Router);
 
   isSidebarOpen = signal(true);
+  isFullPageMode = signal(false);
+  isViewSelectorOpen = signal(false);
+  viewSearchQuery = signal("");
+  isMobile = signal(false);
+
+  constructor() {
+    this.checkMobile();
+    this.isFullPageMode.set(this.router.url === '/piano-roll');
+
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      const path = this.router.url.split('/')[1];
+      if (path && this.uiService.getViewModes().includes(path as any)) {
+        this.uiService.mainViewMode.set(path as any);
+      }
+      this.isFullPageMode.set(this.router.url === '/piano-roll');
+    });
+
+    effect(() => {
+      if (this.uiService.isOnline()) {
+        this.notificationService.show('System Online', 'success', 3000);
+      }
+    });
+  }
   isViewSelectorOpen = signal(false);
   viewSearchQuery = signal("");
   isMobile = signal(false);

@@ -146,3 +146,13 @@
 .is-mobile .app-mini-footer {
   display: none;
 }
+
+.full-page {
+  width: 100vw !important;
+  height: 100vh !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  z-index: 1000 !important;
+  margin: 0 !important;
+}

@@ -2,6 +2,18 @@ import asyncio
 from playwright.async_api import async_playwright
 
 async def run():
+    async def wait_for_server(url, timeout=60, interval=1.0):
+        deadline = time.monotonic() + timeout
+        async with httpx.AsyncClient(follow_redirects=True, timeout=5.0) as client:
+            while time.monotonic() < deadline:
+                try:
+                    resp = await client.get(url)
+                    # Consider the server "up" if we get any non-5xx response.
+                    if resp.status_code < 500:
+                        return True
+                except (httpx.RequestError, httpx.TimeoutException):
+                    pass
+                await asyncio.sleep(interval)
     async def wait_for_server(url, timeout=60):
         import time
         start_time = time.time()
@@ -20,6 +32,10 @@ async def run():
 
     async with async_playwright() as p:
         browser = await p.chromium.launch()
+        page = await browser.new_page()
+
+        # Navigate to Studio (Piano Roll is usually here)
+        await page.goto("http://localhost:4200/piano-roll")
         page = await browser.new_row_page() if hasattr(browser, 'new_row_page') else await browser.new_page()
 
         # Navigate to Studio (Piano Roll is usually here)

@@ -53,6 +53,19 @@ export class PianoRollComponent {
 
   selectedTrack = computed(() => this.musicManager.tracks().find(t => t.id === this.musicManager.selectedTrackId()));
   currentStep = this.engine.currentBeat;
+  private destroyRef = inject(DestroyRef);
+
+  private readonly _isStandaloneSignal = signal(this.router.url === '/piano-roll');
+
+  // Keep standalone state reactive across navigations while the component remains mounted
+  private readonly _standaloneRouteListener = this.router.events
+    .pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+      takeUntilDestroyed(this.destroyRef)
+    )
+    .subscribe(() => this._isStandaloneSignal.set(this.router.url === '/piano-roll'));
+
+  isStandalone = computed(() => this._isStandaloneSignal());
   isStandalone = computed(() => this.router.url === '/piano-roll');
 
   // UI State
@@ -244,6 +257,57 @@ export class PianoRollComponent {
   }
 
   async generateAiPattern() {
+    const track = this.selectedTrack();
+    if (!track) return;
+
+    this.isAiGenerating.set(true);
+    try {
+      const prompt = `Generate a professional ${this.selectedScale().name} ${track.name} pattern. Return JSON: { notes: [{midi, step, length, velocity}] }`;
+      const response = await this.aiService.generateAiResponse(prompt);
+
+      try {
+        const data = JSON.parse(
+          response.substring(response.indexOf('{'), response.lastIndexOf('}') + 1)
+        );
+        if (data.notes) {
+          this.musicManager.clearTrack(track.id);
+          data.notes.forEach((n: any) => this.musicManager.addNoteToTrack(track.id, n));
+        }
+      } catch (e) {
+        console.error('AI Generation failed', e);
+      }
+    } finally {
+      this.isAiGenerating.set(false);
+    }
+  }
+
+  quantizeNotes() {
+    const track = this.selectedTrack();
+    if (!track) return;
+    track.notes.forEach(n => {
+       if (this.selectedNoteIds().size === 0 || this.selectedNoteIds().has(n.id)) {
+          this.musicManager.updateNote(track.id, n.id, { step: Math.round(n.step) });
+       }
+    });
+  }
+
+  randomizeVelocity() {
+    const track = this.selectedTrack();
+    if (!track) return;
+    track.notes.forEach(n => {
+       if (this.selectedNoteIds().size === 0 || this.selectedNoteIds().has(n.id)) {
+          this.musicManager.updateNote(track.id, n.id, { velocity: 0.5 + Math.random() * 0.5 });
+       }
+    });
+  }
+
+  deleteSelected() {
+    const track = this.selectedTrack();
+    if (!track) return;
+    this.selectedNoteIds().forEach(id => this.musicManager.deleteNoteById(track.id, id));
+    this.selectedNoteIds.set(new Set());
+  }
+
     const track = this.selectedTrack();
     if (!track) return;
 
