@@ -130,6 +130,8 @@ export class PianoRollComponent {
     const target = event.target as HTMLElement;
     if (target.classList.contains('grid-background') || target.classList.contains('grid-cell')) {
        if (this.editMode() === 'select' && event.shiftKey) {
+         // Start marquee selection (clear previous selection)
+         this.selectedNoteIds.set(new Set());
          this.isSelecting = true;
          this.selectionBox.set({ x, y, w: 0, h: 0, active: true });
          this.startX = event.clientX;
