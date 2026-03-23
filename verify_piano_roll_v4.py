@@ -14,6 +14,16 @@ async def run():
                 except (httpx.RequestError, httpx.TimeoutException):
                     pass
                 await asyncio.sleep(interval)
+    async def wait_for_server(url, timeout=60):
+        import time
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            try:
+                import urllib.request
+                urllib.request.urlopen(url)
+                return True
+            except:
+                await asyncio.sleep(1)
         return False
 
     if not await wait_for_server("http://localhost:4200"):
@@ -26,6 +36,10 @@ async def run():
 
         # Navigate to Studio (Piano Roll is usually here)
         await page.goto("http://localhost:4200/piano-roll")
+        page = await browser.new_row_page() if hasattr(browser, 'new_row_page') else await browser.new_page()
+
+        # Navigate to Studio (Piano Roll is usually here)
+        await page.goto("http://localhost:4200/studio")
         await page.wait_for_timeout(3000)
 
         # Take screenshot of the new Piano Roll High-Voltage UI

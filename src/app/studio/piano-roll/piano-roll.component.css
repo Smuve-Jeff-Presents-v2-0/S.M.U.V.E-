@@ -139,3 +139,8 @@
   background: rgba(236, 91, 19, 0.2);
   border-radius: 2px;
 }
+
+@keyframes slide-in {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}

@@ -66,6 +66,7 @@ export class PianoRollComponent {
     .subscribe(() => this._isStandaloneSignal.set(this.router.url === '/piano-roll'));
 
   isStandalone = computed(() => this._isStandaloneSignal());
+  isStandalone = computed(() => this.router.url === '/piano-roll');
 
   // UI State
   selectedScale = signal(SCALES[1]);
@@ -307,6 +308,57 @@ export class PianoRollComponent {
     this.selectedNoteIds.set(new Set());
   }
 
+    const track = this.selectedTrack();
+    if (!track) return;
+
+    this.isAiGenerating.set(true);
+    try {
+      const prompt = `Generate a professional ${this.selectedScale().name} ${track.name} pattern. Return JSON: { notes: [{midi, step, length, velocity}] }`;
+      const response = await this.aiService.generateAiResponse(prompt);
+
+      try {
+        const data = JSON.parse(
+          response.substring(response.indexOf('{'), response.lastIndexOf('}') + 1)
+        );
+        if (data.notes) {
+          this.musicManager.clearTrack(track.id);
+          data.notes.forEach((n: any) => this.musicManager.addNoteToTrack(track.id, n));
+        }
+      } catch (e) {
+        console.error('AI Generation failed', e);
+      }
+    } finally {
+      this.isAiGenerating.set(false);
+    }
+  }
+
+  quantizeNotes() {
+    const track = this.selectedTrack();
+    if (!track) return;
+    track.notes.forEach(n => {
+       if (this.selectedNoteIds().size === 0 || this.selectedNoteIds().has(n.id)) {
+          this.musicManager.updateNote(track.id, n.id, { step: Math.round(n.step) });
+       }
+    });
+  }
+
+  randomizeVelocity() {
+    const track = this.selectedTrack();
+    if (!track) return;
+    track.notes.forEach(n => {
+       if (this.selectedNoteIds().size === 0 || this.selectedNoteIds().has(n.id)) {
+          this.musicManager.updateNote(track.id, n.id, { velocity: 0.5 + Math.random() * 0.5 });
+       }
+    });
+  }
+
+  deleteSelected() {
+    const track = this.selectedTrack();
+    if (!track) return;
+    this.selectedNoteIds().forEach(id => this.musicManager.deleteNoteById(track.id, id));
+    this.selectedNoteIds.set(new Set());
+  }
+
   selectTrack(track: TrackModel) {
     this.musicManager.selectedTrackId.set(track.id);
     this.selectedNoteIds.set(new Set());
@@ -321,3 +373,14 @@ export class PianoRollComponent {
     return note ? note.velocity * 100 : 0;
   }
 }
+    this.selectedNoteIds.set(new Set());
+  }
+
+  getVisibleNotes(track: TrackModel): typeof track.notes {
+    const displayKeys = this.getDisplayKeys();
+    return track.notes.filter(n => displayKeys.includes(n.midi));
+  }
+
+  goToStudio() { this.router.navigate(['/studio']); }
+
+  getVelocityAt(cell: number): number {

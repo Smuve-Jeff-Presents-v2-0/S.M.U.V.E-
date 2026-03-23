@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ReleasePipelineService } from '../../services/release-pipeline.service';
 import { ProductionTrack, ReleaseType } from '../../types/release.types';
 import { Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-release-pipeline',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './release-pipeline.component.html',
   styleUrls: ['./release-pipeline.component.css']
 })

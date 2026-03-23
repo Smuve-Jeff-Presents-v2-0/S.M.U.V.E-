@@ -187,6 +187,7 @@
              <!-- MIDI Notes -->
              <ng-container *ngIf="selectedTrack() as track">
                 <div *ngFor="let note of track.notes"
+                <div *ngFor="let note of getVisibleNotes(track)"
                      (mousedown)="onNoteMouseDown($event, note)"
                      class="absolute rounded-sm cursor-move midi-note transition-all border border-white/20 flex flex-col justify-center overflow-hidden"
                      [class.selected-note]="selectedNoteIds().has(note.id)"
@@ -216,6 +217,7 @@
                     </div>
                   </ng-container>
                 </ng-container>
+                     [style.top.px]="getDisplayKeys().indexOf(note.midi) * rowHeight"
                      [style.width.px]="note.length * cellWidth"
                      [style.height.px]="rowHeight - 2">
                   <div class="absolute inset-0 bg-white/10 opacity-0 hover:opacity-100 transition-opacity"></div>
@@ -288,4 +290,5 @@
 
   <!-- Glitch Overlay -->
   <div class="scanline"></div>
+</div>
 </div>
