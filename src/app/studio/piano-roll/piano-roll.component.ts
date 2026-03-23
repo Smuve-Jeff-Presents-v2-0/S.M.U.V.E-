@@ -238,23 +238,28 @@ export class PianoRollComponent {
   }
 
   async generateAiPattern() {
-    this.isAiGenerating.set(true);
     const track = this.selectedTrack();
     if (!track) return;
 
-    const prompt = `Generate a professional ${this.selectedScale().name} ${track.name} pattern. Return JSON: { notes: [{midi, step, length, velocity}] }`;
-    const response = await this.aiService.generateAiResponse(prompt);
-
+    this.isAiGenerating.set(true);
     try {
-      const data = JSON.parse(response.substring(response.indexOf('{'), response.lastIndexOf('}') + 1));
-      if (data.notes) {
-        this.musicManager.clearTrack(track.id);
-        data.notes.forEach((n: any) => this.musicManager.addNoteToTrack(track.id, n));
+      const prompt = `Generate a professional ${this.selectedScale().name} ${track.name} pattern. Return JSON: { notes: [{midi, step, length, velocity}] }`;
+      const response = await this.aiService.generateAiResponse(prompt);
+
+      try {
+        const data = JSON.parse(
+          response.substring(response.indexOf('{'), response.lastIndexOf('}') + 1)
+        );
+        if (data.notes) {
+          this.musicManager.clearTrack(track.id);
+          data.notes.forEach((n: any) => this.musicManager.addNoteToTrack(track.id, n));
+        }
+      } catch (e) {
+        console.error('AI Generation failed', e);
       }
-    } catch (e) {
-      console.error("AI Generation failed", e);
+    } finally {
+      this.isAiGenerating.set(false);
     }
-    this.isAiGenerating.set(false);
   }
 
   quantizeNotes() {
