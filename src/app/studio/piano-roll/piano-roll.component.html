@@ -196,7 +196,26 @@
                      [class.to-emerald-600]="selectedNoteIds().has(note.id)"
                      [class.bg-gradient-to-br]="true"
                      [style.left.px]="note.step * cellWidth"
-                     [style.top.px]="getDisplayKeys().indexOf(note.midi) * rowHeight"
+                <ng-container *ngFor="let note of track.notes">
+                  <ng-container *ngIf="getDisplayKeys().indexOf(note.midi) as rowIndex">
+                    <div *ngIf="rowIndex !== -1"
+                         (mousedown)="onNoteMouseDown($event, note)"
+                         class="absolute rounded-sm cursor-move midi-note transition-all border border-white/20 flex flex-col justify-center overflow-hidden"
+                         [class.selected-note]="selectedNoteIds().has(note.id)"
+                         [class.from-primary]="!selectedNoteIds().has(note.id)"
+                         [class.to-orange-600]="!selectedNoteIds().has(note.id)"
+                         [class.from-emerald-400]="selectedNoteIds().has(note.id)"
+                         [class.to-emerald-600]="selectedNoteIds().has(note.id)"
+                         [class.bg-gradient-to-br]="true"
+                         [style.left.px]="note.step * cellWidth"
+                         [style.top.px]="rowIndex * rowHeight"
+                         [style.width.px]="note.length * cellWidth"
+                         [style.height.px]="rowHeight - 2">
+                      <div class="absolute inset-0 bg-white/10 opacity-0 hover:opacity-100 transition-opacity"></div>
+                      <div class="h-1 bg-white/30 absolute bottom-0 left-0" [style.width.%]="note.velocity * 100"></div>
+                    </div>
+                  </ng-container>
+                </ng-container>
                      [style.width.px]="note.length * cellWidth"
                      [style.height.px]="rowHeight - 2">
                   <div class="absolute inset-0 bg-white/10 opacity-0 hover:opacity-100 transition-opacity"></div>
