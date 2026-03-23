@@ -1,4 +1,4 @@
-import { Component, inject, effect, signal, HostListener, computed, viewChild } from '@angular/core';
+import { Component, inject, effect, signal, HostListener, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterOutlet, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -11,7 +11,6 @@ import { NotificationService } from './services/notification.service';
 import { MainViewMode } from './services/user-context.service';
 import { AiService } from './services/ai.service';
 import { PlayerService } from './services/player.service';
-import { SettingsIntegrationService } from './services/settings-integration.service';
 
 @Component({
   selector: 'app-root',
@@ -26,10 +25,10 @@ export class AppComponent {
   aiService = inject(AiService);
   playerService = inject(PlayerService);
   notificationService = inject(NotificationService);
-  settingsIntegration = inject(SettingsIntegrationService);
   router = inject(Router);
 
   isSidebarOpen = signal(true);
+  isFullPageMode = signal(false);
   isViewSelectorOpen = signal(false);
   viewSearchQuery = signal("");
   isMobile = signal(false);
@@ -43,6 +42,7 @@ export class AppComponent {
       if (path && this.uiService.getViewModes().includes(path as any)) {
         this.uiService.mainViewMode.set(path as any);
       }
+      this.isFullPageMode.set(this.router.url === '/piano-roll');
     });
 
     effect(() => {
