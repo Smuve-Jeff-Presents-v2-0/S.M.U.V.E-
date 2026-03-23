@@ -118,7 +118,7 @@
 
             <div class="w-px h-3 bg-white/10"></div>
 
-            <button *ngIf="!isStandalone()" (click)="router.navigate(['/piano-roll'])"
+            <button *ngIf="!isStandalone()" (click)="goStandalone()"
                     class="p-1 rounded hover:text-primary hover:bg-white/5 transition-all group" title="Maximize Piano Roll">
                <span class="material-symbols-outlined text-sm group-hover:scale-110">fullscreen</span>
             </button>
