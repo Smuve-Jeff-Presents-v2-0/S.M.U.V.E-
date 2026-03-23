@@ -28,6 +28,7 @@ export class AppComponent {
   router = inject(Router);
 
   isSidebarOpen = signal(true);
+  isFullPageMode = computed(() => this.router.url === '/piano-roll');
   isViewSelectorOpen = signal(false);
   viewSearchQuery = signal("");
   isMobile = signal(false);

@@ -1,12 +1,12 @@
 <div class="app-container font-sans bg-brand-dark text-silver selection:bg-brand-primary/20"
-     [class.sidebar-closed]="!isSidebarOpen()"
+     [class.sidebar-closed]="!isSidebarOpen() || isFullPageMode()"
      [class.is-mobile]="isMobile()"
      [class.perf-mode-active]="uiService.performanceMode()">
   <app-notification-toast></app-notification-toast>
   <app-smuve-advisor></app-smuve-advisor>
 
   <!-- SIDEBAR: Elegant Navigation -->
-  <aside class="app-sidebar glass-panel shadow-2xl transition-all duration-300 z-50" [class.open]="isSidebarOpen()">
+  <aside *ngIf="!isFullPageMode()" class="app-sidebar glass-panel shadow-2xl transition-all duration-300 z-50" [class.open]="isSidebarOpen()">
     <div class="sidebar-header flex items-center px-6 py-8 cursor-pointer group" (click)="navigateToView('hub')">
       <div class="w-10 h-10 rounded-xl bg-brand-primary/10 border border-brand-primary/20 flex items-center justify-center text-brand-primary group-hover:scale-110 transition-transform">
         <i class="fas fa-feather-pointed text-xl"></i>
@@ -47,7 +47,7 @@
   </aside>
 
   <!-- TOP BAR: Refined Controls -->
-  <header class="app-top-bar glass-panel px-4 md:px-8 flex items-center justify-between z-40">
+  <header *ngIf="!isFullPageMode()" class="app-top-bar glass-panel px-4 md:px-8 flex items-center justify-between z-40">
     <div class="flex items-center gap-2 md:gap-4">
       <button (click)="toggleSidebar()" class="w-10 h-10 rounded-xl hover:bg-white/5 text-silver-dim hover:text-white transition-all">
         <i class="fas" [class.fa-bars]="!isSidebarOpen()" [class.fa-indent]="isSidebarOpen()"></i>
@@ -96,7 +96,7 @@
   </header>
 
   <!-- MAIN CONTENT -->
-  <main class="app-content relative overflow-hidden bg-brand-dark animate-enter">
+  <main class="app-content relative overflow-hidden bg-brand-dark animate-enter" [class.full-page]="isFullPageMode()">
     <div class="absolute inset-0 bg-gradient-to-br from-brand-primary/5 via-transparent to-brand-accent/5 pointer-events-none"></div>
     <div class="content-scroll-container custom-scrollbar relative z-10 p-0">
        <router-outlet></router-outlet>
@@ -108,7 +108,7 @@
     </aside>
   </main>
 
-  <footer class="app-mini-footer glass-panel border-t border-white/10 flex items-center justify-center">
+  <footer *ngIf="!isFullPageMode()" class="app-mini-footer glass-panel border-t border-white/10 flex items-center justify-center">
     <div class="flex items-center gap-6 text-[8px] font-black text-silver-dim tracking-[0.2em] uppercase">
        <span>S.M.U.V.E Executive Suite v4.0</span>
        <div class="w-1 h-1 rounded-full bg-white/10"></div>
@@ -119,7 +119,7 @@
   </footer>
 
   <!-- MOBILE BOTTOM NAV -->
-  <nav class="mobile-nav-bar border-t border-white/10">
+  <nav *ngIf="!isFullPageMode()" class="mobile-nav-bar border-t border-white/10">
     <button (click)="navigateToView('hub')" class="mobile-nav-item" [class.active]="uiService.mainViewMode() === 'hub'">
       <i class="fas fa-th-large"></i>
       <span>Hub</span>

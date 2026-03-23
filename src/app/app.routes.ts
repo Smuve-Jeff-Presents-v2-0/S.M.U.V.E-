@@ -18,7 +18,7 @@ export const routes: Routes = [
   { path: 'image-video-lab', loadComponent: () => import('./components/image-video-lab/image-video-lab.component').then(m => m.ImageVideoLabComponent) },
   { path: 'login', loadComponent: () => import('./components/login/login.component').then(m => m.LoginComponent) },
   { path: 'dj', loadComponent: () => import('./studio/studio.component').then(m => m.StudioComponent) },
-  { path: 'piano-roll', loadComponent: () => import('./studio/studio.component').then(m => m.StudioComponent) },
+  { path: 'piano-roll', loadComponent: () => import('./studio/piano-roll/piano-roll.component').then(m => m.PianoRollComponent) },
   { path: 'networking', loadComponent: () => import('./components/tha-spot/tha-spot.component').then(m => m.ThaSpotComponent) },
   { path: 'player', loadComponent: () => import('./hub/hub.component').then(m => m.HubComponent) },
   { path: 'image-editor', loadComponent: () => import('./components/image-video-lab/image-video-lab.component').then(m => m.ImageVideoLabComponent) },
