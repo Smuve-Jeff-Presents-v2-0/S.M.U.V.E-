@@ -72,6 +72,7 @@ export class ProfileEditorComponent {
   });
   saveStatus = signal<'idle' | 'saving' | 'saved'>('idle');
   activeSection = signal<string>('basic');
+  aiUpgradePlan = signal<string | null>(null);
 
   readonly allGenres = [
     'Hip Hop',
@@ -176,6 +177,30 @@ export class ProfileEditorComponent {
     if (p.proIpi) score += 10;
     if (p.team?.length > 0) score += 10;
     return Math.min(100, score);
+  }
+
+  async deleteProfile(): Promise<void> {
+    const confirmDelete = window.confirm(
+      'Delete this artist profile and reset all fields?'
+    );
+    if (!confirmDelete) return;
+    await this.userProfileService.deleteProfile();
+    this.editableProfile.set({ ...this.userProfileService.profile() });
+    this.saveStatus.set('idle');
+  }
+
+  async runAiUpgrade(): Promise<void> {
+    const profile = this.editableProfile();
+    const prompt = `Design an elite, user-tailored upgrade plan for artist ${profile.artistName ||
+      'Unknown'} in genre ${profile.primaryGenre ||
+      'unspecified'}. Include profile edits, branding moves, release sequencing, and collaboration targets. Keep it concise and actionable.`;
+    this.syncingWithAi.set(true);
+    try {
+      const resp = await this.aiService.generateAiResponse(prompt);
+      this.aiUpgradePlan.set(resp);
+    } finally {
+      this.syncingWithAi.set(false);
+    }
   }
 
   toggleChip(field: string, value: any, nestedPath?: string) {

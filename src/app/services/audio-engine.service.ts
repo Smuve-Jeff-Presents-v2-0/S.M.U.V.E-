@@ -165,7 +165,8 @@ export class AudioEngineService {
       this.outputSink = new Audio();
       this.outputSink.autoplay = true;
       this.outputSink.srcObject = this.outputDestination.stream;
-      // Start muted to avoid double-routing with the default destination until routing is configured
+      // Master bus still feeds the default ctx.destination; keep this auxiliary sink muted
+      // until a specific output target is selected or routing falls back to default.
       this.outputSink.muted = true;
       try {
         await this.outputSink.play();
@@ -265,7 +266,8 @@ export class AudioEngineService {
     deck.eqHigh.type = 'highshelf';
     deck.eqHigh.frequency.value = 4000;
     deck.filter.type = 'lowpass';
-    // Keep the default filter effectively bypassed by setting cutoff to Nyquist to avoid muffled playback
+    // Default BiquadFilter cutoff is ~350Hz (lowpass), which muffles playback—open it to Nyquist
+    // so the deck starts in a full-bandwidth state.
     deck.filter.frequency.value = this.ctx.sampleRate / 2;
 
     deck.analyser.fftSize = 1024;

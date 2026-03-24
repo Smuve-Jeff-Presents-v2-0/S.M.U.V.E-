@@ -321,6 +321,40 @@
 
     <!-- Main Content Area -->
     <main class="flex-1 bg-white/5 rounded-2xl border border-white/5 p-8 backdrop-blur-sm overflow-hidden relative min-h-[70vh]">
+      <!-- Hero: Artist Snapshot & Actions -->
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8 p-6 bg-gradient-to-r from-brand-primary/10 via-purple-700/10 to-slate-900/60 border border-white/10 rounded-2xl shadow-lg">
+        <div class="space-y-2">
+          <p class="text-[10px] font-black uppercase tracking-[0.3em] text-brand-primary">Artist Command</p>
+          <h2 class="text-3xl font-black uppercase italic text-white leading-tight">{{ editableProfile().artistName || 'Unregistered Artist' }}</h2>
+          <p class="text-sm text-slate-300">Genre: {{ editableProfile().primaryGenre || 'Select Genre' }} • XP: {{ editableProfile().xp || 0 }} • Level: {{ editableProfile().level || 1 }}</p>
+          <div class="flex items-center gap-3 text-[11px] text-slate-300">
+            <span class="px-3 py-1 rounded-full bg-black/30 border border-white/10">Optimization {{ optimizationScore() }}%</span>
+            <span class="px-3 py-1 rounded-full bg-brand-primary/20 text-brand-primary border border-brand-primary/30">AI Core {{ syncingWithAi() ? 'Engaged' : 'Idle' }}</span>
+          </div>
+        </div>
+        <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-3">
+          <button (click)="saveProfile()" class="h-full px-4 py-3 rounded-xl bg-brand-primary text-black font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center justify-between">
+            <span>Save & Sync</span>
+            <i class="fas fa-cloud-upload-alt"></i>
+          </button>
+          <button (click)="runAiUpgrade()" class="h-full px-4 py-3 rounded-xl bg-purple-700 text-white font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center justify-between">
+            <span>AI Rebuild Profile</span>
+            <i class="fas fa-robot"></i>
+          </button>
+          <button (click)="deleteProfile()" class="h-full px-4 py-3 rounded-xl bg-red-600 text-white font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center justify-between">
+            <span>Delete Profile</span>
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </section>
+
+      <section *ngIf="aiUpgradePlan()" class="mb-8 p-4 bg-black/50 border border-brand-primary/30 rounded-xl">
+        <div class="flex items-center gap-3 mb-2">
+          <i class="fas fa-brain text-brand-primary"></i>
+          <h3 class="text-sm font-black uppercase tracking-widest text-white">AI Upgrade Blueprint</h3>
+        </div>
+        <p class="text-sm text-slate-200 whitespace-pre-line">{{ aiUpgradePlan() }}</p>
+      </section>
       <div class="absolute top-0 right-0 w-64 h-64 bg-brand-brand-primary/5 rounded-full blur-[100px] -mr-32 -mt-32"></div>
 
       <div [ngSwitch]="activeSection()" class="relative z-10 space-y-12">

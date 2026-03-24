@@ -115,10 +115,10 @@
               <select class="w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 text-xs text-white"
                       [ngModel]="selectedOutputId()"
                       (ngModelChange)="changeOutputDevice($event)">
+                <option [ngValue]="null">System Default</option>
                 <option *ngFor="let dev of outputDevices()" [ngValue]="dev.deviceId">
                   {{ dev.label || 'Unknown Output' }}
                 </option>
-                <option [ngValue]="null">System Default</option>
               </select>
             </div>
           </div>
