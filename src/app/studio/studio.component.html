@@ -23,180 +23,160 @@
     </div>
   </aside>
 
-  <!-- Main Work Area -->
   <div class="main-content">
-    <!-- Top Bar (Transport / Status) -->
+    <!-- Top Bar -->
     <header class="fl-top-bar px-4 flex items-center justify-between shrink-0 relative z-50">
-       <div class="flex items-center gap-4">
-          <div class="flex items-center gap-2 text-brand-primary">
-             <span class="material-symbols-outlined text-xl">token</span>
-             <h2 class="text-slate-100 text-xs font-black tracking-tight uppercase italic leading-none">STUDIO PRO <span class="text-brand-primary">v4</span></h2>
-          </div>
-          <div class="h-6 w-px bg-white/10"></div>
-          <div class="flex items-center gap-3 bg-black/40 px-3 py-1 rounded border border-brand-primary/20">
-             <span class="material-symbols-outlined text-brand-primary text-xs">schedule</span>
-             <span class="text-brand-primary font-mono text-lg font-bold tracking-[0.1em]">{{ currentBeat().toFixed(0) }}</span>
-          </div>
-       </div>
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2 text-brand-primary">
+          <span class="material-symbols-outlined text-xl">token</span>
+          <h2 class="text-slate-100 text-xs font-black tracking-tight uppercase italic leading-none">
+            STUDIO PRO <span class="text-brand-primary">v4</span>
+          </h2>
+        </div>
+        <div class="h-6 w-px bg-white/10"></div>
+        <div class="flex items-center gap-3 bg-black/40 px-3 py-1 rounded border border-brand-primary/20">
+          <span class="material-symbols-outlined text-brand-primary text-xs">schedule</span>
+          <span class="text-brand-primary font-mono text-lg font-bold tracking-[0.1em]">{{ currentBeat().toFixed(0) }}</span>
+        </div>
+      </div>
 
-       <div class="flex items-center gap-4">
-          <div class="hidden md:flex flex-col items-end opacity-60 mr-4">
-             <span class="text-[6px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Neural Hub Status</span>
-             <span class="text-[9px] font-bold text-white uppercase tracking-tight italic">{{ aiService.strategicDecrees()[0] }}</span>
-          </div>
-          <button (click)="aiService.performExecutiveAudit()" class="btn-pro btn-pro-primary text-[8px] font-black tracking-widest py-1 px-4 h-auto uppercase">
-             Audit
-          </button>
-       </div>
+      <div class="flex items-center gap-4">
+        <div class="hidden md:flex flex-col items-end opacity-60 mr-4">
+          <span class="text-[6px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Neural Hub Status</span>
+          <span class="text-[9px] font-bold text-white uppercase tracking-tight italic">{{ aiService.strategicDecrees()[0] }}</span>
+        </div>
+        <button
+          (click)="aiService.performExecutiveAudit()"
+          class="btn-pro btn-pro-primary text-[8px] font-black tracking-widest py-1 px-4 h-auto uppercase"
+        >
+          Audit
+        </button>
+      </div>
     </header>
 
-    <!-- CENTRAL PLAYLIST HUB -->
-    <main class="playlist-hub bg-[#121212]">
-      <!-- ALWAYS VISIBLE: Arrangement View (The Playlist) -->
-      <div class="absolute inset-0 z-10">
-         <app-arrangement-view></app-arrangement-view>
-      </div>
-
-     <div class="flex items-center gap-2 md:gap-4">
-        <div class="hidden xl:flex items-center gap-3 opacity-80">
-           <i class="fas fa-tower-broadcast text-brand-primary text-xs animate-pulse"></i>
-           <div class="flex flex-col">
-              <span class="text-[7px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">AI Strategic Decree</span>
-              <span class="text-[10px] font-bold text-white uppercase tracking-tight italic">{{ aiService.strategicDecrees()[0] }}</span>
-           </div>
-        </div>
-        <div class="flex items-center gap-1 md:gap-2 bg-black/40 px-3 md:px-4 py-1.5 rounded-lg border border-white/5">
-           <div class="flex flex-col items-center px-1 md:px-2">
-              <span class="text-[7px] font-black text-slate-500 uppercase">CPU</span>
-              <span class="text-[9px] md:text-[10px] font-mono font-bold text-brand-primary">{{ aiService.systemStatus().cpuLoad }}%</span>
-           </div>
-           <div class="h-4 w-px bg-white/10"></div>
-           <div class="flex flex-col items-center px-1 md:px-2">
-              <span class="text-[7px] font-black text-slate-500 uppercase">MEM</span>
-              <span class="text-[9px] md:text-[10px] font-mono font-bold text-cyan-400">{{ aiService.systemStatus().memoryUsage }}G</span>
-           </div>
-        </div>
-        <button (click)="aiService.performExecutiveAudit()" class="btn-elegant btn-elegant-primary text-[8px] md:text-[9px] font-black tracking-widest py-1 md:py-1.5 px-3 md:px-6 h-auto uppercase">
-           Audit
-        </button>
-     </div>
-  </header>
-
-  <!-- VIEW NAVIGATION -->
-  <div class="flex items-center justify-between px-4 md:px-6 py-2 md:py-3 bg-[#1a110b] border-b border-white/5 shrink-0 shadow-inner overflow-hidden">
-     <div class="view-nav-container flex-grow">
+    <!-- View Navigation -->
+    <div class="flex items-center justify-between px-4 md:px-6 py-2 md:py-3 bg-[#1a110b] border-b border-white/5 shrink-0 shadow-inner overflow-hidden">
+      <div class="view-nav-container flex-grow">
         <div class="flex items-center gap-1 min-w-max">
-           @for (view of ['dj', 'drum-machine', 'piano-roll', 'mixer', 'vocal-suite', 'performance', 'mastering']; track view) {
-              <button (click)="activeView.set((view))"
-                      class="px-3 md:px-5 py-1.5 rounded text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all duration-300 border border-transparent whitespace-nowrap"
-                      [class.bg-brand-primary/20]="activeView() === view"
-                      [class.text-brand-primary]="activeView() === view"
-                      [class.border-brand-primary/20]="activeView() === view"
-                      [class.text-slate-500]="activeView() !== view"
-                      [class.hover:text-white]="activeView() !== view">
-                 {{ view.replace('-', ' ') }}
-              </button>
-           }
+          @for (view of ['dj', 'drum-machine', 'piano-roll', 'mixer', 'vocal-suite', 'performance', 'mastering']; track view) {
+            <button
+              (click)="activeView.set(view)"
+              class="px-3 md:px-5 py-1.5 rounded text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all duration-300 border border-transparent whitespace-nowrap"
+              [class.bg-brand-primary/20]="activeView() === view"
+              [class.text-brand-primary]="activeView() === view"
+              [class.border-brand-primary/20]="activeView() === view"
+              [class.text-slate-500]="activeView() !== view"
+              [class.hover:text-white]="activeView() !== view"
+            >
+              {{ view.replace('-', ' ') }}
+            </button>
+          }
         </div>
-     </div>
-     <div class="hidden sm:flex gap-4 ml-4">
-        <button (click)="showMixer.set(!showMixer())" class="text-[10px] font-black uppercase tracking-widest transition-all" [class.text-brand-primary]="showMixer()" [class.text-slate-500]="!showMixer()">Mixer</button>
-        <button (click)="showRack.set(!showRack())" class="text-[10px] font-black uppercase tracking-widest transition-all" [class.text-brand-primary]="showRack()" [class.text-slate-500]="!showRack()">Rack</button>
-     </div>
-  </div>
+      </div>
+      <div class="hidden sm:flex gap-4 ml-4">
+        <button
+          (click)="showMixer.set(!showMixer())"
+          class="text-[10px] font-black uppercase tracking-widest transition-all"
+          [class.text-brand-primary]="showMixer()"
+          [class.text-slate-500]="!showMixer()"
+        >
+          Mixer
+        </button>
+        <button
+          (click)="showRack.set(!showRack())"
+          class="text-[10px] font-black uppercase tracking-widest transition-all"
+          [class.text-brand-primary]="showRack()"
+          [class.text-slate-500]="!showRack()"
+        >
+          Rack
+        </button>
+      </div>
+    </div>
 
-  <!-- MAIN WORKSPACE -->
-  <main class="flex-grow relative overflow-hidden bg-background-dark">
-     <!-- DRUM MACHINE VIEW -->
-     <div class="absolute inset-0 transition-opacity duration-500" [class.opacity-100]="activeView() === 'drum-machine'" [class.pointer-events-none]="activeView() !== 'drum-machine'" [class.opacity-0]="activeView() !== 'drum-machine'">
-        <app-drum-machine></app-drum-machine>
-     </div>
+    <!-- Main Workspace -->
+    <main class="flex-grow relative overflow-hidden bg-background-dark">
+      <div class="absolute inset-0 z-10">
+        <app-arrangement-view></app-arrangement-view>
+      </div>
 
-     <!-- DJ VIEW -->
-     <div class="absolute inset-0 transition-opacity duration-500" [class.opacity-100]="activeView() === 'dj'" [class.pointer-events-none]="activeView() !== 'dj'" [class.opacity-0]="activeView() !== 'dj'">
+      <div
+        class="absolute inset-0 z-20 transition-all duration-500"
+        [class.opacity-100]="activeView() === 'dj'"
+        [class.pointer-events-none]="activeView() !== 'dj'"
+        [class.opacity-0]="activeView() !== 'dj'"
+      >
         <app-dj-deck></app-dj-deck>
-     </div>
-      <!-- DJ VIEW OVERLAY -->
-      <div class="absolute inset-0 z-20 transition-all duration-500"
-           [class.opacity-100]="activeView() === 'dj'"
-           [class.pointer-events-none]="activeView() !== 'dj'"
-           [class.opacity-0]="activeView() !== 'dj'">
-         <app-dj-deck></app-dj-deck>
       </div>
 
-      <!-- MIXER VIEW OVERLAY -->
-      <div class="absolute inset-0 z-20 transition-all duration-500"
-           [class.opacity-100]="activeView() === 'mixer'"
-           [class.pointer-events-none]="activeView() !== 'mixer'"
-           [class.opacity-0]="activeView() !== 'mixer'">
-         <app-mixer></app-mixer>
+      <div
+        class="absolute inset-0 z-20 transition-all duration-500"
+        [class.opacity-100]="activeView() === 'mixer'"
+        [class.pointer-events-none]="activeView() !== 'mixer'"
+        [class.opacity-0]="activeView() !== 'mixer'"
+      >
+        <app-mixer></app-mixer>
       </div>
 
-      <!-- VOCAL SUITE VIEW OVERLAY -->
-      <div class="absolute inset-0 z-20 transition-all duration-500"
-           [class.opacity-100]="activeView() === 'vocal-suite'"
-           [class.pointer-events-none]="activeView() !== 'vocal-suite'"
-           [class.opacity-0]="activeView() !== 'vocal-suite'">
-         <app-vocal-suite></app-vocal-suite>
+      <div
+        class="absolute inset-0 z-20 transition-all duration-500"
+        [class.opacity-100]="activeView() === 'vocal-suite'"
+        [class.pointer-events-none]="activeView() !== 'vocal-suite'"
+        [class.opacity-0]="activeView() !== 'vocal-suite'"
+      >
+        <app-vocal-suite></app-vocal-suite>
       </div>
 
-      <!-- MASTERING VIEW OVERLAY -->
-      <div class="absolute inset-0 z-20 transition-all duration-500"
-           [class.opacity-100]="activeView() === 'mastering'"
-           [class.pointer-events-none]="activeView() !== 'mastering'"
-           [class.opacity-0]="activeView() !== 'mastering'">
-         <app-mastering-suite></app-mastering-suite>
+      <div
+        class="absolute inset-0 z-20 transition-all duration-500"
+        [class.opacity-100]="activeView() === 'mastering'"
+        [class.pointer-events-none]="activeView() !== 'mastering'"
+        [class.opacity-0]="activeView() !== 'mastering'"
+      >
+        <app-mastering-suite></app-mastering-suite>
       </div>
 
-      <!-- PERFORMANCE VIEW OVERLAY -->
-      <div class="absolute inset-0 z-20 transition-all duration-500"
-           [class.opacity-100]="activeView() === 'performance'"
-           [class.pointer-events-none]="activeView() !== 'performance'"
-           [class.opacity-0]="activeView() !== 'performance'">
+      <div
+        class="absolute inset-0 z-20 transition-all duration-500"
+        [class.opacity-100]="activeView() === 'drum-machine'"
+        [class.pointer-events-none]="activeView() !== 'drum-machine'"
+        [class.opacity-0]="activeView() !== 'drum-machine'"
+      >
+        <app-drum-machine></app-drum-machine>
+      </div>
+
+      <div
+        class="absolute inset-0 z-20 transition-all duration-500"
+        [class.opacity-100]="activeView() === 'performance'"
+        [class.pointer-events-none]="activeView() !== 'performance'"
+        [class.opacity-0]="activeView() !== 'performance'"
+      >
         <div class="absolute inset-0 flex items-center justify-center bg-black/80">
           <div class="text-center p-8 glass-card rounded-3xl border border-brand-primary/20 max-w-sm animate-enter mx-4">
-             <span class="material-symbols-outlined !text-4xl text-brand-primary mb-6 animate-pulse">sensors</span>
-             <h2 class="text-lg font-black text-white uppercase tracking-widest mb-4">Performance Rehearsal</h2>
-             <button (click)="uiService.navigateToView('practice')" class="btn-pro btn-pro-primary text-[10px] font-black uppercase w-full py-3">Open Practice Space</button>
+            <span class="material-symbols-outlined !text-4xl text-brand-primary mb-6 animate-pulse">sensors</span>
+            <h2 class="text-lg font-black text-white uppercase tracking-widest mb-4">Performance Rehearsal</h2>
+            <button (click)="uiService.navigateToView('practice')" class="btn-pro btn-pro-primary text-[10px] font-black uppercase w-full py-3">
+              Open Practice Space
+            </button>
           </div>
         </div>
       </div>
 
-      <!-- THE SLIDING EDITORS (Piano Roll / Drum Machine) -->
-      <!-- Piano Roll (Triggered when track/clip selected) -->
       <div class="fl-editor-overlay" [class.visible]="showPianoRoll()">
-         <div class="editor-header">
-            <div class="flex items-center gap-3">
-               <span class="material-symbols-outlined text-emerald-400 text-sm">grid_on</span>
-               <span class="text-[10px] font-black text-white uppercase tracking-widest">Piano Roll</span>
-            </div>
-            <button (click)="showPianoRoll.set(false)" class="text-slate-500 hover:text-white transition-colors">
-               <span class="material-symbols-outlined text-sm">close</span>
-            </button>
-         </div>
-         <div class="flex-grow overflow-hidden">
-            <app-piano-roll></app-piano-roll>
-         </div>
-      </div>
-
-      <!-- Drum Machine (Triggered manually or by clip) -->
-      <div class="fl-editor-overlay" [class.visible]="activeView() === 'drum-machine'">
-         <div class="editor-header">
-            <div class="flex items-center gap-3">
-               <span class="material-symbols-outlined text-pink-400 text-sm">apps</span>
-               <span class="text-[10px] font-black text-white uppercase tracking-widest">Drum Machine</span>
-            </div>
-            <button (click)="activeView.set('dj')" class="text-slate-500 hover:text-white transition-colors">
-               <span class="material-symbols-outlined text-sm">close</span>
-            </button>
-         </div>
-         <div class="flex-grow overflow-hidden">
-            <app-drum-machine></app-drum-machine>
-         </div>
+        <div class="editor-header">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-emerald-400 text-sm">grid_on</span>
+            <span class="text-[10px] font-black text-white uppercase tracking-widest">Piano Roll</span>
+          </div>
+          <button (click)="showPianoRoll.set(false)" class="text-slate-500 hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-sm">close</span>
+          </button>
+        </div>
+        <div class="flex-grow overflow-hidden">
+          <app-piano-roll></app-piano-roll>
+        </div>
       </div>
     </main>
 
-    <!-- TRANSPORT CONTROL (FL Style Bottom Bar) -->
     <app-transport-bar class="shrink-0 border-t border-white/5"></app-transport-bar>
   </div>
 </div>

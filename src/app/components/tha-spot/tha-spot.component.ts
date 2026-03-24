@@ -5,11 +5,10 @@ import {
   OnInit,
   OnDestroy,
   HostListener,
-  computed,
   ViewChild,
   ElementRef,
 } from '@angular/core';
-import { CommonModule, DecimalPipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Router } from '@angular/router';
@@ -31,7 +30,7 @@ interface ChatMessage {
 @Component({
   selector: 'app-tha-spot',
   standalone: true,
-  imports: [CommonModule, FormsModule, DecimalPipe],
+  imports: [CommonModule, FormsModule],
   templateUrl: './tha-spot.component.html',
   styleUrls: ['./tha-spot.component.css'],
 })
@@ -63,9 +62,8 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
   ]);
 
   chatMessages = signal<ChatMessage[]>([]);
-  newChatMessage = signal('');
+  newChatMessage = '';
   isChatOpen = signal(false);
-  chatActive = signal(false);
 
   // Isometric floor state
   floorRotation = signal({ x: 60, z: -45 });
@@ -73,12 +71,8 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
   private isDragging = false;
   private lastMousePos = { x: 0, y: 0 };
 
-  // Isometric View State
-  floorPan = signal({ x: 0, y: 0 });
-  floorTilt = signal(60);
-  floorRotate = signal(-45);
-
-  constructor() {}
+  // Placeholder for game updates from iframe
+  gameData = signal<any>({});
 
   ngOnInit() {
     this.fetchGames();
@@ -90,7 +84,13 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
         timestamp: new Date(),
         isSystem: true,
       },
-        { id: '1', user: 'SYSTEM', text: 'NEURAL LINK ESTABLISHED. WELCOME TO THA SPOT.', timestamp: new Date(), isSystem: true }
+      {
+        id: '2',
+        user: 'SYSTEM',
+        text: 'NEURAL LINK ESTABLISHED. WELCOME TO THA SPOT.',
+        timestamp: new Date(),
+        isSystem: true,
+      },
     ]);
   }
 
@@ -110,7 +110,7 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
     this.uiService.navigateToView(mode as MainViewMode);
   }
 
-  playGame(game: any) {
+  playGame(game: Game) {
     if (game.tags?.includes('Multiplayer') || Math.random() > 0.7) {
       this.startMatchmaking(game);
     } else {
@@ -118,7 +118,7 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
     }
   }
 
-  startMatchmaking(game: any) {
+  startMatchmaking(game: Game) {
     this.isSearching.set(true);
     this.matchFound.set(false);
     this.searchProgress.set(0);
@@ -149,13 +149,14 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
     this.isChatOpen.update((v) => !v);
   }
 
-  chatActive() {
+  chatActive(): boolean {
     return this.isChatOpen();
   }
 
   sendChatMessage() {
-    const text = this.newChatMessage();
+    const text = this.newChatMessage.trim();
     if (!text) return;
+
     this.chatMessages.update((msgs) => [
       ...msgs,
       {
@@ -165,17 +166,11 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
         timestamp: new Date(),
       },
     ]);
-    this.newChatMessage.set('');
+    this.newChatMessage = '';
   }
 
-  getFloorTransform() {
-    return `rotateX(${this.floorTilt()}deg) rotateZ(${this.floorRotate()}deg) translate(${this.floorPan().x}px, ${this.floorPan().y}px)`;
-  toggleChat() {
-    this.chatActive.update(v => !v);
-  }
-
-  navigateTo(path: string) {
-    this.router.navigate([path]);
+  setActiveTab(tab: string) {
+    this.activeTab.set(tab);
   }
 
   getFloorTransform() {
@@ -191,9 +186,9 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
     if (!this.isDragging) return;
     const deltaX = event.clientX - this.lastMousePos.x;
     const deltaY = event.clientY - this.lastMousePos.y;
-    this.floorRotation.update(r => ({
+    this.floorRotation.update((r) => ({
       x: Math.max(30, Math.min(80, r.x - deltaY * 0.5)),
-      z: r.z + deltaX * 0.5
+      z: r.z + deltaX * 0.5,
     }));
     this.lastMousePos = { x: event.clientX, y: event.clientY };
   }
@@ -209,40 +204,30 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
     return `pos-${row}-${col}`;
   }
 
-  @HostListener('window:message', [''])
+  @HostListener('window:message', ['$event'])
   onMessage(event: MessageEvent) {
-    const type = event.data?.type;
-    const payload = event.data?.payload || event.data?.data;
+    const type = (event as MessageEvent).data?.type;
+    const payload = (event as MessageEvent).data?.payload || (event as MessageEvent).data?.data;
 
     if (type === 'GAME_UPDATE' && payload) {
-      this.gameData.update(d => ({ ...d, ...payload }));
+      this.gameData.update((d: any) => ({ ...d, ...payload }));
 
-      if (payload.score > 1000) {
-        if (payload.score % 5000 < 500) {
-           this.chatMessages.update(msgs => [...msgs, {
-             id: Date.now().toString(),
-             user: 'S.M.U.V.E',
-             text: `EXECUTIVE PERFORMANCE DETECTED: ${payload.score} POINTS. STATUS SYNCED.`,
-             timestamp: new Date(),
-             isSystem: true
-           }]);
-        }
+      if (payload.score > 1000 && payload.score % 5000 < 500) {
+        this.chatMessages.update((msgs) => [
+          ...msgs,
+          {
+            id: Date.now().toString(),
+            user: 'S.M.U.V.E',
+            text: `EXECUTIVE PERFORMANCE DETECTED: ${payload.score} POINTS. STATUS SYNCED.`,
+            timestamp: new Date(),
+            isSystem: true,
+          },
+        ]);
       }
     }
   }
 
-  onFloorMouseDown(event?: any) {}
-  onFloorMouseMove(event?: any) {}
-  onFloorMouseUp(event?: any) {}
-
-  setActiveTab(tab: string) {
-    this.activeTab.set(tab);
+  navigateToPath(path: string) {
+    this.router.navigate([path]);
   }
-
-  getStationPos(index: number) {
-    return 'station-' + index;
-  }
-
-  @HostListener('window:message', [''])
-  onMessage(event: MessageEvent) {}
 }

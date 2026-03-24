@@ -5,7 +5,6 @@ import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 
 const MOCK_GAMES: Game[] = [
-  // Music/Hub Originals
   {
     id: '1',
     name: 'Tha Battlefield',
@@ -16,8 +15,7 @@ const MOCK_GAMES: Game[] = [
     rating: 4.9,
     playersOnline: 1250,
     image: 'https://picsum.photos/seed/battle/300/200',
-    tags: ['Multiplayer', 'Original', 'PvP'],
-    tags: ['Multiplayer', 'Original', 'PvP', 'station-pod']
+    tags: ['Multiplayer', 'Original', 'PvP', 'station-pod'],
   },
   {
     id: '2',
@@ -29,8 +27,7 @@ const MOCK_GAMES: Game[] = [
     rating: 4.7,
     playersOnline: 850,
     image: 'https://picsum.photos/seed/remix/300/200',
-    tags: ['Multiplayer', 'Original', 'Co-op'],
-    tags: ['Multiplayer', 'Original', 'Co-op', 'station-pod']
+    tags: ['Multiplayer', 'Original', 'Co-op', 'station-pod'],
   },
   {
     id: '3',
@@ -42,35 +39,29 @@ const MOCK_GAMES: Game[] = [
     rating: 4.5,
     playersOnline: 2100,
     image: 'https://picsum.photos/seed/beat/300/200',
-    tags: ['Multiplayer', 'Arcade'],
-    tags: ['Multiplayer', 'Arcade', 'station-cabinet']
+    tags: ['Multiplayer', 'Arcade', 'station-cabinet'],
   },
-
-  // SHOOTER
   {
     id: '5',
     name: 'Vanguard: elegant Strike',
     url: 'https://html5.gamedistribution.com/694921971d9c4909a34d0b0b8c28373b/',
-    description:
-      'Elite executive shooter set in a dystopian refined-glow future.',
+    description: 'Elite executive shooter set in a dystopian refined-glow future.',
     genre: 'Shooter',
     rating: 4.9,
     playersOnline: 3400,
     image: 'https://picsum.photos/seed/vanguard/300/200',
-    tags: ['Multiplayer', 'PvP', 'FPS', 'station-pod']
+    tags: ['Multiplayer', 'PvP', 'FPS', 'station-pod'],
   },
   {
     id: '6',
     name: 'pro-grade Assassin',
     url: 'https://html5.gamedistribution.com/5f65349479e04874983058869c0d4561/',
-    description:
-      'Stealth and precision meet high-speed action in the underworld.',
+    description: 'Stealth and precision meet high-speed action in the underworld.',
     genre: 'Shooter',
     rating: 4.8,
     playersOnline: 1800,
     image: 'https://picsum.photos/seed/assassin/300/200',
-    tags: ['Single Player', 'Action'],
-    tags: ['Single Player', 'Action', 'station-cabinet']
+    tags: ['Single Player', 'Action', 'station-cabinet'],
   },
   {
     id: '30',
@@ -81,11 +72,8 @@ const MOCK_GAMES: Game[] = [
     rating: 4.7,
     playersOnline: 1200,
     image: 'https://picsum.photos/seed/swat/300/200',
-    tags: ['Multiplayer', 'Tactical'],
-    tags: ['Multiplayer', 'Tactical', 'station-pod']
+    tags: ['Multiplayer', 'Tactical', 'station-pod'],
   },
-
-  // RACING
   {
     id: '40',
     name: 'Neon Velocity',
@@ -95,8 +83,7 @@ const MOCK_GAMES: Game[] = [
     rating: 4.6,
     playersOnline: 2500,
     image: 'https://picsum.photos/seed/racing1/300/200',
-    tags: ['Multiplayer', 'Racing'],
-    tags: ['Multiplayer', 'Racing', 'station-cabinet']
+    tags: ['Multiplayer', 'Racing', 'station-cabinet'],
   },
   {
     id: '41',
@@ -107,11 +94,8 @@ const MOCK_GAMES: Game[] = [
     rating: 4.8,
     playersOnline: 1900,
     image: 'https://picsum.photos/seed/racing2/300/200',
-    tags: ['Multiplayer', 'Competitive'],
-    tags: ['Multiplayer', 'Competitive', 'station-pod']
+    tags: ['Multiplayer', 'Competitive', 'station-pod'],
   },
-
-  // SPORTS
   {
     id: '50',
     name: 'Street Hoops Pro',
@@ -121,24 +105,19 @@ const MOCK_GAMES: Game[] = [
     rating: 4.7,
     playersOnline: 3100,
     image: 'https://picsum.photos/seed/sports1/300/200',
-    tags: ['Multiplayer', 'Sports'],
-    tags: ['Multiplayer', 'Sports', 'station-cabinet']
+    tags: ['Multiplayer', 'Sports', 'station-cabinet'],
   },
   {
     id: '51',
     name: 'Global Soccer Duel',
     url: 'https://html5.gamedistribution.com/d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6/',
-    description:
-      'Face off against players worldwide in high-stakes soccer duels.',
+    description: 'Face off against players worldwide in high-stakes soccer duels.',
     genre: 'Sports',
     rating: 4.5,
     playersOnline: 4200,
     image: 'https://picsum.photos/seed/sports2/300/200',
-    tags: ['Multiplayer', 'PvP'],
-    tags: ['Multiplayer', 'PvP', 'station-pod']
+    tags: ['Multiplayer', 'PvP', 'station-pod'],
   },
-
-  // STRATEGY
   {
     id: '60',
     name: 'Empire Command',
@@ -148,8 +127,7 @@ const MOCK_GAMES: Game[] = [
     rating: 4.9,
     playersOnline: 5600,
     image: 'https://picsum.photos/seed/strategy1/300/200',
-    tags: ['Multiplayer', 'RTS'],
-    tags: ['Multiplayer', 'RTS', 'station-pod']
+    tags: ['Multiplayer', 'RTS', 'station-pod'],
   },
   {
     id: '61',
@@ -160,11 +138,8 @@ const MOCK_GAMES: Game[] = [
     rating: 4.8,
     playersOnline: 2200,
     image: 'https://picsum.photos/seed/strategy2/300/200',
-    tags: ['Multiplayer', 'Classic'],
-    tags: ['Multiplayer', 'Classic', 'station-cabinet']
+    tags: ['Multiplayer', 'Classic', 'station-cabinet'],
   },
-
-  // PUZZLE
   {
     id: '70',
     name: 'Cyber Enigma',
@@ -174,8 +149,7 @@ const MOCK_GAMES: Game[] = [
     rating: 4.7,
     playersOnline: 1400,
     image: 'https://picsum.photos/seed/puzzle1/300/200',
-    tags: ['Single Player', 'Logic'],
-    tags: ['Single Player', 'Logic', 'station-cabinet']
+    tags: ['Single Player', 'Logic', 'station-cabinet'],
   },
   {
     id: '71',
@@ -186,11 +160,8 @@ const MOCK_GAMES: Game[] = [
     rating: 4.6,
     playersOnline: 3800,
     image: 'https://picsum.photos/seed/puzzle2/300/200',
-    tags: ['Multiplayer', 'PvP'],
-    tags: ['Multiplayer', 'PvP', 'station-pod']
+    tags: ['Multiplayer', 'PvP', 'station-pod'],
   },
-
-  // ADVENTURE
   {
     id: '18',
     name: 'Mystic Realms',
@@ -200,23 +171,18 @@ const MOCK_GAMES: Game[] = [
     rating: 4.8,
     playersOnline: 3200,
     image: 'https://picsum.photos/seed/mystic/300/200',
-    tags: ['Single Player', 'RPG'],
-    tags: ['Single Player', 'RPG', 'station-pod']
+    tags: ['Single Player', 'RPG', 'station-pod'],
   },
-
-  // CLASSIC
   {
     id: '10',
     name: 'Pac-Man Retro',
     url: 'https://html5.gamedistribution.com/602934415a2a4b8787c672b1a8f6d7c1/',
-    description:
-      'The ultimate arcade classic, remastered for the S.M.U.V.E. network.',
+    description: 'The ultimate arcade classic, remastered for the S.M.U.V.E. network.',
     genre: 'Classic',
     rating: 4.9,
     playersOnline: 8500,
     image: 'https://picsum.photos/seed/pacman/300/200',
-    tags: ['Single Player', 'Arcade'],
-    tags: ['Single Player', 'Arcade', 'station-cabinet']
+    tags: ['Single Player', 'Arcade', 'station-cabinet'],
   },
   {
     id: '11',
@@ -228,8 +194,7 @@ const MOCK_GAMES: Game[] = [
     rating: 4.8,
     playersOnline: 4200,
     image: 'https://picsum.photos/seed/galaga/300/200',
-    tags: ['Single Player', 'Shooter'],
-    tags: ['Single Player', 'Shooter', 'station-cabinet']
+    tags: ['Single Player', 'Shooter', 'station-cabinet'],
   },
   {
     id: '12',
@@ -240,11 +205,10 @@ const MOCK_GAMES: Game[] = [
     rating: 4.8,
     playersOnline: 5200,
     image: 'https://picsum.photos/seed/hextris/300/200',
-    tags: ['Single Player', 'Arcade'],
+    tags: ['Single Player', 'Arcade', 'station-cabinet'],
   },
-    tags: ['Single Player', 'Arcade', 'station-cabinet']
-  }
 ];
+
 const GAMES_API_URL =
   'https://firebasestorage.googleapis.com/v0/b/builder-406918.appspot.com/o/gaming-pwa%2Fgames.json?alt=media';
 
@@ -265,15 +229,11 @@ export class GameService implements OnDestroy {
   }
 
   getGame(id: string): Observable<Game | undefined> {
-    return this.listGames({}).pipe(
-      map((games) => games.find((g) => g.id === id))
-    );
+    return this.listGames({}).pipe(map((games) => games.find((g) => g.id === id)));
   }
 
   getTrending(): Observable<Game[]> {
-    return this.listGames({}, 'Popular').pipe(
-      map((games) => games.slice(0, 5))
-    );
+    return this.listGames({}, 'Popular').pipe(map((games) => games.slice(0, 5)));
   }
 
   getNew(): Observable<Game[]> {
@@ -300,12 +260,9 @@ export class GameService implements OnDestroy {
       );
     }
 
-    // Apply Sorting
     switch (sort) {
       case 'Popular':
-        filtered.sort(
-          (a, b) => (b.playersOnline || 0) - (a.playersOnline || 0)
-        );
+        filtered.sort((a, b) => (b.playersOnline || 0) - (a.playersOnline || 0));
         break;
       case 'Rating':
         filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));

@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AiService, AdvisorAdvice } from '../../services/ai.service';
+import { AiService } from '../../services/ai.service';
+import { AdvisorAdvice } from '../../types/ai.types';
 import { UserContextService } from '../../services/user-context.service';
 
 @Component({

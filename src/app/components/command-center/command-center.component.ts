@@ -8,9 +8,12 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UIService } from '../../services/ui.service';
-import { AiService, StrategicRecommendation } from '../../services/ai.service';
+import { AiService } from '../../services/ai.service';
 import { UserProfileService } from '../../services/user-profile.service';
-import { UpgradeRecommendation } from '../../types/ai.types';
+import {
+  UpgradeRecommendation,
+  StrategicRecommendation,
+} from '../../types/ai.types';
 
 interface TerminalLog {
   timestamp: number;

@@ -1,6 +1,7 @@
-import { Injectable, inject, signal, Injector } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LoggingService } from './logging.service';
+import { UserProfileService } from './user-profile.service';
 import { firstValueFrom } from 'rxjs';
 
 export interface SecurityLog {
@@ -27,8 +28,10 @@ export interface UserSession {
 })
 export class SecurityService {
   private http = inject(HttpClient);
-  private injector = inject(Injector);
   private logger = inject(LoggingService);
+  private profileService = inject(UserProfileService);
+
+  // NOTE: backend URL can be swapped via environment later.
   private readonly API_URL = 'http://localhost:3000/api';
 
   logs = signal<SecurityLog[]>([]);
@@ -37,20 +40,15 @@ export class SecurityService {
   async logEvent(
     eventType: string,
     description: string,
-    userId: string = 'anonymous'
-  ) {
-  private get profileService() {
-    return this.injector.get(UserProfileService);
-  }
-
-  async logEvent(eventType: string, description: string) {
+    userId?: string
+  ): Promise<void> {
     const profile = this.profileService.profile();
-    if (!profile.artistName) return;
+    const resolvedUserId = userId || (profile as any)?.id || 'anonymous';
 
     try {
       await firstValueFrom(
         this.http.post(`${this.API_URL}/security/log`, {
-          userId,
+          userId: resolvedUserId,
           eventType,
           description,
           ipAddress: '127.0.0.1',
@@ -58,11 +56,12 @@ export class SecurityService {
         })
       );
     } catch (error) {
+      // Logging should never break the app.
       this.logger.error('Failed to log security event', error);
     }
   }
 
-  async fetchLogs(userId: string = 'anonymous') {
+  async fetchLogs(userId: string = 'anonymous'): Promise<void> {
     try {
       const data = await firstValueFrom(
         this.http.get<SecurityLog[]>(`${this.API_URL}/security/logs/${userId}`)
@@ -73,12 +72,10 @@ export class SecurityService {
     }
   }
 
-  async fetchSessions(userId: string = 'anonymous') {
+  async fetchSessions(userId: string = 'anonymous'): Promise<void> {
     try {
       const data = await firstValueFrom(
-        this.http.get<UserSession[]>(
-          `${this.API_URL}/security/sessions/${userId}`
-        )
+        this.http.get<UserSession[]>(`${this.API_URL}/security/sessions/${userId}`)
       );
       this.sessions.set(data);
     } catch (error) {
@@ -86,17 +83,13 @@ export class SecurityService {
     }
   }
 
-  async revokeSession(sessionId: string, userId: string = 'anonymous') {
+  async revokeSession(sessionId: string, userId: string = 'anonymous'): Promise<void> {
     try {
       await firstValueFrom(
         this.http.delete(`${this.API_URL}/security/session/${sessionId}`)
       );
       await this.fetchSessions(userId);
-      await this.logEvent(
-        'SESSION_REVOKED',
-        `Revoked session ${sessionId}`,
-        userId
-      );
+      await this.logEvent('SESSION_REVOKED', `Revoked session ${sessionId}`, userId);
     } catch (error) {
       this.logger.error('Failed to revoke session', error);
     }
@@ -107,7 +100,7 @@ export class SecurityService {
     deviceName: string,
     location: string,
     userId: string
-  ) {
+  ): Promise<void> {
     try {
       await firstValueFrom(
         this.http.post(`${this.API_URL}/security/session`, {

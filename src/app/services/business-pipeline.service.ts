@@ -5,7 +5,6 @@ import {
   BusinessPipeline,
   BusinessPipelineType,
   BusinessStage,
-  BusinessStep,
 } from '../types/business.types';
 
 @Injectable({
@@ -28,10 +27,7 @@ export class BusinessPipelineService {
     }
   }
 
-  async initializeModule(
-    type: BusinessPipelineType,
-    name: string
-  ): Promise<string> {
+  async initializeModule(type: BusinessPipelineType, name: string): Promise<string> {
     const newPipeline: BusinessPipeline = {
       id: `biz-${Date.now()}`,
       type,
@@ -58,49 +54,41 @@ export class BusinessPipelineService {
   ): Promise<void> {
     const pipelines = this.activePipelines();
     const updated = pipelines.map((p) => {
-      if (p.id === pipelineId) {
-        const updatedStages = p.stages.map((s) => {
-          if (s.id === stageId) {
-            const updatedSteps = s.steps.map((step) => {
-              if (step.id === stepId) {
-                return { ...step, status };
-              }
-              return step;
-            });
-            const allStepsDone = updatedSteps.every(
-              (st) => st.status === 'Completed'
-            );
-            return {
-              ...s,
-              steps: updatedSteps,
-              status: (allStepsDone ? 'Completed' : 'In Progress') as any,
-            };
-          }
-          return s;
-        });
+      if (p.id !== pipelineId) return p;
 
-        // Check if current stage is completed to increment index
-        let newIndex = p.currentStageIndex;
-        if (
-          updatedStages[newIndex].status === 'Completed' &&
-          newIndex < updatedStages.length - 1
-        ) {
-          newIndex++;
-          // Unlock next stage
-          updatedStages[newIndex].status = 'In Progress';
-        }
+      const updatedStages = p.stages.map((s) => {
+        if (s.id !== stageId) return s;
 
+        const updatedSteps = s.steps.map((step) =>
+          step.id === stepId ? { ...step, status } : step
+        );
+
+        const allStepsDone = updatedSteps.every((st) => st.status === 'Completed');
         return {
-          ...p,
-          stages: updatedStages,
-          currentStageIndex: newIndex,
-          status: (updatedStages.every((st) => st.status === 'Completed')
-            ? 'Completed'
-            : 'Active') as any,
-          updatedAt: Date.now(),
+          ...s,
+          steps: updatedSteps,
+          status: (allStepsDone ? 'Completed' : 'In Progress') as any,
         };
+      });
+
+      let newIndex = p.currentStageIndex;
+      if (
+        updatedStages[newIndex]?.status === 'Completed' &&
+        newIndex < updatedStages.length - 1
+      ) {
+        newIndex++;
+        updatedStages[newIndex].status = 'In Progress';
       }
-      return p;
+
+      return {
+        ...p,
+        stages: updatedStages,
+        currentStageIndex: newIndex,
+        status: (updatedStages.every((st) => st.status === 'Completed')
+          ? 'Completed'
+          : 'Active') as any,
+        updatedAt: Date.now(),
+      };
     });
 
     this.activePipelines.set(updated);
@@ -135,11 +123,9 @@ export class BusinessPipelineService {
               {
                 id: 'step-2',
                 title: 'Style Selection',
-                description:
-                  'Choose between Oversized, Vintage, or Tech-Noir aesthetics.',
+                description: 'Choose between Oversized, Vintage, or Tech-Noir aesthetics.',
                 status: 'Pending',
-                aiGuidance:
-                  'Market trends favor High-Voltage neons this quarter. Choose wisely.',
+                aiGuidance: 'Market trends favor High-Voltage neons this quarter. Choose wisely.',
               },
             ],
           },
@@ -151,8 +137,7 @@ export class BusinessPipelineService {
               {
                 id: 'step-3',
                 title: 'AI Mockups',
-                description:
-                  'Generate high-fidelity designs using S.M.U.V.E. Lab.',
+                description: 'Generate high-fidelity designs using S.M.U.V.E. Lab.',
                 status: 'Pending',
                 aiGuidance:
                   'I will generate 3 options based on your sonic profile. Pick the one that screams "Iconic".',
@@ -168,8 +153,7 @@ export class BusinessPipelineService {
               {
                 id: 'step-4',
                 title: 'Vendor Setup',
-                description:
-                  'Connect with Print-on-Demand or bulk manufacturers.',
+                description: 'Connect with Print-on-Demand or bulk manufacturers.',
                 status: 'Pending',
                 aiGuidance:
                   'Efficiency is king. I recommend starting with POD to test the market.',
@@ -177,6 +161,7 @@ export class BusinessPipelineService {
             ],
           },
         ];
+
       case 'Record Label':
         return [
           {
@@ -189,16 +174,14 @@ export class BusinessPipelineService {
                 title: 'Brand Mission',
                 description: 'Define what your label stands for.',
                 status: 'Pending',
-                aiGuidance:
-                  'A label is a promise. What are you promising your future roster?',
+                aiGuidance: 'A label is a promise. What are you promising your future roster?',
               },
               {
                 id: 'step-2',
                 title: 'Visual Identity',
                 description: 'Logo and official assets.',
                 status: 'Pending',
-                aiGuidance:
-                  'Keep it clean, keep it authoritarian. The label logo should command respect.',
+                aiGuidance: 'Keep it clean, keep it authoritarian. The label logo should command respect.',
               },
             ],
           },
@@ -212,8 +195,7 @@ export class BusinessPipelineService {
                 title: 'Business Structure',
                 description: 'Form an LLC or Corp.',
                 status: 'Pending',
-                aiGuidance:
-                  'Protect your assets. An LLC is the bare minimum for a Strategic Commander.',
+                aiGuidance: 'Protect your assets. An LLC is the bare minimum for a Strategic Commander.',
                 actionType: 'External',
               },
               {
@@ -225,12 +207,8 @@ export class BusinessPipelineService {
               },
             ],
           },
-            id: 'stg-2', name: 'Legal Foundation', status: 'Locked', steps: [
-              { id: 'step-3', title: 'Business Structure', description: 'Form an LLC or Corp.', status: 'Pending', aiGuidance: 'Protect your assets. An LLC is the bare minimum for a Neural Core.', actionType: 'External' },
-              { id: 'step-4', title: 'EIN Registration', description: 'Get your Federal Tax ID.', status: 'Pending', aiGuidance: 'You cannot scale without a Tax ID. Do it now.' }
-            ]
-          }
         ];
+
       case 'PRO':
         return [
           {
@@ -274,12 +252,12 @@ export class BusinessPipelineService {
                 title: 'Works Registration',
                 description: 'Register your catalog.',
                 status: 'Pending',
-                aiGuidance:
-                  'Unregistered songs are unpaid songs. Register everything.',
+                aiGuidance: 'Unregistered songs are unpaid songs. Register everything.',
               },
             ],
           },
         ];
+
       case 'Website':
         return [
           {
@@ -292,16 +270,14 @@ export class BusinessPipelineService {
                 title: 'Domain Selection',
                 description: 'Claim your .com or .io territory.',
                 status: 'Pending',
-                aiGuidance:
-                  'Your domain name is your digital flag. Avoid dashes if possible.',
+                aiGuidance: 'Your domain name is your digital flag. Avoid dashes if possible.',
               },
               {
                 id: 'step-2',
                 title: 'Hosting Setup',
                 description: 'Secure high-performance hosting.',
                 status: 'Pending',
-                aiGuidance:
-                  'Elite sites require zero latency. I suggest a CDN-backed hosting provider.',
+                aiGuidance: 'Elite sites require zero latency. I suggest a CDN-backed hosting provider.',
               },
             ],
           },
@@ -322,6 +298,7 @@ export class BusinessPipelineService {
             ],
           },
         ];
+
       case 'Legal':
         return [
           {
@@ -350,6 +327,7 @@ export class BusinessPipelineService {
             ],
           },
         ];
+
       default:
         return [];
     }
