@@ -162,7 +162,11 @@ export class UIService {
   }
 
   getViewLabel(mode: MainViewMode): string {
-    return this.viewConfigs.find((v) => v.mode === mode)?.label ?? mode;
+    const fallback = mode
+      .split('-')
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' ');
+    return this.viewConfigs.find((v) => v.mode === mode)?.label ?? fallback;
   }
 
   navigateToView(mode: MainViewMode) {
