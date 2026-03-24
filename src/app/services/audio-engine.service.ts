@@ -190,14 +190,18 @@ export class AudioEngineService {
         if (this.outputSink) this.outputSink.muted = false;
         try {
           this.masterAnalyser.connect(this.ctx.destination);
-        } catch {}
+        } catch (err) {
+          this.logger.warn('Output reroute connect failed', err);
+        }
       }
     } else {
       this.selectedOutputId.set(null);
       if (this.outputSink) this.outputSink.muted = false;
       try {
         this.masterAnalyser.connect(this.ctx.destination);
-      } catch {}
+      } catch (err) {
+        this.logger.warn('Output default connect failed', err);
+      }
     }
   }
 

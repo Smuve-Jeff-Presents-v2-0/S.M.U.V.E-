@@ -11,6 +11,10 @@ import {
 import { LoggingService } from './logging.service';
 import { MarketingService } from './marketing.service';
 
+interface ReleaseKnowledgeBase {
+  currentRelease?: ReleaseProject;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -27,9 +31,8 @@ export class ReleasePipelineService {
 
   private loadActiveRelease() {
     const profile = this.profileService.profile();
-    const knowledgeBase = profile.knowledgeBase || {};
-    const current = (knowledgeBase as { currentRelease?: ReleaseProject })
-      .currentRelease;
+    const knowledgeBase = (profile.knowledgeBase || {}) as ReleaseKnowledgeBase;
+    const current = knowledgeBase.currentRelease;
     if (current) {
       const hydrated: ReleaseProject = {
         ...current,
@@ -43,7 +46,7 @@ export class ReleasePipelineService {
     const profile = this.profileService.profile();
     const now = Date.now();
     const newRelease: ReleaseProject = {
-      id: `rel-${Date.now()}`,
+      id: `rel-${now}`,
       name,
       type,
       description: '',

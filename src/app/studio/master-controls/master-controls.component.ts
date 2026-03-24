@@ -125,6 +125,6 @@ export class MasterControlsComponent implements OnInit {
   }
 
   async changeOutputDevice(deviceId: string | null) {
-    await this.audioEngine.setOutputDevice(deviceId || null);
+    await this.audioEngine.setOutputDevice(deviceId);
   }
 }
