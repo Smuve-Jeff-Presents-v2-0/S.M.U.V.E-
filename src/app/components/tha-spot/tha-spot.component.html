@@ -1,7 +1,14 @@
-<div class="tha-spot-container min-h-screen bg-black text-white relative overflow-hidden flex flex-col">
+<div
+  class="tha-spot-container min-h-screen bg-black text-white relative overflow-hidden flex flex-col"
+  [ngClass]="qualityModeClass()"
+>
+  <div class="theme-ambient-layer"></div>
+  <div class="theme-ambient-noise"></div>
+  <div class="theme-grid-glow"></div>
+
   <!-- Interactive HUD Header -->
   <div
-    class="hud-header glass-v42 border-b border-white/10 p-4 md:p-6 flex items-center justify-between z-20 sticky top-0 bg-black/80 backdrop-blur-md"
+    class="hud-header theme-panel border-b border-white/10 p-4 md:p-6 flex items-center justify-between z-20 sticky top-0 bg-black/80 backdrop-blur-md"
   >
     <div class="flex items-center gap-4">
       <div
@@ -35,12 +42,17 @@
       >
         <span class="material-symbols-outlined">forum</span>
       </button>
-      <button
-        (click)="setActiveTab('arcade')"
-        class="btn-pro btn-pro-primary h-8 md:h-10 text-[10px] md:text-xs"
-      >
-        FLOOR
-      </button>
+      <div class="quality-control flex items-center gap-1 p-1 rounded-lg bg-white/5 border border-white/10">
+        <button
+          *ngFor="let quality of ['Performance', 'Balanced', 'Ultra']"
+          (click)="setVisualQuality(quality)"
+          [class.bg-brand-primary]="visualQuality() === quality"
+          [class.text-black]="visualQuality() === quality"
+          class="px-2 py-1 text-[9px] uppercase font-black tracking-wide rounded-md text-white/70 hover:text-white transition-all"
+        >
+          {{ quality }}
+        </button>
+      </div>
     </div>
   </div>
 
@@ -48,15 +60,15 @@
   <div class="flex-grow relative flex flex-col lg:flex-row min-h-0">
     <!-- Sidebar Controls -->
     <aside
-      class="w-full lg:w-80 border-b lg:border-b-0 lg:border-r border-white/10 bg-black/40 backdrop-blur-md p-4 md:p-6 flex flex-col gap-6 z-10 shrink-0"
+      class="theme-sidebar w-full lg:w-80 border-b lg:border-b-0 lg:border-r border-white/10 bg-black/40 backdrop-blur-md p-4 md:p-6 flex flex-col gap-6 z-10 shrink-0"
     >
       <section>
         <h3 class="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-4">
-          Navigation
+          Game Discovery
         </h3>
         <div class="grid grid-cols-2 lg:grid-cols-1 gap-2">
           <button
-            *ngFor="let tab of ['Arcade', 'Arena', 'Lounge', 'Vault']"
+            *ngFor="let tab of ['Discover', 'Multiplayer', 'AI Arena', 'Classics']"
             (click)="setActiveTab(tab)"
             [class.bg-brand-primary/10]="activeTab() === tab"
             [class.border-brand-primary/30]="activeTab() === tab"
@@ -66,6 +78,40 @@
             <span class="material-symbols-outlined text-xs text-brand-primary"
               >arrow_forward</span
             >
+          </button>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <div>
+          <label class="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-2"
+            >Search Games</label
+          >
+          <input
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)"
+            type="text"
+            placeholder="Search by name, genre, tag"
+            class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-[10px] text-white focus:border-brand-primary outline-none"
+          />
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <button
+            *ngFor="let mode of ['Popular', 'Rating']"
+            (click)="setSortMode(mode)"
+            [class.bg-white/15]="sortMode() === mode"
+            class="p-2 text-[10px] font-black rounded-md border border-white/10 hover:bg-white/10 transition-all"
+          >
+            Sort: {{ mode }}
+          </button>
+          <button
+            *ngFor="let capability of ['All', 'Multiplayer', 'AI']"
+            (click)="setCapabilityFilter(capability)"
+            [class.bg-brand-primary/20]="capabilityFilter() === capability"
+            class="p-2 text-[10px] font-black rounded-md border border-white/10 hover:bg-white/10 transition-all"
+          >
+            {{ capability }}
           </button>
         </div>
       </section>
@@ -120,24 +166,36 @@
           </div>
 
           <!-- Game Stations -->
-          @for (game of games(); track game.id; let i = $index) {
+          @for (game of filteredGames(); track game.id; let i = $index) {
             <div
-              class="station-wrapper absolute w-24 h-40"
+              class="station-wrapper absolute w-28 h-44"
               [ngClass]="getStationPos(i)"
-              [style.top.px]="300 + (i * 150)"
-              [style.left.px]="200 + (i * 100)"
+              [style.top.px]="220 + ((i % 6) * 210)"
+              [style.left.px]="140 + (Math.floor(i / 6) * 230)"
               (click)="playGame(game)"
             >
               <div
-                class="w-full h-full bg-white/5 border border-white/10 rounded-t-xl overflow-hidden group hover:border-brand-primary transition-all"
+                class="theme-station-card w-full h-full bg-black/70 border border-white/15 rounded-xl overflow-hidden group hover:border-brand-primary transition-all shadow-xl"
               >
                 <img
                   *ngIf="game.image"
                   [src]="game.image"
-                  class="w-full h-1/2 object-cover opacity-40 group-hover:opacity-100"
+                  [alt]="game.name + ' cover art'"
+                  class="w-full h-[45%] object-cover opacity-70 group-hover:opacity-100"
                 />
-                <div class="p-2">
-                  <span class="text-[7px] font-black text-brand-primary uppercase">{{ game.name }}</span>
+                <div class="p-2 space-y-1">
+                  <div class="text-[8px] font-black text-brand-primary uppercase leading-tight">
+                    {{ game.name }}
+                  </div>
+                  <div class="text-[7px] text-white/60 uppercase">{{ game.genre || 'Arcade' }}</div>
+                  <div class="flex flex-wrap gap-1">
+                    <span
+                      *ngFor="let tag of (game.tags || []).slice(0, 2)"
+                      class="px-1.5 py-0.5 rounded bg-white/10 text-[6px] font-bold uppercase tracking-wider"
+                      >{{ tag }}</span
+                    >
+                  </div>
+                  <div class="text-[7px] text-white/80">{{ game.playersOnline || 0 | number }} online</div>
                 </div>
               </div>
             </div>
@@ -150,7 +208,7 @@
   <!-- Chat HUD: Adaptive Sidebar -->
   <aside
     *ngIf="chatActive()"
-    class="fixed top-0 right-0 h-full w-full sm:w-80 bg-black/95 backdrop-blur-2xl border-l border-white/10 z-[100] flex flex-col animate-enter"
+    class="theme-chat fixed top-0 right-0 h-full w-full sm:w-80 bg-black/95 backdrop-blur-2xl border-l border-white/10 z-[100] flex flex-col animate-enter"
   >
     <header class="p-6 border-b border-white/10 flex items-center justify-between">
       <span class="text-[10px] font-black text-white uppercase tracking-[0.2em]">Neural Chat Sync</span>
@@ -196,7 +254,7 @@
   <!-- Matchmaking Overlay -->
   <div
     *ngIf="isSearching()"
-    class="fixed inset-0 z-[150] bg-black/98 backdrop-blur-2xl flex items-center justify-center p-8 animate-enter"
+    class="theme-overlay fixed inset-0 z-[150] bg-black/98 backdrop-blur-2xl flex items-center justify-center p-8 animate-enter"
   >
     <div class="text-center max-w-md w-full">
       <div class="relative w-40 h-40 mx-auto mb-12 flex items-center justify-center">
@@ -216,7 +274,7 @@
   <!-- Game Overlay -->
   <div
     *ngIf="currentGame()"
-    class="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 md:p-8 animate-enter"
+    class="theme-overlay fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 md:p-8 animate-enter"
   >
     <div
       class="w-full h-full max-w-7xl glass-v42 rounded-3xl border-2 border-brand-primary/30 flex flex-col overflow-hidden shadow-2xl"
