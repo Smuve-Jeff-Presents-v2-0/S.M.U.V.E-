@@ -27,12 +27,15 @@ export class ReleasePipelineService {
 
   private loadActiveRelease() {
     const profile = this.profileService.profile();
-    const current = (profile.knowledgeBase as any).currentRelease;
+    const knowledgeBase = profile.knowledgeBase || {};
+    const current = (knowledgeBase as { currentRelease?: ReleaseProject })
+      .currentRelease;
     if (current) {
-      if (!(current as any).officialTasks) {
-        (current as any).officialTasks = this.createOfficialTasks();
-      }
-      this.activeRelease.set(current);
+      const hydrated: ReleaseProject = {
+        ...current,
+        officialTasks: current.officialTasks || this.createOfficialTasks(),
+      };
+      this.activeRelease.set(hydrated);
     }
   }
 

@@ -116,7 +116,7 @@
                       [ngModel]="selectedOutputId()"
                       (ngModelChange)="changeOutputDevice($event)">
                 <option *ngFor="let dev of outputDevices()" [ngValue]="dev.deviceId">
-                  {{ dev.label || ('Device ' + dev.deviceId.slice(0,5)) }}
+                  {{ dev.label || 'Unknown Output' }}
                 </option>
                 <option [ngValue]="null">System Default</option>
               </select>

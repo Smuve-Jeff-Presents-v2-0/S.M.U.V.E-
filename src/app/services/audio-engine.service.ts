@@ -165,6 +165,7 @@ export class AudioEngineService {
       this.outputSink = new Audio();
       this.outputSink.autoplay = true;
       this.outputSink.srcObject = this.outputDestination.stream;
+      // Start muted so we do not double-route audio until a sink is selected
       this.outputSink.muted = true;
       try {
         await this.outputSink.play();
@@ -180,7 +181,9 @@ export class AudioEngineService {
         this.outputSink.muted = false;
         try {
           this.masterAnalyser.disconnect(this.ctx.destination);
-        } catch {}
+        } catch (err) {
+          this.logger.warn('Output reroute disconnect failed', err);
+        }
       } catch (e) {
         this.logger.warn('Unable to route audio to device', deviceId, e);
         this.selectedOutputId.set(null);
@@ -258,6 +261,7 @@ export class AudioEngineService {
     deck.eqHigh.type = 'highshelf';
     deck.eqHigh.frequency.value = 4000;
     deck.filter.type = 'lowpass';
+    // Keep the default filter fully open to avoid muffled playback
     deck.filter.frequency.value = this.ctx.sampleRate / 2;
 
     deck.analyser.fftSize = 1024;
