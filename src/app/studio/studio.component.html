@@ -57,6 +57,65 @@
          <app-arrangement-view></app-arrangement-view>
       </div>
 
+     <div class="flex items-center gap-2 md:gap-4">
+        <div class="hidden xl:flex items-center gap-3 opacity-80">
+           <i class="fas fa-tower-broadcast text-brand-primary text-xs animate-pulse"></i>
+           <div class="flex flex-col">
+              <span class="text-[7px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">AI Strategic Decree</span>
+              <span class="text-[10px] font-bold text-white uppercase tracking-tight italic">{{ aiService.strategicDecrees()[0] }}</span>
+           </div>
+        </div>
+        <div class="flex items-center gap-1 md:gap-2 bg-black/40 px-3 md:px-4 py-1.5 rounded-lg border border-white/5">
+           <div class="flex flex-col items-center px-1 md:px-2">
+              <span class="text-[7px] font-black text-slate-500 uppercase">CPU</span>
+              <span class="text-[9px] md:text-[10px] font-mono font-bold text-brand-primary">{{ aiService.systemStatus().cpuLoad }}%</span>
+           </div>
+           <div class="h-4 w-px bg-white/10"></div>
+           <div class="flex flex-col items-center px-1 md:px-2">
+              <span class="text-[7px] font-black text-slate-500 uppercase">MEM</span>
+              <span class="text-[9px] md:text-[10px] font-mono font-bold text-cyan-400">{{ aiService.systemStatus().memoryUsage }}G</span>
+           </div>
+        </div>
+        <button (click)="aiService.performExecutiveAudit()" class="btn-elegant btn-elegant-primary text-[8px] md:text-[9px] font-black tracking-widest py-1 md:py-1.5 px-3 md:px-6 h-auto uppercase">
+           Audit
+        </button>
+     </div>
+  </header>
+
+  <!-- VIEW NAVIGATION -->
+  <div class="flex items-center justify-between px-4 md:px-6 py-2 md:py-3 bg-[#1a110b] border-b border-white/5 shrink-0 shadow-inner overflow-hidden">
+     <div class="view-nav-container flex-grow">
+        <div class="flex items-center gap-1 min-w-max">
+           @for (view of ['dj', 'drum-machine', 'piano-roll', 'mixer', 'vocal-suite', 'performance', 'mastering']; track view) {
+              <button (click)="activeView.set((view))"
+                      class="px-3 md:px-5 py-1.5 rounded text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all duration-300 border border-transparent whitespace-nowrap"
+                      [class.bg-brand-primary/20]="activeView() === view"
+                      [class.text-brand-primary]="activeView() === view"
+                      [class.border-brand-primary/20]="activeView() === view"
+                      [class.text-slate-500]="activeView() !== view"
+                      [class.hover:text-white]="activeView() !== view">
+                 {{ view.replace('-', ' ') }}
+              </button>
+           }
+        </div>
+     </div>
+     <div class="hidden sm:flex gap-4 ml-4">
+        <button (click)="showMixer.set(!showMixer())" class="text-[10px] font-black uppercase tracking-widest transition-all" [class.text-brand-primary]="showMixer()" [class.text-slate-500]="!showMixer()">Mixer</button>
+        <button (click)="showRack.set(!showRack())" class="text-[10px] font-black uppercase tracking-widest transition-all" [class.text-brand-primary]="showRack()" [class.text-slate-500]="!showRack()">Rack</button>
+     </div>
+  </div>
+
+  <!-- MAIN WORKSPACE -->
+  <main class="flex-grow relative overflow-hidden bg-background-dark">
+     <!-- DRUM MACHINE VIEW -->
+     <div class="absolute inset-0 transition-opacity duration-500" [class.opacity-100]="activeView() === 'drum-machine'" [class.pointer-events-none]="activeView() !== 'drum-machine'" [class.opacity-0]="activeView() !== 'drum-machine'">
+        <app-drum-machine></app-drum-machine>
+     </div>
+
+     <!-- DJ VIEW -->
+     <div class="absolute inset-0 transition-opacity duration-500" [class.opacity-100]="activeView() === 'dj'" [class.pointer-events-none]="activeView() !== 'dj'" [class.opacity-0]="activeView() !== 'dj'">
+        <app-dj-deck></app-dj-deck>
+     </div>
       <!-- DJ VIEW OVERLAY -->
       <div class="absolute inset-0 z-20 transition-all duration-500"
            [class.opacity-100]="activeView() === 'dj'"
