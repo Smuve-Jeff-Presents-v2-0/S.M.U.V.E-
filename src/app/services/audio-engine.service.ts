@@ -183,8 +183,11 @@ export class AudioEngineService {
         } catch {}
       } catch (e) {
         this.logger.warn('Unable to route audio to device', deviceId, e);
-      } finally {
+        this.selectedOutputId.set(null);
         if (this.outputSink) this.outputSink.muted = false;
+        try {
+          this.masterAnalyser.connect(this.ctx.destination);
+        } catch {}
       }
     } else {
       this.selectedOutputId.set(null);
