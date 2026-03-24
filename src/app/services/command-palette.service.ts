@@ -114,7 +114,7 @@ export class CommandPaletteService {
       },
       {
         id: 'executive-audit',
-        label: 'Execute AI Audit',
+        label: 'Executive AI Audit',
         description: 'Trigger a full executive AI audit.',
         category: 'AI',
         shortcut: 'Alt + A',
