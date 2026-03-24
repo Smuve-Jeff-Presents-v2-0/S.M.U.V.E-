@@ -207,6 +207,68 @@ export class BusinessPipelineService {
               },
             ],
           },
+          {
+            id: 'stg-3',
+            name: 'Roster Acquisition',
+            status: 'Locked',
+            steps: [
+              {
+                id: 'step-5',
+                title: 'Talent Pipeline',
+                description: 'Shortlist priority artists to sign.',
+                status: 'Pending',
+                aiGuidance:
+                  'Target creators with momentum. Draft clear split and masters language up front.',
+              },
+              {
+                id: 'step-6',
+                title: 'Offer Issued',
+                description: 'Send official term sheets and hold calls.',
+                status: 'Pending',
+                aiGuidance:
+                  'Move fast—use templated offer packets to stay consistent across artists.',
+              },
+            ],
+          },
+          {
+            id: 'stg-4',
+            name: 'Publishing & PRO Ops',
+            status: 'Locked',
+            steps: [
+              {
+                id: 'step-7',
+                title: 'Publishing Admin',
+                description: 'Stand up publishing entity and split policies.',
+                status: 'Pending',
+                aiGuidance:
+                  'Define writer/publisher splits now to avoid disputes post-release.',
+                actionType: 'Template',
+              },
+              {
+                id: 'step-8',
+                title: 'PRO / IPI Sync',
+                description: 'Register works and map IPIs for roster.',
+                status: 'Pending',
+                aiGuidance:
+                  'Every artist must have their IPI captured before you deliver masters.',
+              },
+            ],
+          },
+          {
+            id: 'stg-5',
+            name: 'Distribution Readiness',
+            status: 'Locked',
+            steps: [
+              {
+                id: 'step-9',
+                title: 'Distributor Onboarding',
+                description: 'Submit label assets, banking, and QC policy.',
+                status: 'Pending',
+                aiGuidance:
+                  'Enable loudness/QC templates so every master passes on first upload.',
+              },
+            ],
+          },
         ];
 
       case 'PRO':

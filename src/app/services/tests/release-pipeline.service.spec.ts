@@ -44,6 +44,7 @@ describe('ReleasePipelineService', () => {
   it('should initialize a release', async () => {
     await service.initializeRelease('Test Album', 'Album');
     expect(service.activeRelease()?.name).toBe('Test Album');
+    expect(service.activeRelease()?.officialTasks.length).toBeGreaterThan(0);
     expect(profileServiceSpy.updateProfile).toHaveBeenCalled();
   });
 
@@ -67,5 +68,24 @@ describe('ReleasePipelineService', () => {
     await service.updateStatus('Released');
     expect(service.activeRelease()?.status).toBe('Released');
     expect(marketingServiceSpy.createCampaign).toHaveBeenCalled();
+  });
+
+  it('should advance status based on official tasks', async () => {
+    await service.initializeRelease('Test Album', 'Album');
+    const strategyTasks = service
+      .activeRelease()!
+      .officialTasks.filter((t) => t.category === 'Strategy');
+    for (const task of strategyTasks) {
+      await service.updateOfficialTask(task.id, 'Completed');
+    }
+    expect(service.activeRelease()!.status).toBe('Production');
+
+    const productionTasks = service
+      .activeRelease()!
+      .officialTasks.filter((t) => t.category === 'Production');
+    for (const task of productionTasks) {
+      await service.updateOfficialTask(task.id, 'Completed');
+    }
+    expect(service.activeRelease()!.status).toBe('Visuals');
   });
 });

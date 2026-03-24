@@ -39,6 +39,9 @@ interface DeckChannel {
 })
 export class AudioEngineService {
   public outputMode = signal<'speakers' | 'headphones'>('speakers');
+  public availableOutputs = signal<MediaDeviceInfo[]>([]);
+  public selectedOutputId = signal<string | null>(null);
+
   private logger = inject(LoggingService);
   private stemSeparationService = inject(StemSeparationService);
   public ctx: AudioContext;
@@ -51,6 +54,8 @@ export class AudioEngineService {
   private delayNode: DelayNode;
   public delayWet: GainNode;
   private recordingDestination: MediaStreamAudioDestinationNode | null = null;
+  private outputDestination: MediaStreamAudioDestinationNode | null = null;
+  private outputSink: HTMLAudioElement | null = null;
   public masterAnalyser: AnalyserNode;
   public getMasterAnalyser() {
     return this.masterAnalyser;
@@ -116,6 +121,7 @@ export class AudioEngineService {
     this.initDeck('A');
     this.initDeck('B');
     this.loadDefaultImpulse();
+    this.refreshOutputDevices();
   }
 
   getContext() {
@@ -134,6 +140,61 @@ export class AudioEngineService {
   setOutputMode(mode: 'speakers' | 'headphones') {
     this.outputMode.set(mode);
   }
+
+  async refreshOutputDevices() {
+    if (typeof navigator === 'undefined' || !navigator.mediaDevices) return;
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const outputs = devices.filter((d) => d.kind === 'audiooutput');
+      this.availableOutputs.set(outputs);
+      if (!this.selectedOutputId() && outputs.length > 0) {
+        this.selectedOutputId.set(outputs[0].deviceId);
+      }
+    } catch (e) {
+      this.logger.warn('Failed to enumerate output devices', e);
+    }
+  }
+
+  async setOutputDevice(deviceId: string | null) {
+    if (typeof document === 'undefined') return;
+    if (!this.outputDestination) {
+      this.outputDestination = this.ctx.createMediaStreamDestination();
+      this.masterAnalyser.connect(this.outputDestination);
+    }
+    if (!this.outputSink) {
+      this.outputSink = new Audio();
+      this.outputSink.autoplay = true;
+      this.outputSink.srcObject = this.outputDestination.stream;
+      this.outputSink.muted = true;
+      try {
+        await this.outputSink.play();
+      } catch (e) {
+        this.logger.warn('Output sink play blocked', e);
+      }
+    }
+
+    if (deviceId && (this.outputSink as any).setSinkId) {
+      try {
+        await (this.outputSink as any).setSinkId(deviceId);
+        this.selectedOutputId.set(deviceId);
+        this.outputSink.muted = false;
+        try {
+          this.masterAnalyser.disconnect(this.ctx.destination);
+        } catch {}
+      } catch (e) {
+        this.logger.warn('Unable to route audio to device', deviceId, e);
+      } finally {
+        if (this.outputSink) this.outputSink.muted = false;
+      }
+    } else {
+      this.selectedOutputId.set(null);
+      if (this.outputSink) this.outputSink.muted = false;
+      try {
+        this.masterAnalyser.connect(this.ctx.destination);
+      } catch {}
+    }
+  }
+
   resume() {
     if (this.ctx.state === 'suspended') this.ctx.resume();
   }
@@ -193,6 +254,8 @@ export class AudioEngineService {
     deck.eqMid.Q.value = 1;
     deck.eqHigh.type = 'highshelf';
     deck.eqHigh.frequency.value = 4000;
+    deck.filter.type = 'lowpass';
+    deck.filter.frequency.value = this.ctx.sampleRate / 2;
 
     deck.analyser.fftSize = 1024;
 

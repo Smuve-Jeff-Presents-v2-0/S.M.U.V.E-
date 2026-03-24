@@ -2,6 +2,23 @@ export type ReleaseType = 'Album' | 'EP' | 'Mixtape' | 'Single';
 
 export type ProductionStageStatus = 'Pending' | 'In Progress' | 'Completed';
 
+export type ReleaseTaskCategory =
+  | 'Strategy'
+  | 'Production'
+  | 'Visuals'
+  | 'Admin'
+  | 'Distribution';
+
+export type ReleaseTaskStatus = 'Pending' | 'In Progress' | 'Completed';
+
+export interface ReleaseTask {
+  id: string;
+  label: string;
+  category: ReleaseTaskCategory;
+  description?: string;
+  status: ReleaseTaskStatus;
+}
+
 export interface ProductionTrack {
   id: string;
   title: string;
@@ -37,6 +54,7 @@ export interface ReleaseProject {
     proIpi?: string;
     collaborators: string[];
   };
+   officialTasks: ReleaseTask[];
   marketingCampaignId?: string;
   createdAt: number;
   updatedAt: number;

@@ -1,7 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReleasePipelineService } from '../../services/release-pipeline.service';
-import { ProductionTrack, ReleaseType } from '../../types/release.types';
+import {
+  ProductionTrack,
+  ReleaseTask,
+  ReleaseTaskCategory,
+  ReleaseTaskStatus,
+  ReleaseType,
+} from '../../types/release.types';
 import { Router } from '@angular/router';
 import { RouterModule } from '@angular/router';
 
@@ -22,6 +28,13 @@ export class ReleasePipelineComponent {
 
   distributionProgress = signal(0);
   isDistributing = signal(false);
+  readonly categories: ReleaseTaskCategory[] = [
+    'Strategy',
+    'Production',
+    'Visuals',
+    'Admin',
+    'Distribution',
+  ];
 
   startNewRelease(name: string, type: ReleaseType) {
     this.releaseService.initializeRelease(name, type);
@@ -43,6 +56,16 @@ export class ReleasePipelineComponent {
 
   completeStage(trackId: string, stage: any) {
     this.releaseService.updateTrackStage(trackId, stage, 'Completed');
+  }
+
+  toggleTask(task: ReleaseTask, status: ReleaseTaskStatus) {
+    this.releaseService.updateOfficialTask(task.id, status);
+  }
+
+  tasksFor(category: ReleaseTaskCategory): ReleaseTask[] {
+    const rel = this.releaseService.activeRelease();
+    if (!rel) return [];
+    return rel.officialTasks.filter((t) => t.category === category);
   }
 
   async triggerDistribution() {
