@@ -58,8 +58,8 @@
 
             <div class="flex-1 w-full space-y-5">
               <div class="progress-meta">
-                <span>{{ (playerService.progress() / 100 * broadcastDurationSeconds) | number: '1.0-1' }}s</span>
-                <span>{{ broadcastDurationSeconds }}s</span>
+                <span>{{ (playerService.progress() / 100 * broadcastDuration) | number: '1.0-1' }}s</span>
+                <span>{{ broadcastDuration }}s</span>
               </div>
               <div class="progress-track">
                 <div class="progress-fill" [style.width.%]="playerService.progress()"></div>

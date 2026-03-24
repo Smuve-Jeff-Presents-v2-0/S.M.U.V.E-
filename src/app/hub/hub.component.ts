@@ -51,7 +51,7 @@ export class HubComponent implements OnInit, OnDestroy, AfterViewInit {
     { label: 'Pipeline', value: '5', foot: 'Releases in mastering' },
     { label: 'Momentum', value: '+18%', foot: 'Month over month growth' },
   ];
-  broadcastDurationSeconds = 320;
+  broadcastDuration = 320;
   marketPulse = [
     'Streaming spike – West Coast',
     'Vinyl preorders up 12%',
