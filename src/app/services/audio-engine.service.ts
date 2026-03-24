@@ -165,7 +165,7 @@ export class AudioEngineService {
       this.outputSink = new Audio();
       this.outputSink.autoplay = true;
       this.outputSink.srcObject = this.outputDestination.stream;
-      // Start muted so we do not double-route audio until a sink is selected
+      // Start muted to avoid double-routing with the default destination until routing is configured
       this.outputSink.muted = true;
       try {
         await this.outputSink.play();
@@ -265,7 +265,7 @@ export class AudioEngineService {
     deck.eqHigh.type = 'highshelf';
     deck.eqHigh.frequency.value = 4000;
     deck.filter.type = 'lowpass';
-    // Keep the default filter fully open to avoid muffled playback
+    // Keep the default filter effectively bypassed by setting cutoff to Nyquist to avoid muffled playback
     deck.filter.frequency.value = this.ctx.sampleRate / 2;
 
     deck.analyser.fftSize = 1024;
