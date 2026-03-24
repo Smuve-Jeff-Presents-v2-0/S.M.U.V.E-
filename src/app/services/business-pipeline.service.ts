@@ -225,6 +225,11 @@ export class BusinessPipelineService {
               },
             ],
           },
+            id: 'stg-2', name: 'Legal Foundation', status: 'Locked', steps: [
+              { id: 'step-3', title: 'Business Structure', description: 'Form an LLC or Corp.', status: 'Pending', aiGuidance: 'Protect your assets. An LLC is the bare minimum for a Neural Core.', actionType: 'External' },
+              { id: 'step-4', title: 'EIN Registration', description: 'Get your Federal Tax ID.', status: 'Pending', aiGuidance: 'You cannot scale without a Tax ID. Do it now.' }
+            ]
+          }
         ];
       case 'PRO':
         return [

@@ -119,6 +119,137 @@ export class AuthService {
     artistName: string
   ): Promise<{ success: boolean; message: string }> {
     return this.login(credentials);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 800));
+
+      const existingUser = localStorage.getItem(`smuve_user_${credentials.email}`);
+      if (existingUser) {
+        return {
+          success: false,
+          message: 'An artist with this email already exists in the S.M.U.V.E 4.2 system.',
+        };
+      }
+
+      const newUser: AuthUser = {
+        id: this.generateUserId(),
+        email: credentials.email,
+        artistName: artistName,
+        role: 'Admin',
+        permissions: ['ALL_ACCESS'],
+        createdAt: new Date(),
+        lastLogin: new Date(),
+        profileCompleteness: 0,
+      };
+
+      const newProfile: UserProfile = {
+        ...initialProfile,
+        artistName: artistName,
+      };
+
+      localStorage.setItem(
+        `smuve_user_${credentials.email}`,
+        this.encrypt(JSON.stringify({
+          user: newUser,
+          passwordHash: this.hashPassword(credentials.password),
+        }))
+      );
+
+      this._currentUser.set(newUser);
+      this._userProfile.set(newProfile);
+      this._isAuthenticated.set(true);
+      this.saveSession(newUser, newProfile);
+
+      await this.securityService.logEvent('ACCOUNT_CREATED', 'New artist account registered.');
+
+      return {
+        success: true,
+        message: 'Welcome to S.M.U.V.E 4.2 Your journey to greatness begins now.',
+      };
+    } catch {
+      return {
+        success: false,
+        message: 'Registration failed. The system encountered an error.',
+      };
+    }
+  }
+
+  async login(
+    credentials: AuthCredentials
+  ): Promise<{ success: boolean; message: string; requires2FA?: boolean }> {
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 800));
+
+      const encryptedUserData = localStorage.getItem(`smuve_user_${credentials.email}`);
+      if (!encryptedUserData) {
+        return {
+          success: false,
+          message: 'No artist found with this email. Register to begin your journey.',
+        };
+      }
+
+      const userData = this.decrypt(encryptedUserData);
+      if (!userData) {
+         return {
+          success: false,
+          message: 'Security breach detected. Data corrupted.',
+        };
+      }
+
+      const { user, passwordHash } = JSON.parse(userData);
+
+      if (this.hashPassword(credentials.password) !== passwordHash) {
+        await this.securityService.logEvent('LOGIN_FAILURE', `Failed login attempt for ${credentials.email}`);
+        return {
+          success: false,
+          message: 'Incorrect password. Access denied.',
+        };
+      }
+
+      // Check for 2FA in profile
+      const encryptedProfile = localStorage.getItem('smuve_user_profile');
+      const profileData = encryptedProfile ? this.decrypt(encryptedProfile) : null;
+      const profile = profileData ? JSON.parse(profileData) : initialProfile;
+
+      if (profile.settings.security?.twoFactorEnabled && !credentials.twoFactorCode) {
+         return {
+           success: false,
+           message: 'Two-Factor Authentication required.',
+           requires2FA: true
+         };
+      }
+      if (profile.settings.security?.twoFactorEnabled && credentials.twoFactorCode !== '123456') { // Mock check
+          await this.securityService.logEvent('2FA_FAILURE', 'Invalid 2FA code entered.');
+          return {
+            success: false,
+            message: 'Invalid 2FA code. Access denied.',
+          };
+      }
+
+      user.lastLogin = new Date();
+
+      this._currentUser.set(user);
+      this._userProfile.set(profile);
+      this._isAuthenticated.set(true);
+      this.saveSession(user, profile);
+
+      localStorage.setItem(
+        `smuve_user_${credentials.email}`,
+        this.encrypt(JSON.stringify({ user, passwordHash }))
+      );
+
+      const sessionId = this.generateSecureId('sess');
+      await this.securityService.logEvent('LOGIN_SUCCESS', `Artist ${user.artistName} logged in successfully.`);
+
+      return {
+        success: true,
+        message: `Welcome back, ${user.artistName}. S.M.U.V.E 4.2 has been waiting.`,
+      };
+    } catch {
+      return {
+        success: false,
+        message: 'Login failed. The system encountered an error.',
+      };
+    }
   }
 
   logout(): void {

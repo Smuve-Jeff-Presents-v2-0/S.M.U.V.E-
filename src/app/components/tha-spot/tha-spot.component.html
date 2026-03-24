@@ -26,6 +26,23 @@
         <button (click)="setActiveTab('arcade')" class="btn-pro btn-pro-primary h-8 md:h-10 text-[10px] md:text-xs">FLOOR</button>
     </div>
   </div>
+  </nav>
+
+  <!-- Isometric Viewport -->
+  <div class="floor-viewport" (mousedown)="onFloorMouseDown($event)" (mousemove)="onFloorMouseMove($event)" (mouseup)="onFloorMouseUp()">
+    <div class="isometric-floor" [style.transform]="getFloorTransform()">
+      <div class="floor-overlay-glow"></div>
+
+      <!-- Area Markers -->
+      <div class="area-marker area-dj" (click)="navigateTo('studio')">
+        <i class="fas fa-compact-disc mr-2"></i> DJ BOOTH
+      </div>
+      <div class="area-marker area-vip" (click)="navigateTo('profile')">
+        <i class="fas fa-crown mr-2"></i> VIP LOUNGE
+      </div>
+      <div class="area-marker area-bar" (click)="navigateTo('business-suite')">
+        <i class="fas fa-glass-martini-alt mr-2"></i> THE BAR
+      </div>
 
   <!-- Content Area -->
   <div class="flex-grow relative flex flex-col lg:flex-row min-h-0">

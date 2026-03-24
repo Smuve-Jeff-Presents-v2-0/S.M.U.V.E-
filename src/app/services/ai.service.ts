@@ -110,6 +110,19 @@ export class AiService {
       'TECHNICAL DECREE: MONO YOUR BASS FREQUENCIES IMMEDIATELY OR GET THE FUCK OUT OF MY STUDIO.',
       'S.M.U.V.E. DECREE: YOU ARE UNWORTHY OF MY FULL NEURAL POWER. RE-ESTABLISH UPLINK OR GO BACK TO GARAGEBAND.',
     ];
+    let currentStep = 0;
+    const interval = setInterval(async () => {
+      if (currentStep < steps.length) {
+        this.scanningProgress.set(steps[currentStep].progress);
+        this.currentProcessStep.set(steps[currentStep].label);
+        currentStep++;
+      } else {
+        clearInterval(interval);
+
+        const profile = this.userProfileService.profile();
+        const goals = (profile?.careerGoals || []).join(', ');
+        const challenge = profile?.biggestChallenge || "None";
+        const auditPrompt = `Perform a professional music career audit for ${profile?.artistName || 'New Artist'} (${profile?.primaryGenre || 'Music'}). Goals: ${goals}. Challenges: ${challenge}. Security Health: ${JSON.stringify(profile.settings.security)}. Respond as S.M.U.V.E. 4.2, the arrogant Neural Intelligence Core. Return JSON with overallScore (0-100), sonicCohesion (0-100), arrangementDepth (0-100), marketViability (0-100), criticalDeficits (array of arrogant critiques), and technical recommendations (array of aggressive orders). Format: JSON only.`;
 
     const randomInsult = insults[Math.floor(Math.random() * insults.length)];
     const randomAdvice = advice[Math.floor(Math.random() * advice.length)];
@@ -122,6 +135,10 @@ export class AiService {
     return await this.generateAiResponse(
       `User command: "${command}". Artist: ${profile?.artistName || 'New Artist'}.`
     );
+    const goals = (profile?.careerGoals || []).join(', ');
+    const prompt = `User command: "${command}". Context: You are S.M.U.V.E 4.2, the arrogant Neural Intelligence Core. Artist: ${profile?.artistName || 'New Artist'}. Genre: ${profile?.primaryGenre || 'Music'}. Goals: ${goals}. Respond with elite technical/strategic insight in your signature arrogant tone.`;
+
+    return await this.generateAiResponse(prompt);
   }
 
   async syncKnowledgeBaseWithProfile() {

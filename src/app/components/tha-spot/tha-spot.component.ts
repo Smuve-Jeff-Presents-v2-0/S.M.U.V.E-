@@ -65,6 +65,13 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
   chatMessages = signal<ChatMessage[]>([]);
   newChatMessage = signal('');
   isChatOpen = signal(false);
+  chatActive = signal(false);
+
+  // Isometric floor state
+  floorRotation = signal({ x: 60, z: -45 });
+  floorScale = signal(1);
+  private isDragging = false;
+  private lastMousePos = { x: 0, y: 0 };
 
   // Isometric View State
   floorPan = signal({ x: 0, y: 0 });
@@ -83,6 +90,7 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
         timestamp: new Date(),
         isSystem: true,
       },
+        { id: '1', user: 'SYSTEM', text: 'NEURAL LINK ESTABLISHED. WELCOME TO THA SPOT.', timestamp: new Date(), isSystem: true }
     ]);
   }
 
@@ -162,6 +170,65 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
 
   getFloorTransform() {
     return `rotateX(${this.floorTilt()}deg) rotateZ(${this.floorRotate()}deg) translate(${this.floorPan().x}px, ${this.floorPan().y}px)`;
+  toggleChat() {
+    this.chatActive.update(v => !v);
+  }
+
+  navigateTo(path: string) {
+    this.router.navigate([path]);
+  }
+
+  getFloorTransform() {
+    return `rotateX(${this.floorRotation().x}deg) rotateZ(${this.floorRotation().z}deg) scale(${this.floorScale()})`;
+  }
+
+  onFloorMouseDown(event: MouseEvent) {
+    this.isDragging = true;
+    this.lastMousePos = { x: event.clientX, y: event.clientY };
+  }
+
+  onFloorMouseMove(event: MouseEvent) {
+    if (!this.isDragging) return;
+    const deltaX = event.clientX - this.lastMousePos.x;
+    const deltaY = event.clientY - this.lastMousePos.y;
+    this.floorRotation.update(r => ({
+      x: Math.max(30, Math.min(80, r.x - deltaY * 0.5)),
+      z: r.z + deltaX * 0.5
+    }));
+    this.lastMousePos = { x: event.clientX, y: event.clientY };
+  }
+
+  @HostListener('window:mouseup')
+  onFloorMouseUp() {
+    this.isDragging = false;
+  }
+
+  getStationPos(index: number) {
+    const row = Math.floor(index / 4);
+    const col = index % 4;
+    return `pos-${row}-${col}`;
+  }
+
+  @HostListener('window:message', [''])
+  onMessage(event: MessageEvent) {
+    const type = event.data?.type;
+    const payload = event.data?.payload || event.data?.data;
+
+    if (type === 'GAME_UPDATE' && payload) {
+      this.gameData.update(d => ({ ...d, ...payload }));
+
+      if (payload.score > 1000) {
+        if (payload.score % 5000 < 500) {
+           this.chatMessages.update(msgs => [...msgs, {
+             id: Date.now().toString(),
+             user: 'S.M.U.V.E',
+             text: `EXECUTIVE PERFORMANCE DETECTED: ${payload.score} POINTS. STATUS SYNCED.`,
+             timestamp: new Date(),
+             isSystem: true
+           }]);
+        }
+      }
+    }
   }
 
   onFloorMouseDown(event?: any) {}

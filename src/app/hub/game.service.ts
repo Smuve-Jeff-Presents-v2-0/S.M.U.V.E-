@@ -17,6 +17,7 @@ const MOCK_GAMES: Game[] = [
     playersOnline: 1250,
     image: 'https://picsum.photos/seed/battle/300/200',
     tags: ['Multiplayer', 'Original', 'PvP'],
+    tags: ['Multiplayer', 'Original', 'PvP', 'station-pod']
   },
   {
     id: '2',
@@ -29,6 +30,7 @@ const MOCK_GAMES: Game[] = [
     playersOnline: 850,
     image: 'https://picsum.photos/seed/remix/300/200',
     tags: ['Multiplayer', 'Original', 'Co-op'],
+    tags: ['Multiplayer', 'Original', 'Co-op', 'station-pod']
   },
   {
     id: '3',
@@ -41,6 +43,7 @@ const MOCK_GAMES: Game[] = [
     playersOnline: 2100,
     image: 'https://picsum.photos/seed/beat/300/200',
     tags: ['Multiplayer', 'Arcade'],
+    tags: ['Multiplayer', 'Arcade', 'station-cabinet']
   },
 
   // SHOOTER
@@ -54,7 +57,7 @@ const MOCK_GAMES: Game[] = [
     rating: 4.9,
     playersOnline: 3400,
     image: 'https://picsum.photos/seed/vanguard/300/200',
-    tags: ['Multiplayer', 'PvP', 'FPS'],
+    tags: ['Multiplayer', 'PvP', 'FPS', 'station-pod']
   },
   {
     id: '6',
@@ -67,6 +70,7 @@ const MOCK_GAMES: Game[] = [
     playersOnline: 1800,
     image: 'https://picsum.photos/seed/assassin/300/200',
     tags: ['Single Player', 'Action'],
+    tags: ['Single Player', 'Action', 'station-cabinet']
   },
   {
     id: '30',
@@ -78,6 +82,7 @@ const MOCK_GAMES: Game[] = [
     playersOnline: 1200,
     image: 'https://picsum.photos/seed/swat/300/200',
     tags: ['Multiplayer', 'Tactical'],
+    tags: ['Multiplayer', 'Tactical', 'station-pod']
   },
 
   // RACING
@@ -91,6 +96,7 @@ const MOCK_GAMES: Game[] = [
     playersOnline: 2500,
     image: 'https://picsum.photos/seed/racing1/300/200',
     tags: ['Multiplayer', 'Racing'],
+    tags: ['Multiplayer', 'Racing', 'station-cabinet']
   },
   {
     id: '41',
@@ -102,6 +108,7 @@ const MOCK_GAMES: Game[] = [
     playersOnline: 1900,
     image: 'https://picsum.photos/seed/racing2/300/200',
     tags: ['Multiplayer', 'Competitive'],
+    tags: ['Multiplayer', 'Competitive', 'station-pod']
   },
 
   // SPORTS
@@ -115,6 +122,7 @@ const MOCK_GAMES: Game[] = [
     playersOnline: 3100,
     image: 'https://picsum.photos/seed/sports1/300/200',
     tags: ['Multiplayer', 'Sports'],
+    tags: ['Multiplayer', 'Sports', 'station-cabinet']
   },
   {
     id: '51',
@@ -127,6 +135,7 @@ const MOCK_GAMES: Game[] = [
     playersOnline: 4200,
     image: 'https://picsum.photos/seed/sports2/300/200',
     tags: ['Multiplayer', 'PvP'],
+    tags: ['Multiplayer', 'PvP', 'station-pod']
   },
 
   // STRATEGY
@@ -140,6 +149,7 @@ const MOCK_GAMES: Game[] = [
     playersOnline: 5600,
     image: 'https://picsum.photos/seed/strategy1/300/200',
     tags: ['Multiplayer', 'RTS'],
+    tags: ['Multiplayer', 'RTS', 'station-pod']
   },
   {
     id: '61',
@@ -151,6 +161,7 @@ const MOCK_GAMES: Game[] = [
     playersOnline: 2200,
     image: 'https://picsum.photos/seed/strategy2/300/200',
     tags: ['Multiplayer', 'Classic'],
+    tags: ['Multiplayer', 'Classic', 'station-cabinet']
   },
 
   // PUZZLE
@@ -164,6 +175,7 @@ const MOCK_GAMES: Game[] = [
     playersOnline: 1400,
     image: 'https://picsum.photos/seed/puzzle1/300/200',
     tags: ['Single Player', 'Logic'],
+    tags: ['Single Player', 'Logic', 'station-cabinet']
   },
   {
     id: '71',
@@ -175,6 +187,7 @@ const MOCK_GAMES: Game[] = [
     playersOnline: 3800,
     image: 'https://picsum.photos/seed/puzzle2/300/200',
     tags: ['Multiplayer', 'PvP'],
+    tags: ['Multiplayer', 'PvP', 'station-pod']
   },
 
   // ADVENTURE
@@ -188,6 +201,7 @@ const MOCK_GAMES: Game[] = [
     playersOnline: 3200,
     image: 'https://picsum.photos/seed/mystic/300/200',
     tags: ['Single Player', 'RPG'],
+    tags: ['Single Player', 'RPG', 'station-pod']
   },
 
   // CLASSIC
@@ -202,6 +216,7 @@ const MOCK_GAMES: Game[] = [
     playersOnline: 8500,
     image: 'https://picsum.photos/seed/pacman/300/200',
     tags: ['Single Player', 'Arcade'],
+    tags: ['Single Player', 'Arcade', 'station-cabinet']
   },
   {
     id: '11',
@@ -214,6 +229,7 @@ const MOCK_GAMES: Game[] = [
     playersOnline: 4200,
     image: 'https://picsum.photos/seed/galaga/300/200',
     tags: ['Single Player', 'Shooter'],
+    tags: ['Single Player', 'Shooter', 'station-cabinet']
   },
   {
     id: '12',
@@ -226,6 +242,8 @@ const MOCK_GAMES: Game[] = [
     image: 'https://picsum.photos/seed/hextris/300/200',
     tags: ['Single Player', 'Arcade'],
   },
+    tags: ['Single Player', 'Arcade', 'station-cabinet']
+  }
 ];
 const GAMES_API_URL =
   'https://firebasestorage.googleapis.com/v0/b/builder-406918.appspot.com/o/gaming-pwa%2Fgames.json?alt=media';

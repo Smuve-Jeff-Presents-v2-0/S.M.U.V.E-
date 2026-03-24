@@ -1,4 +1,4 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, Injector } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LoggingService } from './logging.service';
 import { firstValueFrom } from 'rxjs';
@@ -27,6 +27,7 @@ export interface UserSession {
 })
 export class SecurityService {
   private http = inject(HttpClient);
+  private injector = inject(Injector);
   private logger = inject(LoggingService);
   private readonly API_URL = 'http://localhost:3000/api';
 
@@ -38,6 +39,14 @@ export class SecurityService {
     description: string,
     userId: string = 'anonymous'
   ) {
+  private get profileService() {
+    return this.injector.get(UserProfileService);
+  }
+
+  async logEvent(eventType: string, description: string) {
+    const profile = this.profileService.profile();
+    if (!profile.artistName) return;
+
     try {
       await firstValueFrom(
         this.http.post(`${this.API_URL}/security/log`, {

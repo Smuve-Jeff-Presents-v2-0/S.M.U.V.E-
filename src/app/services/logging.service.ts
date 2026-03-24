@@ -42,7 +42,7 @@ export class LoggingService {
     }
   }
 
-  // Specialized logging for S.M.U.V.E 4.2 Strategic Commander persona
+  // Specialized logging for S.M.U.V.E 4.2 Neural Intelligence persona
   system(message: string, ...args: any[]) {
     if (this.level <= LogLevel.INFO) {
       console.log(
