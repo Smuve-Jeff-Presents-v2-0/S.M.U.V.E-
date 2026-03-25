@@ -91,6 +91,7 @@ export class PianoRollComponent implements AfterViewInit, OnDestroy {
   isCompactMobile = signal(false);
   showAudioDock = signal(false);
   audioDockView = signal<'mixer' | 'drum-machine' | 'mastering'>('mixer');
+  readonly defaultTrackPresetId = 'synth-lead';
 
   selectionBox = signal({ active: false, x: 0, y: 0, w: 0, h: 0 });
   isStandalone = computed(() => this.router.url === '/piano-roll');

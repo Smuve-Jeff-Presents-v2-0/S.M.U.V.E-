@@ -334,7 +334,7 @@
           <select
             class="bg-surface/70 border border-border rounded-xl px-3 py-1 text-[9px] font-bold uppercase tracking-[0.2em] text-text-main"
             [value]="uiService.mainViewMode()"
-            (change)="handleQuickNavigate($any($event.target).value)"
+            (change)="navigateToView($any($event.target).value)"
           >
             <optgroup
               *ngFor="let group of navigationGroups"

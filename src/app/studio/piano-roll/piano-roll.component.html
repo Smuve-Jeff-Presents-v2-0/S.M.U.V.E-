@@ -9,7 +9,7 @@
             <span class="material-symbols-outlined text-brand-primary text-sm">inventory_2</span>
             <h2 class="text-[10px] font-black uppercase tracking-[0.2em] text-white">Channel Rack</h2>
          </div>
-         <button (click)="musicManager.ensureTrack('synth-lead')" class="p-1 rounded bg-brand-primary/20 hover:bg-brand-primary/40 text-brand-primary transition-all">
+         <button (click)="musicManager.ensureTrack(defaultTrackPresetId)" class="p-1 rounded bg-brand-primary/20 hover:bg-brand-primary/40 text-brand-primary transition-all">
             <span class="material-symbols-outlined text-sm">add</span>
          </button>
       </div>
@@ -87,7 +87,15 @@
              <button (click)="showAutomation.set(!showAutomation())" [class.text-brand-primary]="showAutomation()" class="p-1 rounded hover:bg-white/5 transition-all">
                 <span class="material-symbols-outlined text-sm">equalizer</span>
              </button>
-             <button *ngIf="isStandalone()" (click)="toggleAudioDock()" [class.text-brand-primary]="showAudioDock()" class="p-1 rounded hover:text-brand-primary group">
+             <button
+               *ngIf="isStandalone()"
+               (click)="toggleAudioDock()"
+               [class.text-brand-primary]="showAudioDock()"
+               [attr.aria-expanded]="showAudioDock()"
+               aria-controls="audio-dock-panel"
+               aria-label="Toggle audio dock"
+               class="p-1 rounded hover:text-brand-primary group"
+             >
                <span class="material-symbols-outlined text-sm">tune</span>
              </button>
              <button *ngIf="!isStandalone()" (click)="goStandalone()" class="p-1 rounded hover:text-brand-primary group"><span class="material-symbols-outlined text-sm">fullscreen</span></button>
@@ -170,7 +178,13 @@
           </button>
         </div>
       </div>
-      <div *ngIf="showAudioDock()" class="h-[360px] md:h-[420px] overflow-hidden border-t border-white/5 bg-black/20">
+      <div
+        *ngIf="showAudioDock()"
+        id="audio-dock-panel"
+        role="region"
+        aria-label="Audio dock modules"
+        class="h-[360px] md:h-[420px] overflow-hidden border-t border-white/5 bg-black/20"
+      >
         <div class="h-full overflow-auto custom-scrollbar p-3">
           <app-mixer *ngIf="audioDockView() === 'mixer'"></app-mixer>
           <app-drum-machine *ngIf="audioDockView() === 'drum-machine'"></app-drum-machine>
