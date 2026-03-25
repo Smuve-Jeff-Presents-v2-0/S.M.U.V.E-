@@ -176,4 +176,9 @@ export class AppComponent {
     this.uiService.navigateToView(mode);
     if (this.isMobile()) this.isSidebarOpen.set(false);
   }
+
+  handleQuickNavigate(mode: MainViewMode) {
+    if (!mode) return;
+    this.navigateToView(mode);
+  }
 }

@@ -175,10 +175,20 @@ export class MusicManagerService {
   }
 
   setInstrument(trackId: number, presetId: string) {
+    const preset = this.instruments
+      .getPresets()
+      .find((item) => item.id === presetId);
     this.tracks.update((ts) =>
-      ts.map((t) => (t.id === trackId ? { ...t, instrumentId: presetId } : t))
+      ts.map((t) =>
+        t.id === trackId
+          ? { ...t, instrumentId: presetId, name: preset?.name ?? t.name }
+          : t
+      )
     );
-    this.engine.updateTrack(trackId, { instrumentId: presetId });
+    this.engine.updateTrack(trackId, {
+      instrumentId: presetId,
+      name: preset?.name,
+    });
   }
 
   addNote(

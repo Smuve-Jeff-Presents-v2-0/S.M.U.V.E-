@@ -78,6 +78,7 @@ describe('PianoRollComponent', () => {
 
     const fixture = TestBed.createComponent(PianoRollComponent);
     const component = fixture.componentInstance;
+    component.isCompactMobile.set(true);
     fixture.detectChanges();
 
     return { component, updates, adds };
@@ -119,5 +120,14 @@ describe('PianoRollComponent', () => {
       length: 2,
       velocity: 0.7,
     });
+  });
+
+  it('opens the audio dock when selecting a dock view', async () => {
+    const { component } = await createComponent();
+
+    component.setAudioDockView('mastering');
+
+    expect(component.audioDockView()).toBe('mastering');
+    expect(component.showAudioDock()).toBe(true);
   });
 });
