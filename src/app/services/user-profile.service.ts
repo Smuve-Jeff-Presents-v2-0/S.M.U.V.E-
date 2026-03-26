@@ -129,6 +129,11 @@ export class UserProfileService {
     }
   }
 
+  async deleteProfile(): Promise<void> {
+    this.logger.warn('UserProfileService: Deleting profile and resetting state');
+    await this.updateProfile(initialProfile);
+  }
+
   async acquireUpgrade(upgrade: { title: string; type: string }) {
     const current = this.profile();
     const next: UserProfile = {

@@ -5,8 +5,10 @@ import {
   computed,
   HostListener,
   ElementRef,
+  OnInit,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { InstrumentService } from '../instrument.service';
 import { AudioEngineService } from '../../services/audio-engine.service';
 import { ExportService } from '../../services/export.service';
@@ -16,11 +18,11 @@ import { NotificationService } from '../../services/notification.service';
 @Component({
   selector: 'app-master-controls',
   standalone: true,
-  imports: [CommonModule, GainReductionMeterComponent],
+  imports: [CommonModule, FormsModule, GainReductionMeterComponent],
   templateUrl: './master-controls.component.html',
   styleUrls: ['./master-controls.component.css'],
 })
-export class MasterControlsComponent {
+export class MasterControlsComponent implements OnInit {
   private readonly instrumentService = inject(InstrumentService);
   private readonly exportService = inject(ExportService);
   private readonly notificationService = inject(NotificationService);
@@ -39,6 +41,8 @@ export class MasterControlsComponent {
 
   masterVolumePercent = computed(() => Math.round(this.masterVolume() * 100));
   reverbMixPercent = computed(() => Math.round(this.reverbMix() * 100));
+  outputDevices = this.audioEngine.availableOutputs;
+  selectedOutputId = computed(() => this.audioEngine.selectedOutputId());
 
   private activeRecorder: any = null;
 
@@ -47,6 +51,10 @@ export class MasterControlsComponent {
     if (!this.elementRef.nativeElement.contains(event.target)) {
       this.isDropdownOpen.set(false);
     }
+  }
+
+  ngOnInit(): void {
+    this.audioEngine.refreshOutputDevices();
   }
 
   toggleDropdown(): void {
@@ -114,5 +122,9 @@ export class MasterControlsComponent {
       this.isFinishing.set(false);
       this.notificationService.show('Track Exported & XP Awarded!', 'success');
     }, 3000);
+  }
+
+  async changeOutputDevice(deviceId: string | null) {
+    await this.audioEngine.setOutputDevice(deviceId);
   }
 }

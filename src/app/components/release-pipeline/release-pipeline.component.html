@@ -43,6 +43,60 @@
       </div>
     </div>
 
+    <!-- Official Taskforce -->
+    <div class="bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 shadow-[0_0_30px_rgba(16,185,129,0.05)]">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <div>
+          <p class="text-[10px] font-black uppercase tracking-widest text-brand-primary mb-1">Official Release Path</p>
+          <h2 class="text-2xl md:text-3xl font-black text-white uppercase italic tracking-tight">Strategy ➜ Production ➜ Visuals ➜ Admin ➜ Distribution</h2>
+        </div>
+        <div class="text-right text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+          <span class="text-brand-primary">{{ release.status }}</span> Mode
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div *ngFor="let category of categories" class="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col gap-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-2 h-2 rounded-full" [class.bg-brand-primary]="tasksFor(category).every(t => t.status === 'Completed')" [class.bg-amber-400]="tasksFor(category).some(t => t.status === 'In Progress')" [class.bg-slate-500]="tasksFor(category).every(t => t.status === 'Pending')"></div>
+              <span class="text-sm font-black uppercase tracking-widest text-white">{{ category }}</span>
+            </div>
+            <span class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">
+              {{ tasksFor(category).filter(t => t.status === 'Completed').length }}/{{ tasksFor(category).length }}
+            </span>
+          </div>
+
+          <div class="space-y-3">
+            <div *ngFor="let task of tasksFor(category)" class="rounded-xl border border-white/10 bg-white/5 p-3">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <p class="text-[11px] font-black uppercase tracking-tight text-white">{{ task.label }}</p>
+                  <p class="text-[11px] text-slate-400 leading-snug">{{ task.description }}</p>
+                </div>
+                <div class="flex gap-2">
+                  <button class="text-[10px] px-2 py-1 rounded-lg border"
+                          [class.bg-brand-primary]="task.status === 'Completed'"
+                          [class.border-brand-primary]="task.status === 'Completed'"
+                          [class.border-white/10]="task.status !== 'Completed'"
+                          [class.text-black]="task.status === 'Completed'"
+                          [class.text-slate-300]="task.status !== 'Completed'"
+                          (click)="toggleTask(task, task.status === 'Completed' ? 'Pending' : 'Completed')">
+                    {{ task.status === 'Completed' ? 'Done' : 'Mark Done' }}
+                  </button>
+                  <button class="text-[10px] px-2 py-1 rounded-lg border border-white/10 text-slate-300"
+                          [class.bg-amber-500/20]="task.status === 'In Progress'"
+                          (click)="toggleTask(task, 'In Progress')">
+                    In Progress
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Track Pipeline -->
     <div class="space-y-4">
       <div class="flex justify-between items-center">

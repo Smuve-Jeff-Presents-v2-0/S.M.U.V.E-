@@ -109,6 +109,18 @@
                <i class="fas" [class.fa-volume-up]="audioEngine.outputMode() === 'speakers'" [class.fa-headphones]="audioEngine.outputMode() === 'headphones'"></i>
                {{ audioEngine.outputMode() === 'speakers' ? 'Main Speakers' : 'Headphone Cue' }}
             </button>
+
+            <div class="flex flex-col gap-2">
+              <label class="text-[8px] font-black uppercase tracking-widest text-slate-500">Audio Output</label>
+              <select class="w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 text-xs text-white"
+                      [ngModel]="selectedOutputId()"
+                      (ngModelChange)="changeOutputDevice($event)">
+                <option [ngValue]="null">System Default</option>
+                <option *ngFor="let dev of outputDevices()" [ngValue]="dev.deviceId">
+                  {{ dev.label || 'Unknown Output' }}
+                </option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
