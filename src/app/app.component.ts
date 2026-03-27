@@ -82,7 +82,7 @@ export class AppComponent {
 
   constructor() {
     this.checkMobile();
-    this.isFullPageMode.set(this.router.url === '/piano-roll');
+    this.updateFullPageMode(this.router.url);
 
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
@@ -91,7 +91,7 @@ export class AppComponent {
         if (path && this.uiService.getViewModes().includes(path as any)) {
           this.uiService.mainViewMode.set(path as any);
         }
-        this.isFullPageMode.set(this.router.url === '/piano-roll');
+        this.updateFullPageMode(this.router.url);
       });
 
     effect(() => {
@@ -118,6 +118,13 @@ export class AppComponent {
       if (isNowMobile) this.isSidebarOpen.set(false);
       else this.isSidebarOpen.set(true);
     }
+  }
+
+  private updateFullPageMode(url: string) {
+    const path = url.split('?')[0].split('#')[0].split('/')[1];
+    this.isFullPageMode.set(
+      ['piano-roll', 'tha-spot', 'networking', 'gaming-hub'].includes(path)
+    );
   }
 
   toggleSidebar() {

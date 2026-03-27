@@ -14,7 +14,7 @@ import { AutoSaveService } from './services/auto-save.service';
 import { CommandPaletteService } from './services/command-palette.service';
 
 describe('AppComponent', () => {
-  const createComponent = async () => {
+  const createComponent = async (routerUrl = '/hub') => {
     const routerEvents$ = new Subject<any>();
     const uiService = {
       mainViewMode: signal<'hub' | 'strategy'>('hub'),
@@ -101,7 +101,7 @@ describe('AppComponent', () => {
         {
           provide: Router,
           useValue: {
-            url: '/hub',
+            url: routerUrl,
             events: routerEvents$.asObservable(),
           },
         },
@@ -174,5 +174,11 @@ describe('AppComponent', () => {
     component.toggleChatbot();
 
     expect(uiService.toggleChatbot).toHaveBeenCalled();
+  });
+
+  it('marks tha-spot as full-page mode', async () => {
+    const { component } = await createComponent('/tha-spot');
+
+    expect(component.isFullPageMode()).toBe(true);
   });
 });
