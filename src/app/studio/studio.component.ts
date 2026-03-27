@@ -130,7 +130,6 @@ export class StudioComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-
   setActiveView(
     view:
       | 'dj'
