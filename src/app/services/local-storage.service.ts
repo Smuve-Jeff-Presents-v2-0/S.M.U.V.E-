@@ -7,13 +7,17 @@ export class LocalStorageService {
   private dbName = 'SMUVE_OFFLINE_DB';
   private dbVersion = 2;
   private db: IDBDatabase | null = null;
+  private dbUnsupported = false;
 
   constructor() {
     this.initDB();
   }
 
   private initDB() {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !(window as any).indexedDB) {
+      this.dbUnsupported = true;
+      return;
+    }
 
     const request = indexedDB.open(this.dbName, this.dbVersion);
 
@@ -41,6 +45,7 @@ export class LocalStorageService {
 
   async saveItem(storeName: string, item: any): Promise<void> {
     return new Promise((resolve, reject) => {
+      if (this.dbUnsupported) return resolve();
       if (!this.db) {
         setTimeout(() => {
           this.saveItem(storeName, item).then(resolve).catch(reject);
@@ -61,6 +66,7 @@ export class LocalStorageService {
 
   async getItem(storeName: string, id: string): Promise<any> {
     return new Promise((resolve, reject) => {
+      if (this.dbUnsupported) return resolve(null);
       if (!this.db) {
         setTimeout(() => {
           this.getItem(storeName, id).then(resolve).catch(reject);
@@ -81,6 +87,7 @@ export class LocalStorageService {
 
   async getAllItems(storeName: string): Promise<any[]> {
     return new Promise((resolve, reject) => {
+      if (this.dbUnsupported) return resolve([]);
       if (!this.db) {
         setTimeout(() => {
           this.getAllItems(storeName).then(resolve).catch(reject);
