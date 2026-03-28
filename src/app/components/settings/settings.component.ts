@@ -8,6 +8,8 @@ import {
 import { UIService } from '../../services/ui.service';
 import { NotificationService } from '../../services/notification.service';
 import { SecurityService } from '../../services/security.service';
+import { MicrophoneService } from '../../services/microphone.service';
+import { AudioEngineService } from '../../services/audio-engine.service';
 
 @Component({
   selector: 'app-settings',
@@ -21,13 +23,30 @@ export class SettingsComponent implements OnInit {
   uiService = inject(UIService);
   notificationService = inject(NotificationService);
   securityService = inject(SecurityService);
+  microphoneService = inject(MicrophoneService);
+  audioEngine = inject(AudioEngineService);
 
   settings = computed(() => this.profileService.profile().settings);
   activeTab = signal<'ui' | 'audio' | 'ai' | 'studio' | 'security'>('ui');
+  audioInputDevices = this.microphoneService.availableDevices;
+  selectedAudioInputId = this.microphoneService.selectedDeviceId;
 
   ngOnInit() {
     this.securityService.fetchLogs();
     this.securityService.fetchSessions();
+  }
+
+  async refreshAudioInputs() {
+    await this.microphoneService.updateAvailableDevices();
+  }
+
+  async selectAudioInput(deviceId: string | null) {
+    if (!deviceId) return;
+    await this.microphoneService.initialize(deviceId);
+  }
+
+  setOutputMode(mode: 'speakers' | 'headphones') {
+    this.audioEngine.setOutputMode(mode);
   }
 
   async updateSetting(category: keyof AppSettings, key: string, value: any) {

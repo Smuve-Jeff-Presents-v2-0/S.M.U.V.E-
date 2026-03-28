@@ -239,6 +239,28 @@ describe('PianoRollComponent', () => {
     ).toBeTruthy();
   });
 
+  it('updates project pattern length and timeline cells', async () => {
+    const { component } = await createComponent();
+
+    component.setPatternLength(2);
+    expect(component.numMeasures).toBe(2);
+    expect(component.cells.length).toBe(32);
+
+    component.setPatternLength(99);
+    expect(component.numMeasures).toBe(16);
+    expect(component.cells.length).toBe(256);
+  });
+
+  it('summarizes arrangement bars for the current track', async () => {
+    const { component } = await createComponent();
+
+    const bars = component.arrangementBars();
+
+    expect(bars.length).toBe(component.numMeasures);
+    expect(bars[0].noteCount).toBe(2);
+    expect(bars[1].noteCount).toBe(0);
+  });
+
   it('widens grid sizing for narrow and compact viewports', async () => {
     const originalWidth = window.innerWidth;
     const { component } = await createComponent({ compact: false });

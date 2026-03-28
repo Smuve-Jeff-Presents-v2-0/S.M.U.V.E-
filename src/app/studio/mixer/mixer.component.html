@@ -1,4 +1,4 @@
-<div class="h-full flex flex-col bg-background-dark p-6 overflow-hidden titanium-texture">
+<div class="h-full flex flex-col bg-background-dark p-4 md:p-6 overflow-hidden titanium-texture">
   <!-- Mixer Header -->
   <header class="flex items-center justify-between mb-8 border-b border-white/5 pb-6">
     <div class="flex items-center gap-4">
@@ -109,18 +109,14 @@
     </div>
   </section>
 
-  <section class="mb-6">
-    <app-microphone-interface mode="compact"></app-microphone-interface>
-  </section>
-
-  <div class="flex-grow flex gap-4 overflow-hidden">
-     <div class="flex-grow flex gap-3 overflow-x-auto no-scrollbar pb-6">
+  <div class="flex-grow flex flex-col lg:flex-row gap-4 overflow-hidden min-h-0">
+     <div class="flex-grow flex gap-3 overflow-x-auto no-scrollbar pb-6 pr-1 min-h-0">
         <!-- MICROPHONE INPUTS -->
         <app-channel-strip *ngFor="let channel of micChannels()" [channel]="channel" class="flex-shrink-0"></app-channel-strip>
 
         <!-- TRACK CHANNELS (Brushed Titanium style) -->
-        <div *ngFor="let track of tracks(); let i = index"
-             class="flex-shrink-0 w-32 bg-extreme-titanium/30 border border-white/5 rounded-2xl p-4 flex flex-col items-center gap-4 group hover:bg-extreme-titanium/50 hover:border-brand-primary/20 transition-all shadow-inner relative cursor-pointer"
+         <div *ngFor="let track of tracks(); let i = index"
+              class="flex-shrink-0 w-36 bg-extreme-titanium/30 border border-white/5 rounded-2xl p-4 flex flex-col items-center gap-4 group hover:bg-extreme-titanium/50 hover:border-brand-primary/20 transition-all shadow-inner relative cursor-pointer"
              [class.border-brand-primary/40]="isSelected(track)"
              [class.bg-brand-primary/10]="isSelected(track)"
              (click)="selectTrack(track.id)">
@@ -249,7 +245,7 @@
      </div>
 
     <!-- MASTER STRIP -->
-    <div class="w-36 bg-brand-primary/5 rounded-[32px] border border-brand-primary/20 p-5 flex flex-col items-center gap-6 shadow-2xl relative overflow-hidden">
+    <div class="w-full lg:w-44 lg:sticky lg:top-0 bg-brand-primary/5 rounded-[32px] border border-brand-primary/20 p-5 flex flex-col items-center gap-6 shadow-2xl relative overflow-hidden self-start">
        <div class="absolute inset-0 bg-brand-primary/5 blur-[40px] pointer-events-none"></div>
        <div class="w-full bg-brand-primary/20 rounded p-1.5 mb-2 text-center border border-brand-primary/30 z-10">
           <span class="text-[10px] text-brand-primary font-mono font-black uppercase tracking-wider">MASTER BUS</span>
