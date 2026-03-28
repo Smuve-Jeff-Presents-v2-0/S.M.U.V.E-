@@ -1,10 +1,30 @@
-import { Injectable, OnDestroy, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Game } from './game';
 import { Observable, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
-const MOCK_GAMES: Game[] = [
+function buildGameCover(title: string, eyebrow: string, accentStart: string, accentEnd: string) {
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200">
+      <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="${accentStart}" />
+          <stop offset="100%" stop-color="${accentEnd}" />
+        </linearGradient>
+      </defs>
+      <rect width="300" height="200" rx="24" fill="#020617" />
+      <rect x="12" y="12" width="276" height="176" rx="20" fill="url(#bg)" opacity="0.95" />
+      <circle cx="246" cy="54" r="42" fill="rgba(255,255,255,0.12)" />
+      <circle cx="228" cy="138" r="56" fill="rgba(255,255,255,0.08)" />
+      <text x="26" y="44" fill="rgba(255,255,255,0.82)" font-size="16" font-family="Arial, sans-serif" letter-spacing="2">${eyebrow.toUpperCase()}</text>
+      <text x="26" y="116" fill="#ffffff" font-size="30" font-weight="700" font-family="Arial, sans-serif">${title}</text>
+      <text x="26" y="152" fill="rgba(255,255,255,0.88)" font-size="14" font-family="Arial, sans-serif">Curated for Tha Spot</text>
+    </svg>
+  `;
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
+const CURATED_GAMES: Game[] = [
   {
     id: '1',
     name: 'Tha Battlefield',
@@ -14,7 +34,8 @@ const MOCK_GAMES: Game[] = [
     genre: 'Music Battle',
     rating: 4.9,
     playersOnline: 1250,
-    image: 'https://picsum.photos/seed/battle/300/200',
+    image: buildGameCover('Tha Battlefield', 'Hybrid', '#10b981', '#0f766e'),
+    availability: 'Hybrid',
     tags: ['Multiplayer', 'Original', 'PvP', 'station-pod'],
   },
   {
@@ -26,240 +47,124 @@ const MOCK_GAMES: Game[] = [
     genre: 'Rhythm',
     rating: 4.7,
     playersOnline: 850,
-    image: 'https://picsum.photos/seed/remix/300/200',
+    image: buildGameCover('Remix Arena', 'Hybrid', '#22c55e', '#14b8a6'),
+    availability: 'Hybrid',
     tags: ['Multiplayer', 'Original', 'Co-op', 'station-pod'],
   },
   {
     id: '3',
-    name: 'Beat Runner',
-    url: 'https://htmlgames.com/game/Beat+Runner',
+    name: 'Neon Drift X',
+    url: '/assets/games/neon-drift/neon-drift.html',
     description:
-      'Sprint through refined-glow landscapes synced to the beat. PvP Ranking enabled.',
-    genre: 'Runner',
-    rating: 4.5,
-    playersOnline: 2100,
-    image: 'https://picsum.photos/seed/beat/300/200',
-    tags: ['Multiplayer', 'Arcade', 'AI', 'station-cabinet'],
+      'Swap lanes through a neon expressway and survive precision traffic patterns offline.',
+    genre: 'Racing',
+    rating: 4.8,
+    playersOnline: 420,
+    image: buildGameCover('Neon Drift X', 'Offline', '#38bdf8', '#6366f1'),
+    availability: 'Offline',
+    tags: ['Arcade', 'Offline', 'Reflex', 'station-cabinet'],
+  },
+  {
+    id: '4',
+    name: 'Vinyl Vault',
+    url: '/assets/games/vinyl-vault/vinyl-vault.html',
+    description:
+      'Crack the crate-digging memory board and chain perfect matches in an offline puzzle run.',
+    genre: 'Puzzle',
+    rating: 4.7,
+    playersOnline: 260,
+    image: buildGameCover('Vinyl Vault', 'Offline', '#f59e0b', '#f97316'),
+    availability: 'Offline',
+    tags: ['Puzzle', 'Offline', 'Memory', 'station-cabinet'],
   },
   {
     id: '5',
-    name: 'Vanguard: elegant Strike',
-    url: 'https://html5.gamedistribution.com/694921971d9c4909a34d0b0b8c28373b/',
-    description: 'Elite executive shooter set in a dystopian refined-glow future.',
-    genre: 'Shooter',
-    rating: 4.9,
-    playersOnline: 3400,
-    image: 'https://picsum.photos/seed/vanguard/300/200',
-    tags: ['Multiplayer', 'PvP', 'FPS', 'station-pod'],
+    name: 'Cipher Surge',
+    url: '/assets/games/cipher-surge/cipher-surge.html',
+    description:
+      'A polished sequence-memory challenge with escalating AI pressure and instant offline play.',
+    genre: 'Puzzle',
+    rating: 4.8,
+    playersOnline: 310,
+    image: buildGameCover('Cipher Surge', 'Offline', '#8b5cf6', '#6d28d9'),
+    availability: 'Offline',
+    tags: ['AI', 'Offline', 'Puzzle', 'station-pod'],
   },
   {
     id: '6',
-    name: 'pro-grade Assassin',
-    url: 'https://html5.gamedistribution.com/5f65349479e04874983058869c0d4561/',
-    description: 'Stealth and precision meet high-speed action in the underworld.',
-    genre: 'Shooter',
-    rating: 4.8,
-    playersOnline: 1800,
-    image: 'https://picsum.photos/seed/assassin/300/200',
-    tags: ['Single Player', 'Action', 'station-cabinet'],
-  },
-  {
-    id: '30',
-    name: 'Elite SWAT',
-    url: 'https://html5.gamedistribution.com/001479814234850754876b5b91b5e37d/',
-    description: 'High-stakes counter-terrorism operations.',
-    genre: 'Shooter',
-    rating: 4.7,
-    playersOnline: 1200,
-    image: 'https://picsum.photos/seed/swat/300/200',
-    tags: ['Multiplayer', 'Tactical', 'station-pod'],
-  },
-  {
-    id: '40',
-    name: 'Neon Velocity',
-    url: 'https://html5.gamedistribution.com/a4f3b7c8d9e0f1a2b3c4d5e6f7a8b9c0/',
-    description: 'High-speed racing through neon-lit cityscapes.',
-    genre: 'Racing',
-    rating: 4.6,
-    playersOnline: 2500,
-    image: 'https://picsum.photos/seed/racing1/300/200',
-    tags: ['Multiplayer', 'Racing', 'station-cabinet'],
-  },
-  {
-    id: '41',
-    name: 'Drift Masters',
-    url: 'https://html5.gamedistribution.com/b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6/',
-    description: 'Master the art of drifting in competitive global circuits.',
-    genre: 'Racing',
-    rating: 4.8,
-    playersOnline: 1900,
-    image: 'https://picsum.photos/seed/racing2/300/200',
-    tags: ['Multiplayer', 'Competitive', 'station-pod'],
-  },
-  {
-    id: '50',
-    name: 'Street Hoops Pro',
-    url: 'https://html5.gamedistribution.com/c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6/',
-    description: 'Show your skills on the urban courts in 3v3 matches.',
-    genre: 'Sports',
-    rating: 4.7,
-    playersOnline: 3100,
-    image: 'https://picsum.photos/seed/sports1/300/200',
-    tags: ['Multiplayer', 'Sports', 'station-cabinet'],
-  },
-  {
-    id: '51',
-    name: 'Global Soccer Duel',
-    url: 'https://html5.gamedistribution.com/d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6/',
-    description: 'Face off against players worldwide in high-stakes soccer duels.',
-    genre: 'Sports',
-    rating: 4.5,
-    playersOnline: 4200,
-    image: 'https://picsum.photos/seed/sports2/300/200',
-    tags: ['Multiplayer', 'PvP', 'station-pod'],
-  },
-  {
-    id: '60',
-    name: 'Empire Command',
-    url: 'https://html5.gamedistribution.com/e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6/',
-    description: 'Build your empire and command your armies in real-time.',
-    genre: 'Strategy',
-    rating: 4.9,
-    playersOnline: 5600,
-    image: 'https://picsum.photos/seed/strategy1/300/200',
-    tags: ['Multiplayer', 'RTS', 'AI', 'station-pod'],
-  },
-  {
-    id: '61',
-    name: 'Grandmaster Chess',
-    url: 'https://html5.gamedistribution.com/f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6/',
-    description: 'The ultimate board game, refined for the modern executive.',
-    genre: 'Strategy',
-    rating: 4.8,
-    playersOnline: 2200,
-    image: 'https://picsum.photos/seed/strategy2/300/200',
-    tags: ['Multiplayer', 'Classic', 'AI', 'station-cabinet'],
-  },
-  {
-    id: '70',
-    name: 'Cyber Enigma',
-    url: 'https://html5.gamedistribution.com/a1b2c3d4e5f67890abcdef1234567890/',
-    description: 'Solve complex neural puzzles in a race against time.',
-    genre: 'Puzzle',
-    rating: 4.7,
-    playersOnline: 1400,
-    image: 'https://picsum.photos/seed/puzzle1/300/200',
-    tags: ['Single Player', 'Logic', 'station-cabinet'],
-  },
-  {
-    id: '71',
-    name: 'Tetra Fusion',
-    url: 'https://html5.gamedistribution.com/b2c3d4e5f67890abcdef1234567890a1/',
-    description: 'A modern twist on the block-stacking classic with PvP modes.',
-    genre: 'Puzzle',
-    rating: 4.6,
-    playersOnline: 3800,
-    image: 'https://picsum.photos/seed/puzzle2/300/200',
-    tags: ['Multiplayer', 'PvP', 'AI', 'station-pod'],
-  },
-  {
-    id: '18',
-    name: 'Mystic Realms',
-    url: 'https://html5.gamedistribution.com/834311895a9d4530869d8540c6c64923/',
-    description: 'Embark on an epic journey through mystical landscapes.',
-    genre: 'Adventure',
-    rating: 4.8,
-    playersOnline: 3200,
-    image: 'https://picsum.photos/seed/mystic/300/200',
-    tags: ['Single Player', 'RPG', 'station-pod'],
-  },
-  {
-    id: '10',
-    name: 'Pac-Man Retro',
-    url: 'https://html5.gamedistribution.com/602934415a2a4b8787c672b1a8f6d7c1/',
-    description: 'The ultimate arcade classic, remastered for the S.M.U.V.E. network.',
-    genre: 'Classic',
-    rating: 4.9,
-    playersOnline: 8500,
-    image: 'https://picsum.photos/seed/pacman/300/200',
-    tags: ['Single Player', 'Arcade', 'station-cabinet'],
-  },
-  {
-    id: '11',
-    name: 'Galaga Retro',
-    url: 'https://html5.gamedistribution.com/9b7083834311895a9d4530869d8540c6/',
+    name: 'Tempo Lockdown',
+    url: '/assets/games/tempo-lockdown/tempo-lockdown.html',
     description:
-      'Defend the galaxy against swarms of alien invaders in this high-octane classic.',
-    genre: 'Classic',
+      'Hit the beat window, build streaks, and hold the pulse in a responsive offline rhythm challenge.',
+    genre: 'Rhythm',
     rating: 4.8,
-    playersOnline: 4200,
-    image: 'https://picsum.photos/seed/galaga/300/200',
-    tags: ['Single Player', 'Shooter', 'station-cabinet'],
+    playersOnline: 390,
+    image: buildGameCover('Tempo Lockdown', 'Offline', '#34d399', '#059669'),
+    availability: 'Offline',
+    tags: ['Rhythm', 'Offline', 'Arcade', 'station-pod'],
   },
   {
-    id: '12',
+    id: '7',
     name: 'Hextris',
-    url: 'https://hextris.io/',
-    description: 'Fast-paced hexagonal puzzle challenge. Modern classic.',
+    url: 'https://hextris.github.io/hextris/',
+    description: 'A proven online arcade puzzler with premium hex-stack gameplay.',
     genre: 'Classic',
     rating: 4.8,
     playersOnline: 5200,
-    image: 'https://picsum.photos/seed/hextris/300/200',
-    tags: ['Single Player', 'Arcade', 'station-cabinet'],
+    image: buildGameCover('Hextris', 'Online', '#06b6d4', '#2563eb'),
+    availability: 'Online',
+    tags: ['Classic', 'Arcade', 'station-cabinet'],
   },
   {
-    id: '80',
-    name: 'Neural Tactics Online',
-    url: 'https://html5.gamedistribution.com/8faeb13cc3fc4f69a19907ac5f8f8a1f/',
+    id: '8',
+    name: '2048 Championship',
+    url: 'https://play2048.co/',
     description:
-      'AI-assisted tactical battleground with live multiplayer squad coordination.',
-    genre: 'Strategy',
-    rating: 4.9,
-    playersOnline: 4700,
-    image: 'https://picsum.photos/seed/neuraltactics/300/200',
-    tags: ['Multiplayer', 'AI', 'Tactical', 'station-pod'],
-  },
-  {
-    id: '81',
-    name: 'Aether Kart League',
-    url: 'https://html5.gamedistribution.com/9dfcf57d88ce49f2bb9df7adf2cc2677/',
-    description:
-      'High-speed online kart battles with AI ghost racing and live PvP tournaments.',
-    genre: 'Racing',
-    rating: 4.8,
-    playersOnline: 5300,
-    image: 'https://picsum.photos/seed/aetherkart/300/200',
-    tags: ['Multiplayer', 'AI', 'PvP', 'station-cabinet'],
-  },
-  {
-    id: '82',
-    name: 'Cipher Strike Arena',
-    url: 'https://html5.gamedistribution.com/e3e9eb7ff7bf41edbcd11a89f0d88e17/',
-    description:
-      'Precision shooter with adaptive AI opponents and ranked cross-region multiplayer.',
-    genre: 'Shooter',
+      'A reliable online number-combo classic for quick strategy sessions between studio work.',
+    genre: 'Puzzle',
     rating: 4.7,
-    playersOnline: 6100,
-    image: 'https://picsum.photos/seed/cipherstrike/300/200',
-    tags: ['Multiplayer', 'AI', 'Shooter', 'station-pod'],
+    playersOnline: 6300,
+    image: buildGameCover('2048 Championship', 'Online', '#f97316', '#ea580c'),
+    availability: 'Online',
+    tags: ['Classic', 'AI', 'station-cabinet'],
+  },
+  {
+    id: '9',
+    name: 'Beat Runner',
+    url: 'https://htmlgames.com/game/Beat+Runner',
+    description:
+      'Sprint through refined-glow landscapes synced to the beat with a streamlined online launch.',
+    genre: 'Runner',
+    rating: 4.5,
+    playersOnline: 2100,
+    image: buildGameCover('Beat Runner', 'Online', '#ec4899', '#db2777'),
+    availability: 'Online',
+    tags: ['Arcade', 'Reflex', 'station-pod'],
+  },
+  {
+    id: '10',
+    name: 'Mystic Realms',
+    url: 'https://html5.gamedistribution.com/834311895a9d4530869d8540c6c64923/',
+    description:
+      'An online fantasy adventure pick for longer sessions when you want an expansive world to explore.',
+    genre: 'Adventure',
+    rating: 4.8,
+    playersOnline: 3200,
+    image: buildGameCover('Mystic Realms', 'Online', '#a855f7', '#4f46e5'),
+    availability: 'Online',
+    tags: ['RPG', 'Adventure', 'station-pod'],
   },
 ];
-
-const GAMES_API_URL =
-  'https://firebasestorage.googleapis.com/v0/b/builder-406918.appspot.com/o/gaming-pwa%2Fgames.json?alt=media';
 
 @Injectable({
   providedIn: 'root',
 })
-export class GameService implements OnDestroy {
-  private http = inject(HttpClient);
-
+export class GameService {
   listGames(
     filters: { genre?: string; query?: string } = {},
     sort: 'Popular' | 'Rating' | 'Newest' = 'Popular'
   ): Observable<Game[]> {
-    return this.http.get<Game[]>(GAMES_API_URL).pipe(
-      catchError(() => of(MOCK_GAMES)),
+    return of(CURATED_GAMES).pipe(
       map((games) => this.applyFiltersAndSort(games, filters, sort))
     );
   }
@@ -315,6 +220,4 @@ export class GameService implements OnDestroy {
 
     return filtered;
   }
-
-  ngOnDestroy() {}
 }

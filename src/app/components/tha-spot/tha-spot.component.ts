@@ -57,6 +57,7 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
   searchQuery = signal('');
   sortMode = signal<'Popular' | 'Rating'>('Popular');
   capabilityFilter = signal<'All' | 'Multiplayer' | 'AI'>('All');
+  availabilityFilter = signal<'All' | 'Offline' | 'Online' | 'Hybrid'>('All');
   visualQuality = signal<'Performance' | 'Balanced' | 'Ultra'>('Balanced');
   isSearching = signal(false);
   matchFound = signal(false);
@@ -95,6 +96,10 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
 
     if (this.capabilityFilter() !== 'All') {
       filtered = filtered.filter((g) => g.tags?.includes(this.capabilityFilter()));
+    }
+
+    if (this.availabilityFilter() !== 'All') {
+      filtered = filtered.filter((g) => g.availability === this.availabilityFilter());
     }
 
     filtered.sort((a, b) =>
@@ -246,6 +251,17 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
   setCapabilityFilter(filter: string) {
     if (filter === 'All' || filter === 'Multiplayer' || filter === 'AI') {
       this.capabilityFilter.set(filter);
+    }
+  }
+
+  setAvailabilityFilter(filter: string) {
+    if (
+      filter === 'All' ||
+      filter === 'Offline' ||
+      filter === 'Online' ||
+      filter === 'Hybrid'
+    ) {
+      this.availabilityFilter.set(filter as 'All' | 'Offline' | 'Online' | 'Hybrid');
     }
   }
 
