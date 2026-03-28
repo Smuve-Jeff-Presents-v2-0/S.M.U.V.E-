@@ -188,7 +188,7 @@
 
 .fl-mobile-nav-button {
   min-width: 68px;
-  height: 54px;
+  height: 58px;
   border-radius: 14px;
   border: 1px solid transparent;
   background: rgba(8, 8, 8, 0.6);
@@ -198,7 +198,7 @@
   justify-content: center;
   gap: 2px;
   color: #94a3b8;
-  font-size: 9px;
+  font-size: 0.7rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
