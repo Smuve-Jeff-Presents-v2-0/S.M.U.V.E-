@@ -9,8 +9,17 @@
 .hub-backdrop {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 20% 20%, rgba(20, 184, 166, 0.14), transparent 35%),
-    radial-gradient(circle at 80% 0%, rgba(147, 51, 234, 0.14), transparent 40%),
+  background:
+    radial-gradient(
+      circle at 20% 20%,
+      rgba(20, 184, 166, 0.14),
+      transparent 35%
+    ),
+    radial-gradient(
+      circle at 80% 0%,
+      rgba(147, 51, 234, 0.14),
+      transparent 40%
+    ),
     linear-gradient(135deg, #0b1222, #0e162b 40%, #0b1222);
   filter: blur(40px);
   opacity: 0.9;
@@ -222,7 +231,10 @@
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   text-align: left;
-  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
 }
 
 .feature-card:hover {
@@ -304,7 +316,9 @@
 
 .workflow-step {
   text-align: left;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .workflow-step:hover {
@@ -365,7 +379,11 @@
   height: 200px;
   position: relative;
   border-radius: 24px;
-  background: radial-gradient(circle at 30% 30%, rgba(124, 58, 237, 0.25), rgba(20, 184, 166, 0.15));
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(124, 58, 237, 0.25),
+    rgba(20, 184, 166, 0.15)
+  );
   border: 1px solid rgba(255, 255, 255, 0.08);
   display: grid;
   place-items: center;
@@ -375,7 +393,11 @@
 .cover-glow {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle, rgba(124, 58, 237, 0.25), transparent 60%);
+  background: radial-gradient(
+    circle,
+    rgba(124, 58, 237, 0.25),
+    transparent 60%
+  );
   filter: blur(10px);
 }
 

@@ -62,6 +62,9 @@ describe('HubComponent', () => {
       createDynamicsCompressor() {
         return { ...mockNode };
       }
+      createWaveShaper() {
+        return { ...mockNode, curve: null, oversample: 'none' };
+      }
       createDelay() {
         return { ...mockNode };
       }
@@ -88,6 +91,9 @@ describe('HubComponent', () => {
       }
       get currentTime() {
         return 0;
+      }
+      get state() {
+        return 'running';
       }
       get sampleRate() {
         return 44100;

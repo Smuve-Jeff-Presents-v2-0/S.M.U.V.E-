@@ -1,11 +1,4 @@
-import {
-  Component,
-  OnInit,
-  OnDestroy,
-  signal,
-  computed,
-  inject,
-} from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -64,7 +57,11 @@ export class HubComponent implements OnInit, OnDestroy, AfterViewInit {
 
   genres = ['Hip Hop', 'R&B', 'Pop', 'Electronic', 'Rock', 'Jazz', 'Classical'];
   labelStats = [
-    { label: 'Roster Ready', value: '12', foot: 'Active talent under management' },
+    {
+      label: 'Roster Ready',
+      value: '12',
+      foot: 'Active talent under management',
+    },
     { label: 'Pipeline', value: '5', foot: 'Releases in mastering' },
     { label: 'Momentum', value: '+18%', foot: 'Month over month growth' },
   ];
@@ -174,7 +171,8 @@ export class HubComponent implements OnInit, OnDestroy, AfterViewInit {
     {
       shortcut: 'Themes',
       title: 'Visual Modes',
-      description: 'Swap theme, scanlines, and performance settings from the shell.',
+      description:
+        'Swap theme, scanlines, and performance settings from the shell.',
     },
   ];
 
