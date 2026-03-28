@@ -333,6 +333,13 @@
   border-color: rgba(56, 189, 248, 0.2);
   box-shadow: var(--spot-panel-shadow);
   backdrop-filter: blur(calc(var(--spot-panel-blur) - 6px));
+  position: relative;
+  isolation: isolate;
+}
+
+.theme-station-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .theme-station-card::after {
@@ -342,6 +349,7 @@
   background: linear-gradient(140deg, rgba(255, 255, 255, 0.16), transparent 55%);
   opacity: 0.35;
   pointer-events: none;
+  z-index: 0;
 }
 
 .theme-station-card:hover {
