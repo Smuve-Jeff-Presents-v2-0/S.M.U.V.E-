@@ -6,6 +6,7 @@ export interface Game {
   description?: string;
   genre?: string;
   tags?: string[]; // e.g., ['PvP','Shooter','Duel']
+  availability?: 'Offline' | 'Online' | 'Hybrid';
   previewVideo?: string; // Short webm/mp4 for hover preview
   rating?: number; // 0..5
   playersOnline?: number;

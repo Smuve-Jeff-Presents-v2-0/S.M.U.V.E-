@@ -157,6 +157,7 @@ describe('ThaSpotComponent', () => {
         genre: 'Strategy',
         rating: 4.5,
         playersOnline: 100,
+        availability: 'Online',
         tags: ['Multiplayer', 'AI'],
       },
       {
@@ -166,6 +167,7 @@ describe('ThaSpotComponent', () => {
         genre: 'Strategy',
         rating: 4.9,
         playersOnline: 80,
+        availability: 'Online',
         tags: ['Multiplayer', 'AI'],
       },
       {
@@ -175,6 +177,7 @@ describe('ThaSpotComponent', () => {
         genre: 'Classic',
         rating: 5,
         playersOnline: 10,
+        availability: 'Offline',
         tags: ['Single Player'],
       },
     ]);
@@ -185,6 +188,38 @@ describe('ThaSpotComponent', () => {
     component.setSortMode('Rating');
 
     expect(component.filteredGames().map((g) => g.id)).toEqual(['g2', 'g1']);
+  });
+
+  it('should filter games by online and offline availability', () => {
+    component.games.set([
+      {
+        id: 'g1',
+        name: 'Offline Puzzle',
+        url: '/assets/games/offline.html',
+        availability: 'Offline',
+        rating: 4.5,
+      },
+      {
+        id: 'g2',
+        name: 'Online Arena',
+        url: 'https://example.com/arena',
+        availability: 'Online',
+        rating: 4.8,
+      },
+      {
+        id: 'g3',
+        name: 'Hybrid Jam',
+        url: '/assets/games/hybrid.html',
+        availability: 'Hybrid',
+        rating: 4.6,
+      },
+    ]);
+
+    component.setAvailabilityFilter('Offline');
+    expect(component.filteredGames().map((game) => game.id)).toEqual(['g1']);
+
+    component.setAvailabilityFilter('Online');
+    expect(component.filteredGames().map((game) => game.id)).toEqual(['g2']);
   });
 
   it('should surface spotlight game from filtered list', () => {
