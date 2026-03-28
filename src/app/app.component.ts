@@ -121,11 +121,15 @@ export class AppComponent {
   }
 
   private updateFullPageMode(url: string) {
-    const normalizedPath = url.split(/[?#]/)[0].replace(/^\/+/, '');
-    const path = normalizedPath.split('/')[0];
+    const path = this.getPrimaryRoute(url);
     this.isFullPageMode.set(
       ['piano-roll', 'tha-spot', 'networking'].includes(path)
     );
+  }
+
+  private getPrimaryRoute(url: string): string {
+    const normalizedPath = url.split(/[?#]/)[0].replace(/^\/+/, '');
+    return normalizedPath.split('/')[0] ?? '';
   }
 
   toggleSidebar() {
