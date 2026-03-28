@@ -97,6 +97,21 @@ export class PianoRollComponent implements AfterViewInit, OnDestroy {
   audioDockView = signal<'mixer' | 'drum-machine' | 'mastering'>('mixer');
   isPlaying = this.audioSession.isPlaying;
   readonly defaultTrackPresetId = 'synth-lead';
+  readonly patternLengthOptions = [1, 2, 4, 8];
+  readonly arrangementBars = computed(() => {
+    const track = this.selectedTrack();
+    return Array.from({ length: this.numMeasures }, (_, index) => {
+      const start = index * this.stepsPerMeasure;
+      const end = start + this.stepsPerMeasure;
+      const noteCount =
+        track?.notes.filter((note) => note.step >= start && note.step < end)
+          .length ?? 0;
+      return {
+        index,
+        noteCount,
+      };
+    });
+  });
 
   selectionBox = signal({ active: false, x: 0, y: 0, w: 0, h: 0 });
   isStandalone = computed(() => this.router.url === '/piano-roll');
@@ -465,6 +480,15 @@ export class PianoRollComponent implements AfterViewInit, OnDestroy {
   setAudioDockView(view: 'mixer' | 'drum-machine' | 'mastering') {
     this.audioDockView.set(view);
     this.showAudioDock.set(true);
+  }
+
+  setPatternLength(measures: number) {
+    this.numMeasures = this.clamp(measures, 1, 16);
+    this.cells = Array.from(
+      { length: this.numMeasures * this.stepsPerMeasure },
+      (_, i) => i
+    );
+    this.gridWidth = this.cells.length * this.cellWidth;
   }
 
   @HostListener('window:keydown', ['$event'])

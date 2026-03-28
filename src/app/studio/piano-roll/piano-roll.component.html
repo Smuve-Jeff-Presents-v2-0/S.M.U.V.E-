@@ -37,7 +37,7 @@
   </aside>
 
   <main class="flex-1 flex flex-col min-w-0 bg-slate-900/50 relative">
-    <header class="piano-toolbar h-auto md:h-14 shrink-0 border-b border-white/5 bg-slate-950/80 backdrop-blur-md flex flex-col md:flex-row md:items-center justify-between px-3 md:px-6 py-2 md:py-0 gap-2 md:gap-0 z-30">
+    <header class="piano-toolbar h-auto shrink-0 border-b border-white/5 bg-slate-950/80 backdrop-blur-md flex flex-col px-3 md:px-6 py-2 gap-2 z-30">
       <div class="flex flex-wrap items-center gap-2 md:gap-6">
           <div class="flex items-center gap-2 md:gap-3">
              <select [ngModel]="selectedScale()" (ngModelChange)="selectedScale.set($event)"
@@ -91,7 +91,7 @@
               <button (click)="randomizeVelocity()" title="Randomize Velocity" class="p-1.5 rounded hover:text-brand-primary group"><span class="material-symbols-outlined text-sm">shuffle</span></button>
               <button (click)="deleteSelected()" title="Delete" class="p-1.5 rounded hover:text-red-500 group"><span class="material-symbols-outlined text-sm">delete</span></button>
            </div>
-       </div>
+        </div>
        <div class="flex items-center justify-between md:justify-end gap-2 md:gap-4">
           <div class="flex items-center gap-2 bg-slate-900 p-1 rounded-lg border border-white/10">
              <button (click)="showAutomation.set(!showAutomation())" [class.text-brand-primary]="showAutomation()" class="p-1 rounded hover:bg-white/5 transition-all">
@@ -110,11 +110,45 @@
              </button>
              <button *ngIf="!isStandalone()" (click)="goStandalone()" class="p-1 rounded hover:text-brand-primary group"><span class="material-symbols-outlined text-sm">fullscreen</span></button>
              <button *ngIf="isStandalone()" (click)="goToStudio()" class="p-1 rounded hover:text-brand-primary group"><span class="material-symbols-outlined text-sm">exit_to_app</span></button>
+           </div>
+           <div class="text-[9px] font-black font-mono text-brand-primary bg-brand-primary/5 px-2 py-1 rounded border border-brand-primary/20">
+             {{ musicManager.engine.tempo() }} BPM
+           </div>
+      </div>
+      <div class="arrangement-strip rounded-xl border border-white/10 bg-black/25 px-3 py-2">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-3">
+            <span class="text-[8px] font-black uppercase tracking-[0.3em] text-slate-500">Project Arrangement</span>
+            <div class="h-3 w-px bg-white/10"></div>
+            <span class="text-[8px] font-black uppercase tracking-[0.25em] text-brand-primary">Pattern Length</span>
+            <div class="flex items-center gap-1">
+              <button
+                *ngFor="let measures of patternLengthOptions"
+                (click)="setPatternLength(measures)"
+                class="px-2 py-1 rounded border border-white/10 text-[8px] font-black uppercase tracking-widest transition-all"
+                [class.border-brand-primary/40]="numMeasures === measures"
+                [class.text-brand-primary]="numMeasures === measures"
+                [class.bg-brand-primary/10]="numMeasures === measures"
+              >
+                {{ measures }} bar{{ measures > 1 ? 's' : '' }}
+              </button>
+            </div>
           </div>
-          <div class="text-[9px] font-black font-mono text-brand-primary bg-brand-primary/5 px-2 py-1 rounded border border-brand-primary/20">
-            {{ musicManager.engine.tempo() }} BPM
+          <div class="text-[8px] font-black uppercase tracking-[0.25em] text-slate-500">
+            {{ cells.length }} steps
           </div>
-       </div>
+        </div>
+        <div class="mt-2 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-1">
+          <button
+            *ngFor="let bar of arrangementBars()"
+            class="arrangement-bar-button rounded-lg border border-white/10 px-2 py-1 text-left transition-all hover:border-brand-primary/30 hover:bg-brand-primary/10"
+            (click)="scrollContainer?.nativeElement?.scrollTo({ left: bar.index * stepsPerMeasure * cellWidth, behavior: 'smooth' })"
+          >
+            <div class="text-[7px] font-black uppercase tracking-widest text-slate-500">Bar {{ bar.index + 1 }}</div>
+            <div class="mt-0.5 text-[9px] font-black text-white">{{ bar.noteCount }} notes</div>
+          </button>
+        </div>
+      </div>
     </header>
 
     <div class="piano-grid-scroll flex-1 overflow-auto custom-scrollbar relative" #scrollContainer>

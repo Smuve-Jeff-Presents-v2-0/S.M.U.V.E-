@@ -90,6 +90,57 @@
       <!-- Audio Section -->
       <div *ngIf="activeTab() === 'audio'" class="flex flex-col gap-6 animate-enter">
         <div class="setting-group">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <label class="setting-label">Audio Interface Routing</label>
+              <p class="text-xs text-text-dim mt-1">Manage recording input and monitoring output from Settings.</p>
+            </div>
+            <button
+              (click)="refreshAudioInputs()"
+              class="px-3 py-1.5 rounded-lg border border-border text-[10px] uppercase font-black tracking-widest text-text-dim hover:text-brand-primary hover:border-brand-primary/40 transition-all"
+            >
+              Refresh
+            </button>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+            <label class="block">
+              <span class="setting-label">Input Device</span>
+              <select
+                class="smuve-input w-full mt-2"
+                [ngModel]="selectedAudioInputId()"
+                (ngModelChange)="selectAudioInput($event)"
+              >
+                <option [ngValue]="null">Auto Select</option>
+                <option *ngFor="let device of audioInputDevices()" [value]="device.deviceId">
+                  {{ device.label }} [{{ device.type }}]
+                </option>
+              </select>
+            </label>
+            <div>
+              <span class="setting-label">Output Monitor</span>
+              <div class="flex gap-2 mt-2">
+                <button
+                  (click)="setOutputMode('speakers')"
+                  class="px-4 py-2 rounded-lg border text-[10px] uppercase font-black tracking-widest transition-all"
+                  [class.btn-active]="audioEngine.outputMode() === 'speakers'"
+                  [class.border-border]="audioEngine.outputMode() !== 'speakers'"
+                >
+                  Speakers
+                </button>
+                <button
+                  (click)="setOutputMode('headphones')"
+                  class="px-4 py-2 rounded-lg border text-[10px] uppercase font-black tracking-widest transition-all"
+                  [class.btn-active]="audioEngine.outputMode() === 'headphones'"
+                  [class.border-border]="audioEngine.outputMode() !== 'headphones'"
+                >
+                  Headphones
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="setting-group">
           <label class="setting-label">Master Gain ({{(settings().audio.masterVolume * 100).toFixed(0)}}%)</label>
           <input type="range" min="0" max="1" step="0.01"
             [ngModel]="settings().audio.masterVolume"

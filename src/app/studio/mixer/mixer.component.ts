@@ -2,7 +2,6 @@ import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AudioSessionService } from '../audio-session.service';
 import { ChannelStripComponent } from '../channel-strip/channel-strip.component';
-import { MicrophoneInterfaceComponent } from '../microphone-interface/microphone-interface.component';
 import {
   MusicManagerService,
   TrackModel,
@@ -12,7 +11,7 @@ import { Clip } from '../instrument.service';
 @Component({
   selector: 'app-mixer',
   standalone: true,
-  imports: [CommonModule, ChannelStripComponent, MicrophoneInterfaceComponent],
+  imports: [CommonModule, ChannelStripComponent],
   templateUrl: './mixer.component.html',
   styleUrls: ['./mixer.component.css'],
 })
