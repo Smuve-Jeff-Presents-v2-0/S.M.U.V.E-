@@ -690,13 +690,15 @@ export class PianoRollComponent implements AfterViewInit, OnDestroy {
     }
 
     const octave = Math.floor(clampedMidi / 12);
-    const candidates = [-1, 0, 1]
-      .flatMap((octaveOffset) =>
-        this.selectedScale().notes.map((scaleNote) =>
-          this.clamp((octave + octaveOffset) * 12 + scaleNote, 0, 127)
+    const candidates = Array.from(
+      new Set(
+        [-1, 0, 1].flatMap((octaveOffset) =>
+          this.selectedScale().notes.map((scaleNote) =>
+            this.clamp((octave + octaveOffset) * 12 + scaleNote, 0, 127)
+          )
         )
       )
-      .filter((candidate, index, source) => source.indexOf(candidate) === index)
+    )
       .sort((left, right) => {
         const distanceDelta =
           Math.abs(left - clampedMidi) - Math.abs(right - clampedMidi);
