@@ -34,6 +34,11 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'gaming-hub',
+    redirectTo: 'tha-spot',
+    pathMatch: 'full',
+  },
+  {
     path: 'practice',
     loadComponent: () =>
       import('./components/practice-space/practice-space.component').then(

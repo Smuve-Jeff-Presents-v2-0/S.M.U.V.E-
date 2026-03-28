@@ -113,10 +113,10 @@ export class UIService {
     },
     {
       mode: 'tha-spot',
-      label: 'Community',
+      label: 'Gaming Hub',
       description:
-        'Move through the social floor and engage community features.',
-      icon: 'bolt',
+        'Step into Tha Spot for arcade floors, matchmaking, and community play.',
+      icon: 'sports_esports',
       category: 'COMMUNITY',
     },
     {
