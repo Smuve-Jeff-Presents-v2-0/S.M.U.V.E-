@@ -18,6 +18,7 @@
   --studio-grid-opacity: 0.55;
   --studio-surface-shadow: 0 18px 35px rgba(0, 0, 0, 0.45);
   --studio-topbar-blur: 12px;
+  --studio-mobile-safe-padding: 0.35rem;
   display: flex;
   flex-direction: row; /* Sidebar layout */
   height: 100%;
@@ -305,10 +306,14 @@
   }
   .fl-mobile-nav {
     display: flex;
-    padding-bottom: calc(0.35rem + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(
+      var(--studio-mobile-safe-padding) + env(safe-area-inset-bottom, 0px)
+    );
   }
   .studio-bottom-dock {
-    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(
+      var(--studio-mobile-safe-padding) + 0.4rem + env(safe-area-inset-bottom, 0px)
+    );
   }
   .fl-editor-overlay {
     height: 100%;
