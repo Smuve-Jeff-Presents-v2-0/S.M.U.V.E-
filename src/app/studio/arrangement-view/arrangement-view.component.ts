@@ -133,7 +133,7 @@ export class ArrangementViewComponent {
     const colorIndex = this.tracks().findIndex((t) => t.id === trackId);
     const color = TRACK_COLORS[colorIndex % TRACK_COLORS.length];
     const newClip: ArrangementClip = {
-      id: `clip-${Date.now()}`,
+      id: `clip-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
       name: 'New Clip',
       start: 0,
       length: 4,
@@ -162,6 +162,13 @@ export class ArrangementViewComponent {
   selectClip(clipId: string, event: Event): void {
     event.stopPropagation();
     this.selectedClipId.set(clipId);
+  }
+
+  onClipKeydown(clipId: string, event: KeyboardEvent): void {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      this.selectedClipId.set(clipId);
+    }
   }
 
   isTrackSelected(trackId: string): boolean {
