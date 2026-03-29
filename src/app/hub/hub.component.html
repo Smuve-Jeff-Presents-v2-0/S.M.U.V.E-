@@ -368,12 +368,12 @@
       </div>
 
       <div class="feature-grid">
-          @for (feature of featureSpotlights; track feature.route) {
-            <button
-              type="button"
-              class="feature-card"
-              (click)="navigateToFeature(feature.route)"
-            >
+        @for (feature of featureSpotlights; track feature.route) {
+          <button
+            type="button"
+            class="feature-card"
+            (click)="navigateToFeature(feature.route)"
+          >
             <div class="feature-card-head">
               <span class="feature-icon material-symbols-outlined">{{
                 feature.icon
