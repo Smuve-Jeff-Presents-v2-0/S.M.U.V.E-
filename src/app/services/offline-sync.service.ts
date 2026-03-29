@@ -174,13 +174,7 @@ export class OfflineSyncService {
   }
 
   private async removeFromQueue(id: string): Promise<void> {
-    const items = await this.localStorage.getAllItems(this.SYNC_STORE);
-    const filtered = items.filter((i) => i.id !== id);
-
-    // Clear and re-add items
-    for (const item of filtered) {
-      await this.localStorage.saveItem(this.SYNC_STORE, item);
-    }
+    await this.localStorage.deleteItem(this.SYNC_STORE, id);
   }
 
   private async updatePendingCount(): Promise<void> {

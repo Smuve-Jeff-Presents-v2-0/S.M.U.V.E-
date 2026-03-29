@@ -378,11 +378,13 @@ export class SecurityService {
   }
 
   /**
-   * Cleans up resources.
+   * Cleans up resources manually. Called explicitly when needed since root-level
+   * services don't go through normal Angular lifecycle destruction.
    */
-  ngOnDestroy(): void {
+  cleanup(): void {
     if (this.activityCheckInterval) {
       clearInterval(this.activityCheckInterval);
+      this.activityCheckInterval = null;
     }
   }
 }
