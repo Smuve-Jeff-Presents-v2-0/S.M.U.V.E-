@@ -1,6 +1,5 @@
 <div class="profile-editor-view bg-black/95 min-h-screen text-slate-100 font-mono relative overflow-x-hidden">
 
-  <!-- Ambient background -->
   <div class="absolute inset-0 pointer-events-none overflow-hidden">
     <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-brand-primary/5 to-transparent"></div>
     <div class="absolute -top-24 -right-24 w-96 h-96 bg-purple-600/10 rounded-full blur-[100px]"></div>
@@ -34,7 +33,6 @@
 
   <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8 p-8 relative z-10">
 
-    <!-- Sidebar -->
     <aside class="w-full lg:w-72 space-y-6">
       <nav class="bg-white/5 border border-white/5 rounded-3xl p-4 overflow-hidden">
         <button *ngFor="let section of sections"
@@ -55,14 +53,12 @@
           </div>
         </div>
       </div>
-    </div>
+    </aside>
 
-    <!-- Main Content -->
     <main class="flex-1 bg-white/5 rounded-[2.5rem] border border-white/5 p-10 backdrop-blur-md relative min-h-[70vh]">
 
       <div [ngSwitch]="activeSection()" class="relative z-10 space-y-12">
 
-        <!-- BASIC -->
         <div *ngSwitchCase="'basic'" class="space-y-10 animate-fade-in">
           <header class="border-b border-white/5 pb-6">
             <h2 class="text-3xl font-black italic uppercase text-brand-primary">Identity & Vision</h2>
@@ -92,7 +88,6 @@
           </section>
         </div>
 
-        <!-- GENRE DEEP DIVE -->
         <div *ngSwitchCase="'genre-deep-dive'" class="space-y-10 animate-fade-in">
           <header class="border-b border-white/5 pb-6">
             <h2 class="text-3xl font-black italic uppercase text-brand-primary">Genre Intelligence</h2>
@@ -110,12 +105,10 @@
           </div>
         </div>
 
-        <!-- CATALOG -->
         <div *ngSwitchCase="'catalog'" class="animate-fade-in">
           <app-catalog-manager></app-catalog-manager>
         </div>
 
-        <!-- TOURING -->
         <div *ngSwitchCase="'touring'" class="space-y-10 animate-fade-in">
            <header class="border-b border-white/5 pb-6">
             <h2 class="text-3xl font-black italic uppercase text-brand-primary">Touring & Live</h2>
@@ -138,14 +131,12 @@
           </div>
         </div>
 
-        <!-- OTHER SECTIONS FALLBACK -->
         <div *ngSwitchDefault class="py-20 text-center">
           <p class="text-slate-600 uppercase text-xs tracking-[0.3em] italic">Section encrypted or under construction.</p>
         </div>
 
       </div>
 
-      <!-- MODAL COMPONENT -->
       <app-artist-questionnaire *ngIf="showQuestionnaire()"
         (close)="showQuestionnaire.set(false)"
         (complete)="editableProfile.set($event)">

@@ -144,7 +144,7 @@ export class ArtistQuestionnaireComponent {
     const parts = field.split('.');
     let current: any = this.profileDraft();
     for (const part of parts) {
-      if (!current) return undefined;
+      if (!current || part === '__proto__' || part === 'constructor' || part === 'prototype') return undefined;
       current = current[part];
     }
     return current;
@@ -157,14 +157,22 @@ export class ArtistQuestionnaireComponent {
       let target: any = updated;
 
       for (let i = 0; i < parts.length - 1; i++) {
-        if (!target[parts[i]]) target[parts[i]] = {};
-        target = target[parts[i]];
+        const part = parts[i];
+        if (part === '__proto__' || part === 'constructor' || part === 'prototype') {
+            return p;
+        }
+        if (!target[part]) target[part] = {};
+        target = target[part];
       }
 
       const lastPart = parts[parts.length - 1];
+      if (lastPart === '__proto__' || lastPart === 'constructor' || lastPart === 'prototype') {
+          return p;
+      }
+
       const q = this.currentQuestion();
 
-      if (q.type === 'multi-select') {
+      if (q && q.type === 'multi-select') {
         if (!Array.isArray(target[lastPart])) target[lastPart] = [];
         if (target[lastPart].includes(value)) {
           target[lastPart] = target[lastPart].filter((v: any) => v !== value);
@@ -209,10 +217,10 @@ export class ArtistQuestionnaireComponent {
   private calculateStrategicScore(p: UserProfile): number {
     let score = 60;
     if (p.primaryGenre) score += 5;
-    if (p.strategicGoals?.length > 0) score += 10;
-    if (p.brandVoices?.length > 1) score += 5;
-    if (p.expertise?.technical_mastery > 7) score += 10;
-    if (p.expertise?.catalyst) score += 5;
+    if (p.strategicGoals && p.strategicGoals.length > 0) score += 10;
+    if (p.brandVoices && p.brandVoices.length > 1) score += 5;
+    if (p.expertise && p.expertise.technical_mastery > 7) score += 10;
+    if (p.expertise && p.expertise.catalyst) score += 5;
     return Math.min(100, score);
   }
 
