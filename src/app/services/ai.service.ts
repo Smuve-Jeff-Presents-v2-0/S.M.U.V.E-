@@ -29,6 +29,7 @@ import {
   SystemStatus as AiSystemStatus,
   UpgradeRecommendation,
   StrategicRecommendation as StrategicRecommendationType,
+  ExecutiveAuditReport
 } from '../types/ai.types';
 
 /**
