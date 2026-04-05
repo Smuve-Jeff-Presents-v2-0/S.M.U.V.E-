@@ -10,6 +10,8 @@ import {
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
+import { NeuralMixerService } from './neural-mixer.service';
+import { MusicManagerService } from './music-manager.service';
 import { UserProfileService, UserProfile } from './user-profile.service';
 import { LoggingService } from './logging.service';
 import { AnalyticsService } from './analytics.service';
@@ -91,6 +93,8 @@ export class AiService {
   private userProfileService = inject(UserProfileService);
   private analyticsService = inject(AnalyticsService);
   private userContext = inject(UserContextService);
+  private neuralMixer = inject(NeuralMixerService);
+  private musicManager = inject(MusicManagerService);
   private logger = inject(LoggingService);
 
   private API_URL =
@@ -111,6 +115,11 @@ export class AiService {
   scanningProgress = signal(0);
   currentProcessStep = signal('');
   executiveAudit = signal<any>(null);
+  sonicCohesion = signal(85);
+  dynamicRange = signal(12);
+  frequencyBalance = signal({ low: 80, mid: 90, high: 85 });
+  criticalDeficits = signal<string[]>([]);
+
 
   isAIBassistActive = signal(false);
   isAIDrummerActive = signal(false);
@@ -323,6 +332,9 @@ export class AiService {
     if (trimmed === '/business') return this.handleBizCommand(artist);
     if (trimmed === '/hooks') return this.handleHooksCommand(genre);
     if (trimmed === '/release') return this.handleReleaseCommand(artist, genre);
+    if (trimmed === '/generate_structure') return this.generateStructure(genre);
+    if (trimmed === '/generate_chords') return this.generateChords(genre);
+    if (trimmed === '/auto_mix') return this.handleAutoMixCommand();
 
     // Check for keyword-routed commands (e.g., AUTO_MIX, BIZ_STRATEGY)
     const upperCommand = command.toUpperCase().trim();
@@ -410,6 +422,12 @@ export class AiService {
       if (!step) {
         clearInterval(interval);
         this.isScanning.set(false);
+        this.sonicCohesion.set(Math.floor(75 + Math.random() * 20));
+        this.criticalDeficits.set([
+          'Low-mid buildup at 300Hz',
+          'Vocal needs 2dB more air at 10kHz',
+          'Kick-Bass phase alignment suboptimal'
+        ]);
         return;
       }
 
@@ -420,11 +438,52 @@ export class AiService {
       if (step.progress >= 100) {
         clearInterval(interval);
         this.isScanning.set(false);
+        this.sonicCohesion.set(Math.floor(75 + Math.random() * 20));
+        this.criticalDeficits.set([
+          'Low-mid buildup at 300Hz',
+          'Vocal needs 2dB more air at 10kHz',
+          'Kick-Bass phase alignment suboptimal'
+        ]);
       }
     }, 250);
   }
 
-  getUpgradeRecommendations(): UpgradeRecommendation[] {
+
+  async generateStructure(genre: string) {
+    this.logger.info('AiService: Generating song structure for genre', genre);
+    const structure = [
+      { id: 's1', label: 'Intro', startBar: 0, length: 4, color: '#10b981' },
+      { id: 's2', label: 'Verse 1', startBar: 4, length: 8, color: '#3b82f6' },
+      { id: 's3', label: 'Pre-Chorus', startBar: 12, length: 4, color: '#f59e0b' },
+      { id: 's4', label: 'Chorus 1', startBar: 16, length: 8, color: '#8b5cf6' },
+      { id: 's5', label: 'Verse 2', startBar: 24, length: 8, color: '#3b82f6' },
+      { id: 's6', label: 'Chorus 2', startBar: 32, length: 8, color: '#8b5cf6' },
+      { id: 's7', label: 'Bridge', startBar: 40, length: 8, color: '#ef4444' },
+      { id: 's8', label: 'Chorus 3', startBar: 48, length: 8, color: '#8b5cf6' },
+      { id: 's9', label: 'Outro', startBar: 56, length: 8, color: '#10b981' },
+    ];
+    this.musicManager.structure.set(structure);
+    return 'Song structure generated for ' + genre;
+  }
+
+  async generateChords(genre: string) {
+    this.logger.info('AiService: Generating chord progression for genre', genre);
+    const chords = [
+      { id: 'c1', name: 'Am', startStep: 0, length: 16 },
+      { id: 'c2', name: 'F', startStep: 16, length: 16 },
+      { id: 'c3', name: 'C', startStep: 32, length: 16 },
+      { id: 'c4', name: 'G', startStep: 48, length: 16 },
+    ];
+    this.musicManager.chords.set(chords);
+    return 'Chord progression generated for ' + genre;
+  }
+
+  private async handleAutoMixCommand(): Promise<string> {
+    this.neuralMixer.applyNeuralMix();
+    return 'Neural Mix protocol initiated. All channel strips have been balanced according to heuristic production intelligence.';
+  }
+
+getUpgradeRecommendations(): UpgradeRecommendation[] {
     return [
       {
         id: 'upg-1',

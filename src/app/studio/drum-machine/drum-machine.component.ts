@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MusicManagerService } from '../../services/music-manager.service';
 import { AudioEngineService } from '../../services/audio-engine.service';
 import { MicrophoneService } from '../../services/microphone.service';
 import { AiService } from '../../services/ai.service';
@@ -46,6 +47,7 @@ export class DrumMachineComponent implements AfterViewInit, OnDestroy {
   readonly audioEngine = inject(AudioEngineService);
   private readonly micService = inject(MicrophoneService);
   private readonly aiService = inject(AiService);
+  private readonly musicManager = inject(MusicManagerService);
   private readonly logger = inject(LoggingService);
 
   pads = signal<DrumPad[]>([
@@ -187,6 +189,12 @@ export class DrumMachineComponent implements AfterViewInit, OnDestroy {
     // Keep selectedPad in sync
     if (this.selectedPad()?.id === pad.id) {
       this.selectedPad.set(this.pads().find(p => p.id === pad.id) ?? null);
+    }
+
+    // Sync with MusicManagerService
+    const track = this.musicManager.tracks().find(t => t.name.toLowerCase().includes(pad.name.toLowerCase()));
+    if (track) {
+      this.musicManager.toggleStep(track.id, stepIdx);
     }
   }
 

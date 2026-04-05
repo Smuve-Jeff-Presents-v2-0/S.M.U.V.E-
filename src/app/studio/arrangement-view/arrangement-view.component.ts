@@ -1,21 +1,6 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-export interface ArrangementTrack {
-  id: string;
-  name: string;
-  clips: ArrangementClip[];
-  muted: boolean;
-  solo: boolean;
-}
-
-export interface ArrangementClip {
-  id: string;
-  name: string;
-  start: number;
-  length: number;
-  color: string;
-}
+import { MusicManagerService, TrackModel, ArrangementClip } from '../../services/music-manager.service';
 
 const TRACK_COLORS = [
   '#10b981', '#8b5cf6', '#f59e0b', '#3b82f6',
@@ -30,129 +15,74 @@ const TRACK_COLORS = [
   styleUrls: ['./arrangement-view.component.css'],
 })
 export class ArrangementViewComponent {
+  private musicManager = inject(MusicManagerService);
+
   bars = Array.from({ length: 64 }, (_, i) => i);
   barWidth = 100;
   gridWidth = 64 * 100;
-  playheadPos = signal(120);
-  selectedTrackId = signal<string | null>(null);
+
+  playheadPos = computed(() => {
+    const step = this.musicManager.currentStep();
+    if (step < 0) return 0;
+    return (step / 16) * this.barWidth;
+  });
+
+  selectedTrackId = computed(() => this.musicManager.selectedTrackId());
   selectedClipId = signal<string | null>(null);
 
-  tracks = signal<ArrangementTrack[]>([
-    {
-      id: '1',
-      name: 'Kick',
-      muted: false,
-      solo: false,
-      clips: [
-        { id: 'c1', name: 'Pattern 1', start: 0, length: 4, color: '#10b981' },
-        { id: 'c2', name: 'Pattern 1', start: 8, length: 4, color: '#10b981' },
-      ],
-    },
-    {
-      id: '2',
-      name: 'Snare',
-      muted: false,
-      solo: false,
-      clips: [
-        { id: 'c3', name: 'Pattern 2', start: 4, length: 4, color: '#8b5cf6' },
-      ],
-    },
-    {
-      id: '3',
-      name: 'Vocal 01',
-      muted: false,
-      solo: false,
-      clips: [
-        {
-          id: 'c4',
-          name: 'Verse 1 Recording',
-          start: 0,
-          length: 16,
-          color: '#f59e0b',
-        },
-      ],
-    },
-    {
-      id: '4',
-      name: 'Lead Synth',
-      muted: false,
-      solo: false,
-      clips: [
-        { id: 'c5', name: 'Synth Loop', start: 8, length: 8, color: '#3b82f6' },
-      ],
-    },
-  ]);
+  tracks = this.musicManager.tracks;
+  structure = this.musicManager.structure;
+  chords = this.musicManager.chords;
 
   trackCount = computed(() => this.tracks().length);
   clipCount = computed(() =>
-    this.tracks().reduce((sum, t) => sum + t.clips.length, 0)
+    this.tracks().reduce((sum, t) => sum + (t.clips?.length || 0), 0)
   );
 
   addTrack(): void {
-    const currentTracks = this.tracks();
-    const newId = String(currentTracks.length + 1);
-    const colorIndex = currentTracks.length % TRACK_COLORS.length;
-    const newTrack: ArrangementTrack = {
-      id: newId,
-      name: `Track ${newId}`,
-      muted: false,
-      solo: false,
-      clips: [],
-    };
-    this.tracks.set([...currentTracks, newTrack]);
+    this.musicManager.ensureTrack('Piano');
   }
 
-  removeTrack(trackId: string): void {
-    this.tracks.update((tracks) => tracks.filter((t) => t.id !== trackId));
-    if (this.selectedTrackId() === trackId) {
-      this.selectedTrackId.set(null);
-    }
+  removeTrack(trackId: number): void {
+    this.musicManager.removeTrack(trackId);
   }
 
-  selectTrack(trackId: string): void {
-    this.selectedTrackId.set(trackId);
+  selectTrack(trackId: number): void {
+    this.musicManager.selectedTrackId.set(trackId);
   }
 
-  toggleMute(trackId: string): void {
-    this.tracks.update((tracks) =>
-      tracks.map((t) =>
-        t.id === trackId ? { ...t, muted: !t.muted } : t
-      )
-    );
+  toggleMute(trackId: number): void {
+    this.musicManager.toggleMute(trackId);
   }
 
-  toggleSolo(trackId: string): void {
-    this.tracks.update((tracks) =>
-      tracks.map((t) =>
-        t.id === trackId ? { ...t, solo: !t.solo } : t
-      )
-    );
+  toggleSolo(trackId: number): void {
+    this.musicManager.toggleSolo(trackId);
   }
 
-  addClip(trackId: string): void {
-    const colorIndex = this.tracks().findIndex((t) => t.id === trackId);
+  addClip(trackId: number): void {
+    const track = this.tracks().find(t => t.id === trackId);
+    if (!track) return;
+
+    const colorIndex = this.tracks().indexOf(track);
     const color = TRACK_COLORS[colorIndex % TRACK_COLORS.length];
+
     const newClip: ArrangementClip = {
       id: `clip-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-      name: 'New Clip',
+      name: 'New Pattern',
       start: 0,
       length: 4,
       color,
+      type: 'midi'
     };
-    this.tracks.update((tracks) =>
-      tracks.map((t) =>
-        t.id === trackId ? { ...t, clips: [...t.clips, newClip] } : t
-      )
+
+    this.musicManager.tracks.update(ts =>
+      ts.map(t => t.id === trackId ? { ...t, clips: [...(t.clips || []), newClip] } : t)
     );
   }
 
-  removeClip(trackId: string, clipId: string): void {
-    this.tracks.update((tracks) =>
-      tracks.map((t) =>
-        t.id === trackId
-          ? { ...t, clips: t.clips.filter((c) => c.id !== clipId) }
-          : t
-      )
+  removeClip(trackId: number, clipId: string): void {
+    this.musicManager.tracks.update(ts =>
+      ts.map(t => t.id === trackId ? { ...t, clips: (t.clips || []).filter(c => c.id !== clipId) } : t)
     );
     if (this.selectedClipId() === clipId) {
       this.selectedClipId.set(null);
@@ -171,7 +101,7 @@ export class ArrangementViewComponent {
     }
   }
 
-  isTrackSelected(trackId: string): boolean {
+  isTrackSelected(trackId: number): boolean {
     return this.selectedTrackId() === trackId;
   }
 

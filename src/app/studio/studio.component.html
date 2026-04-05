@@ -1,9 +1,17 @@
-<div class="studio-container" [ngClass]="studioQualityClass()">
-  <!-- Sidebar Navigation (FL Style) -->
-  <aside class="fl-sidebar">
+<div class="studio-container flex h-full bg-[#050505] overflow-hidden" [class.performance-mode]="uiService.performanceMode()">
+  <!-- Side Navigation Rail -->
+  <aside class="studio-sidebar w-16 md:w-20 border-r border-white/5 flex flex-col items-center py-8 gap-10 bg-black/40 backdrop-blur-xl z-50">
     <div class="sidebar-icon" [class.active]="activeView() === 'dj'" (click)="setActiveView('dj')">
-      <span class="material-symbols-outlined">album</span>
-      <span class="sidebar-label">DJ</span>
+      <span class="material-symbols-outlined">queue_music</span>
+      <span class="sidebar-label">Arrangement</span>
+    </div>
+    <div class="sidebar-icon" [class.active]="activeView() === 'drum-machine'" (click)="setActiveView('drum-machine')">
+      <span class="material-symbols-outlined">music_note</span>
+      <span class="sidebar-label">Drums</span>
+    </div>
+    <div class="sidebar-icon" [class.active]="showPianoRoll()" (click)="showPianoRoll.set(!showPianoRoll())">
+      <span class="material-symbols-outlined">piano</span>
+      <span class="sidebar-label">Piano</span>
     </div>
     <div class="sidebar-icon" [class.active]="activeView() === 'mixer'" (click)="setActiveView('mixer')">
       <span class="material-symbols-outlined">equalizer</span>
@@ -31,7 +39,7 @@
           <span class="material-symbols-outlined text-xl">token</span>
           <h2 class="text-slate-100 text-xs font-black tracking-tight uppercase italic leading-none">
             <span class="studio-title-desktop">STUDIO PRO </span>
-            <span class="studio-title-desktop studio-title-accent">v4</span>
+            <span class="studio-title-desktop studio-title-accent">v4.2</span>
             <span class="studio-title-mobile">STUDIO </span>
             <span class="studio-title-mobile studio-title-accent">Mobile</span>
           </h2>
@@ -47,7 +55,7 @@
         <div class="hidden lg:flex items-center gap-4 studio-mode-pills">
           <div class="mode-pill" [class.mode-pill-active]="activeView() === 'dj'">
             <span class="material-symbols-outlined text-[10px]">album</span>
-            <span>Deck Mode</span>
+            <span>Arrangement</span>
           </div>
           <div class="mode-pill" [class.mode-pill-active]="showPianoRoll()">
             <span class="material-symbols-outlined text-[10px]">piano</span>
@@ -117,8 +125,60 @@
     <!-- Main Workspace -->
     <main class="flex-grow relative overflow-hidden bg-background-dark">
       <div class="studio-grid-overlay pointer-events-none"></div>
+
+      <!-- ARRANGEMENT VIEW (Always Underneath for better connection) -->
       <div class="absolute inset-0 z-10">
         <app-arrangement-view></app-arrangement-view>
+      </div>
+
+      <!-- Holographic Executive Audit Overlay -->
+      <div
+        *ngIf="aiService.isScanning()"
+        class="absolute inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-center justify-center animate-enter"
+      >
+        <div class="w-full max-w-md p-8 glass-card border border-brand-primary/30 text-center">
+          <div class="mb-6 relative">
+            <div class="text-[60px] font-black text-brand-primary/20 absolute inset-0 flex items-center justify-center">{{ aiService.scanningProgress() }}%</div>
+            <span class="material-symbols-outlined !text-6xl text-brand-primary animate-spin-slow">offline_bolt</span>
+          </div>
+          <h3 class="text-lg font-black text-white uppercase tracking-[0.3em] mb-2">{{ aiService.currentProcessStep() }}</h3>
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6">S.M.U.V.E. Neural Intelligence Scanning Session Architecture...</p>
+          <div class="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+            <div class="h-full bg-brand-primary transition-all duration-300" [style.width.%]="aiService.scanningProgress()"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Strategic Audit Report Overlay -->
+      <div
+        *ngIf="!aiService.isScanning() && aiService.criticalDeficits().length > 0"
+        class="absolute top-20 right-8 z-[100] w-80 glass-card p-6 border border-brand-primary/20 shadow-2xl animate-enter"
+      >
+        <div class="flex items-center justify-between mb-4">
+           <span class="text-[10px] font-black text-brand-primary uppercase tracking-widest">Executive Audit Report</span>
+           <button (click)="aiService.criticalDeficits.set([])" class="text-slate-500 hover:text-white"><span class="material-symbols-outlined text-sm">close</span></button>
+        </div>
+        <div class="flex items-end justify-between mb-6">
+           <div class="flex flex-col">
+              <span class="text-[8px] font-black text-slate-500 uppercase">Overall Cohesion</span>
+              <span class="text-3xl font-black text-white font-mono">{{ aiService.sonicCohesion() }}%</span>
+           </div>
+           <div class="w-24 h-12 bg-black/40 rounded-lg border border-white/5 overflow-hidden">
+              <div class="h-full bg-brand-primary/40 flex items-end justify-around px-2">
+                 <div class="w-1 bg-brand-primary" [style.height.%]="aiService.frequencyBalance().low"></div>
+                 <div class="w-1 bg-brand-primary" [style.height.%]="aiService.frequencyBalance().mid"></div>
+                 <div class="w-1 bg-brand-primary" [style.height.%]="aiService.frequencyBalance().high"></div>
+              </div>
+           </div>
+        </div>
+        <div class="space-y-3">
+           <div class="text-[8px] font-black text-slate-500 uppercase tracking-widest border-b border-white/5 pb-1">Critical Deficits</div>
+           <div *ngFor="let deficit of aiService.criticalDeficits()" class="flex items-start gap-3">
+              <span class="material-symbols-outlined text-[10px] text-red-500 mt-0.5">warning</span>
+              <span class="text-[10px] font-bold text-white/80 leading-tight uppercase">{{ deficit }}</span>
+           </div>
+        </div>
+        <button class="w-full mt-6 py-2 bg-brand-primary/10 border border-brand-primary/20 rounded-lg text-brand-primary text-[9px] font-black uppercase tracking-widest hover:bg-brand-primary/20 transition-all">Resolve with Neural Mix</button>
       </div>
 
       <div

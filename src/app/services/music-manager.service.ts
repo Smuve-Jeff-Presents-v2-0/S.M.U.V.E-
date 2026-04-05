@@ -11,11 +11,22 @@ export type TrackNote = {
   length: number;
   velocity: number;
 };
+
+export interface ArrangementClip {
+  id: string;
+  name: string;
+  start: number; // in bars
+  length: number; // in bars
+  color: string;
+  type: 'midi' | 'audio';
+}
+
 export interface TrackModel {
   id: number;
   name: string;
   instrumentId: string;
   notes: TrackNote[];
+  clips: ArrangementClip[];
   gain: number;
   pan: number;
   sendA: number;
@@ -23,6 +34,21 @@ export interface TrackModel {
   mute: boolean;
   solo: boolean;
   steps: boolean[];
+}
+
+export interface SongSection {
+  id: string;
+  label: string; // e.g. "Verse", "Chorus"
+  startBar: number;
+  length: number; // in bars
+  color: string;
+}
+
+export interface GlobalChord {
+  id: string;
+  name: string; // e.g. "Am", "F"
+  startStep: number;
+  length: number; // in steps (1 bar = 16 steps)
 }
 
 @Injectable({ providedIn: 'root' })
@@ -36,6 +62,10 @@ export class MusicManagerService {
   selectedTrackId = signal<number | null>(null);
   currentStep = signal(-1);
   automationData = signal<Record<string, number[]>>({});
+
+  // Global Harmonic and Structural Intelligence
+  chords = signal<GlobalChord[]>([]);
+  structure = signal<SongSection[]>([]);
 
   constructor() {
     // Initial setup if no tracks exist
@@ -107,7 +137,7 @@ export class MusicManagerService {
 
   private loadLastSession() {
     const profile = this.profileService.profile();
-    const lastSession = (profile.knowledgeBase as any).lastDawSession;
+    const lastSession = (profile?.knowledgeBase as any)?.lastDawSession;
 
     if (lastSession && lastSession.tracks && lastSession.tracks.length > 0) {
       this.logger.info('MusicManager: Restoring last session...');
@@ -152,6 +182,7 @@ export class MusicManagerService {
       name: preset.name,
       instrumentId: preset.id,
       notes: [],
+      clips: [],
       gain: 0.9,
       pan: 0,
       sendA: 0.1,

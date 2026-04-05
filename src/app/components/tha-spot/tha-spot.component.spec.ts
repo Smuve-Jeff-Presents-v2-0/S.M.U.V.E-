@@ -12,27 +12,15 @@ describe('ThaSpotComponent', () => {
     // Mock AudioContext
     const mockAudioParam = {
       value: 0,
-      setTargetAtTime: function () {
-        return this;
-      },
-      setValueAtTime: function () {
-        return this;
-      },
-      linearRampToValueAtTime: function () {
-        return this;
-      },
-      exponentialRampToValueAtTime: function () {
-        return this;
-      },
+      setTargetAtTime: jest.fn().mockReturnThis(),
+      setValueAtTime: jest.fn().mockReturnThis(),
+      linearRampToValueAtTime: jest.fn().mockReturnThis(),
+      exponentialRampToValueAtTime: jest.fn().mockReturnThis(),
     };
 
     const mockNode = {
-      connect: function (target: any) {
-        return target;
-      },
-      disconnect: function () {
-        return this;
-      },
+      connect: jest.fn().mockImplementation((target) => target),
+      disconnect: jest.fn().mockReturnThis(),
       gain: mockAudioParam,
       frequency: mockAudioParam,
       Q: mockAudioParam,
@@ -44,55 +32,33 @@ describe('ThaSpotComponent', () => {
       pan: mockAudioParam,
       delayTime: mockAudioParam,
       playbackRate: mockAudioParam,
-      start: function () {
-        return this;
-      },
-      stop: function () {
-        return this;
-      },
+      start: jest.fn().mockReturnThis(),
+      stop: jest.fn().mockReturnThis(),
       buffer: null,
+      curve: null,
+      oversample: 'none',
     };
 
     (window as any).AudioContext = class {
-      createGain() {
-        return { ...mockNode };
-      }
-      createOscillator() {
-        return { ...mockNode };
-      }
-      createDynamicsCompressor() {
-        return { ...mockNode };
-      }
-      createDelay() {
-        return { ...mockNode };
-      }
-      createBiquadFilter() {
-        return { ...mockNode };
-      }
-      createAnalyser() {
-        return { ...mockNode, getByteFrequencyData: () => {} };
-      }
-      createConvolver() {
-        return { ...mockNode };
-      }
-      createStereoPanner() {
-        return { ...mockNode };
-      }
-      createBufferSource() {
-        return { ...mockNode };
-      }
-      createBuffer() {
-        return { getChannelData: () => new Float32Array(100) };
-      }
-      get destination() {
-        return { connect: () => {}, disconnect: () => {} };
-      }
-      get currentTime() {
-        return 0;
-      }
-      get sampleRate() {
-        return 44100;
-      }
+      createGain() { return { ...mockNode }; }
+      createOscillator() { return { ...mockNode }; }
+      createDynamicsCompressor() { return { ...mockNode }; }
+      createDelay() { return { ...mockNode }; }
+      createBiquadFilter() { return { ...mockNode }; }
+      createAnalyser() { return { ...mockNode, getByteFrequencyData: jest.fn(), getByteTimeDomainData: jest.fn(), fftSize: 2048, frequencyBinCount: 1024 }; }
+      createConvolver() { return { ...mockNode }; }
+      createStereoPanner() { return { ...mockNode }; }
+      createBufferSource() { return { ...mockNode }; }
+      createWaveShaper() { return { ...mockNode }; }
+      createBuffer() { return { getChannelData: () => new Float32Array(100), numberOfChannels: 2, length: 100, sampleRate: 44100, duration: 1 }; }
+      createMediaStreamDestination() { return { stream: {}, connect: jest.fn() }; }
+      get destination() { return { connect: jest.fn(), disconnect: jest.fn() }; }
+      get currentTime() { return 0; }
+      get sampleRate() { return 44100; }
+      resume() { return Promise.resolve(); }
+      suspend() { return Promise.resolve(); }
+      close() { return Promise.resolve(); }
+      decodeAudioData() { return Promise.resolve({ duration: 1, getChannelData: () => new Float32Array(100) }); }
     };
     (window as any).webkitAudioContext = (window as any).AudioContext;
     (globalThis as any).indexedDB = {
