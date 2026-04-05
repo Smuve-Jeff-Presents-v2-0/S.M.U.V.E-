@@ -6,6 +6,7 @@ import {
   MusicManagerService,
   TrackModel,
 } from '../../services/music-manager.service';
+import { NeuralMixerService } from '../../services/neural-mixer.service';
 import { Clip } from '../instrument.service';
 
 @Component({
@@ -18,6 +19,7 @@ import { Clip } from '../instrument.service';
 export class MixerComponent {
   private readonly audioSession = inject(AudioSessionService);
   public readonly musicManager = inject(MusicManagerService);
+  private readonly neuralMixer = inject(NeuralMixerService);
 
   @Input() activeClip: Clip | null = null;
 
@@ -31,6 +33,10 @@ export class MixerComponent {
 
   updateMasterVolume(newVolume: number): void {
     this.audioSession.updateMasterVolume(newVolume);
+  }
+
+  applyNeuralMix(): void {
+    this.neuralMixer.applyNeuralMix();
   }
 
   stopTrackSelection(event: Event): void {
@@ -96,7 +102,7 @@ export class MixerComponent {
   }
 
   sendPercent(track: TrackModel, send: 'sendA' | 'sendB'): number {
-    return Math.round(Math.max(0, Math.min(1, track[send])) * 100);
+    return Math.round(Math.max(0, Math.min(1, (track as any)[send])) * 100);
   }
 
   isSelected(track: TrackModel): boolean {
@@ -108,7 +114,7 @@ export class MixerComponent {
   }
 
   activeNotes(track: TrackModel): number {
-    return track.notes.length;
+    return track.notes?.length || 0;
   }
 
   selectedTrackNoteCount(): number {
