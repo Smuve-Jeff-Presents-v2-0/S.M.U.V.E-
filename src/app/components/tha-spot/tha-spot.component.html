@@ -26,16 +26,16 @@
       </div>
       <div class="dock-divider"></div>
       <div class="dock-meta">
-        <div class="status-indicator online">
-          <span class="pulse-dot"></span>
-          <span class="status-text">SYSTEM LIVE</span>
-        </div>
+        <button class="dock-btn intel-toggle" (click)="toggleIntel()" [class.active]="showIntelPanel()">
+            <span class="material-symbols-outlined">analytics</span>
+            <span class="btn-label">INTEL</span>
+        </button>
       </div>
     </div>
   </nav>
 
   <!-- Immersive Content Area -->
-  <main class="hub-main" [class.room-transitioning]="isTransitioning()">
+  <main class="hub-main" [class.room-transitioning]="isTransitioning()" [class.with-intel]="showIntelPanel()">
 
     <!-- Room Header -->
     <header class="room-header animate-slide-down">
@@ -71,6 +71,10 @@
               <div class="availability-badge" [attr.data-type]="game.availability">
                 {{ game.availability }}
               </div>
+              <div class="ai-support-badge" *ngIf="game.aiSupportLevel && game.aiSupportLevel !== 'None'">
+                <span class="material-symbols-outlined">neurology</span>
+                {{ game.aiSupportLevel }}
+              </div>
             </div>
 
             <div class="card-content">
@@ -93,6 +97,72 @@
     </div>
 
   </main>
+
+  <!-- S.M.U.V.E. Gaming Intel Sidebar -->
+  <aside class="intel-sidebar glass-v42" [class.active]="showIntelPanel()">
+    <header class="intel-header">
+        <div class="intel-title">
+            <span class="material-symbols-outlined">neurology</span>
+            GAMING INTEL
+        </div>
+        <div class="neural-score-card">
+            <span class="label">NEURAL SYNC</span>
+            <span class="value">{{ neuralSyncScore() }}%</span>
+            <div class="progress-bar-small">
+                <div class="fill" [style.width.%]="neuralSyncScore()"></div>
+            </div>
+        </div>
+    </header>
+
+    <div class="intel-content custom-scrollbar">
+        <div class="intel-section">
+            <h4 class="section-title">STRATEGIC DIRECTIVES</h4>
+            <ul class="directives-list">
+                <li *ngFor="let d of gamingDirectives(); let i = index" [style.animation-delay]="i * 0.1 + 's'">
+                    <span class="material-symbols-outlined">arrow_right</span>
+                    {{ d }}
+                </li>
+            </ul>
+        </div>
+
+        <div class="intel-section">
+            <h4 class="section-title">ADVANTAGE METRICS</h4>
+            <div class="metric-row">
+                <span class="label">TACTICAL EDGE</span>
+                <span class="value">+{{ tacticalAdvantage() }}%</span>
+            </div>
+            <div class="metric-row">
+                <span class="label">REACTION LATENCY</span>
+                <span class="value">12ms</span>
+            </div>
+        </div>
+    </div>
+  </aside>
+
+  <!-- Neural Matchmaking Overlay -->
+  <div class="matchmaking-overlay" *ngIf="isMatchmaking()" [class.active]="isMatchmaking()">
+    <div class="overlay-backdrop"></div>
+    <div class="matchmaking-container">
+        <div class="scanning-circle">
+            <div class="scan-ring outer"></div>
+            <div class="scan-ring inner"></div>
+            <div class="center-icon">
+                <span class="material-symbols-outlined">satellite_alt</span>
+            </div>
+        </div>
+
+        <div class="matchmaking-info">
+            <h2 class="status-title glitch-text" [attr.data-text]="matchmakingStatus()">{{ matchmakingStatus() }}</h2>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" [style.width.%]="matchmakingProgress()"></div>
+                </div>
+                <span class="progress-pct">{{ matchmakingProgress() }}%</span>
+            </div>
+            <p class="ai-briefing">"{{ aiGamingBriefing() }}"</p>
+        </div>
+    </div>
+  </div>
 
   <!-- Immersive Game Overlay -->
   <div class="immersive-overlay" *ngIf="currentGame()" [class.active]="currentGame()">
@@ -130,6 +200,10 @@
           <div class="telemetry-item">
             <span class="label">SIGNAL:</span>
             <span class="value">STABLE</span>
+          </div>
+          <div class="telemetry-item" *ngIf="neuralSyncScore() > 0">
+            <span class="label">NEURAL SYNC:</span>
+            <span class="value success">{{ neuralSyncScore() }}%</span>
           </div>
         </div>
         <div class="footer-actions">

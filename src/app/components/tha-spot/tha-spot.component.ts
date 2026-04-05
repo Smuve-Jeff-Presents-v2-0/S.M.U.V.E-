@@ -59,6 +59,19 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
   games = signal<Game[]>([]);
   currentGame = signal<Game | null>(null);
 
+  // S.M.U.V.E. Neural Matchmaking State
+  isMatchmaking = signal(false);
+  matchmakingProgress = signal(0);
+  matchmakingStatus = signal('INITIALIZING UPLINK');
+  matchedOpponent = signal<string | null>(null);
+  aiGamingBriefing = signal<string>('');
+
+  // S.M.U.V.E. Intel Stats
+  neuralSyncScore = signal(85);
+  tacticalAdvantage = signal(0);
+  showIntelPanel = signal(false);
+  gamingDirectives = signal<string[]>([]);
+
   filteredGames = computed(() => {
     const allGames = this.games();
     const roomId = this.activeRoom();
@@ -88,6 +101,7 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.fetchGames();
+    this.generateGamingDirectives(this.gamingRooms[0] as any);
   }
 
   ngOnDestroy() {}
@@ -115,7 +129,67 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
   }
 
   playGame(game: Game) {
+    if (game.multiplayerType === 'Server' || game.tags?.includes('Multiplayer')) {
+      this.startNeuralMatchmaking(game);
+    } else {
+      this.launchGame(game);
+    }
+  }
+
+  startNeuralMatchmaking(game: Game) {
+    this.isMatchmaking.set(true);
+    this.matchmakingProgress.set(0);
+    this.matchmakingStatus.set('SCANNING GLOBAL GRID');
+    this.aiGamingBriefing.set(game.aiBriefing || 'Neural engine active.');
+
+    const interval = setInterval(() => {
+      const p = this.matchmakingProgress();
+      if (p < 30) {
+        this.matchmakingStatus.set('LOCATING OPPONENTS');
+      } else if (p < 60) {
+        this.matchmakingStatus.set('ESTABLISHING P2P LINK');
+      } else if (p < 90) {
+        this.matchmakingStatus.set('SYNCING NEURAL PROFILES');
+      }
+
+      this.matchmakingProgress.update(v => v + 5);
+      if (this.matchmakingProgress() >= 100) {
+        clearInterval(interval);
+        this.matchedOpponent.set('CYBER_EXECUTIVE_' + Math.floor(Math.random() * 999));
+        setTimeout(() => {
+          this.isMatchmaking.set(false);
+          this.launchGame(game);
+        }, 1500);
+      }
+    }, 150);
+  }
+
+  launchGame(game: Game) {
     this.currentGame.set(game);
+    this.neuralSyncScore.set(75 + Math.floor(Math.random() * 25));
+    this.tacticalAdvantage.set(Math.floor(Math.random() * 15));
+    this.generateGamingDirectives(game);
+  }
+
+  generateGamingDirectives(game: Game) {
+    const directives = [
+      'MAINTAIN NEURAL FOCUS AT ALL TIMES.',
+      'EXPLOIT OPPONENT LATENCY IN TRANSITIONS.',
+      'RHYTHM SYNC ESTABLISHED AT 98.4%.',
+      'TACTICAL SUPERIORITY DETECTED.'
+    ];
+
+    if (game.genre === 'Fighting' || game.id === '14' || game.id === '15') {
+        directives.push('BLOCK HIGH. COUNTER WITH NEURAL PRECISION.');
+    } else if (game.genre === 'Strategy' || game.id === '19') {
+        directives.push('ANALYZE BOARD DEPTH 4 PLIES AHEAD.');
+    }
+
+    this.gamingDirectives.set(directives);
+  }
+
+  toggleIntel() {
+    this.showIntelPanel.update(v => !v);
   }
 
   closeGame() {

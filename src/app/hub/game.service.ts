@@ -67,6 +67,9 @@ const CURATED_GAMES: Game[] = [
     image: buildGameCover('Tha Battlefield', 'Hybrid', '#10b981', '#0f766e'),
     availability: 'Hybrid',
     tags: ['Multiplayer', 'Original', 'PvP', 'station-pod'],
+    multiplayerType: 'Server',
+    aiSupportLevel: 'Advanced',
+    aiBriefing: 'Establish dominance in the rap battle arena. Neural sync active for rhythm precision.',
   },
   {
     id: '2',
@@ -80,6 +83,9 @@ const CURATED_GAMES: Game[] = [
     image: buildGameCover('Remix Arena', 'Hybrid', '#22c55e', '#14b8a6'),
     availability: 'Hybrid',
     tags: ['Multiplayer', 'Original', 'Co-op', 'station-pod'],
+    multiplayerType: 'Server',
+    aiSupportLevel: 'Neural',
+    aiBriefing: 'Collaborative remix engine is live. S.M.U.V.E. is balancing the sonic stems.',
   },
   {
     id: '3',
@@ -157,6 +163,8 @@ const CURATED_GAMES: Game[] = [
     image: buildGameCover('2048 Championship', 'Online', '#f97316', '#ea580c'),
     availability: 'Online',
     tags: ['Classic', 'AI', 'station-cabinet'],
+    aiSupportLevel: 'Neural',
+    aiBriefing: 'S.M.U.V.E. is analyzing the logic matrix for optimal number combination strategies.',
   },
   {
     id: '9',
