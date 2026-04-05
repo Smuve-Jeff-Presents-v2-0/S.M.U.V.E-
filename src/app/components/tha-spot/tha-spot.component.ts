@@ -75,7 +75,7 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
         case 'combat':
           return genre === 'fighting' || tags.includes('combat') || tags.includes('pvp');
         case 'sports':
-          return genre === 'sports' || tags.includes('basketball') || tags.includes('football');
+          return genre === 'sports' || tags.includes('basketball') || tags.includes('football') || tags.includes('soccer') || tags.includes('tennis') || tags.includes('golf');
         case 'arcade':
           return genre === 'racing' || genre === 'rhythm' || tags.includes('arcade') || tags.includes('reflex');
         case 'strategy':
