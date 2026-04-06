@@ -20,9 +20,14 @@ import { LibraryService } from '../../services/library.service';
 import { FormsModule } from '@angular/forms';
 import { DeckService } from '../../services/deck.service';
 import { AudioEngineService } from '../../services/audio-engine.service';
+import { DatabaseService } from '../../services/database.service';
 import { UIService } from '../../services/ui.service';
 import { UserProfileService } from '../../services/user-profile.service';
 import { PlayerService } from '../../services/player.service';
+
+const RECORDING_TIMER_UPDATE_INTERVAL_MILLIS = 250;
+const MIN_ROLL_INTERVAL_MILLIS = 50;
+const MIN_SAMPLER_RETURN_MILLIS = 80;
 
 @Component({
   selector: 'app-dj-deck',
@@ -48,14 +53,29 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private recorder: MediaRecorder | null = null;
   recording = signal(false);
+  recordingElapsedMs = signal(0);
+  recordingDurationLabel = computed(() =>
+    this.formatDuration(this.recordingElapsedMs())
+  );
+  sessionNotice = signal('Ready to scratch, save, and export.');
 
   private animFrame: number | null = null;
   private syncInterval: any = null;
+  private recordingInterval: any = null;
+  private recordingStartedAt: number | null = null;
+  private lastRenderTimestamp = 0;
   performanceMode = signal<'cue' | 'roll' | 'sampler'>('cue');
   private tapTimes: { [key: string]: number[] } = { A: [], B: [] };
+  readonly rollPadLabels = ['1/8', '1/4', '1/2', '1', '2', '4', '8', '16'];
+  readonly rollPadBeats = [0.125, 0.25, 0.5, 1, 2, 4, 8, 16];
+  readonly samplerPadBeats = [0.25, 0.5, 1, 1, 2, 2, 4, 4];
 
   isScratchingA = signal(false);
   isScratchingB = signal(false);
+  activeRollPadA = signal<number | null>(null);
+  activeRollPadB = signal<number | null>(null);
+  activeSamplerPadA = signal<number | null>(null);
+  activeSamplerPadB = signal<number | null>(null);
   isFlatView = signal(false);
   private lastAngleA = 0;
   private lastAngleB = 0;
@@ -64,9 +84,25 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
     B: null,
   };
   private wasPlaying: Record<'A' | 'B', boolean> = { A: false, B: false };
+  private rollState: Record<
+    'A' | 'B',
+    | {
+        padIndex: number;
+        origin: number;
+        duration: number;
+        loopDuration: number;
+        startedAt: number;
+        playbackRate: number;
+        wasPlaying: boolean;
+      }
+    | null
+  > = { A: null, B: null };
+  private rollIntervals: Record<'A' | 'B', any> = { A: null, B: null };
+  private samplerReturnTimers: Record<'A' | 'B', any> = { A: null, B: null };
 
   public uiService = inject(UIService);
   private profileService = inject(UserProfileService);
+  private databaseService = inject(DatabaseService);
   public playerService = inject(PlayerService);
 
   hasNeuralStems = computed(() => {
@@ -94,9 +130,8 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
   ) {}
 
   ngOnInit() {
-    this.syncInterval = setInterval(() => {
-      this.deckService.syncProgress();
-    }, 50);
+    this.checkMobile();
+    this.configureSyncInterval();
   }
 
   ngAfterViewInit() {
@@ -106,11 +141,17 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnDestroy() {
     if (this.animFrame) cancelAnimationFrame(this.animFrame);
     if (this.syncInterval) clearInterval(this.syncInterval);
+    if (this.recordingInterval) clearInterval(this.recordingInterval);
+    this.clearRollInterval('A');
+    this.clearRollInterval('B');
+    this.clearSamplerReturnTimer('A');
+    this.clearSamplerReturnTimer('B');
   }
 
   @HostListener('window:resize')
   onResize() {
     this.checkMobile();
+    this.configureSyncInterval();
   }
 
   private checkMobile() {
@@ -119,13 +160,31 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  private configureSyncInterval() {
+    if (this.syncInterval) clearInterval(this.syncInterval);
+    const interval = this.isMobile() || this.uiService.isLowPower() ? 90 : 50;
+    this.syncInterval = setInterval(() => {
+      this.deckService.syncProgress();
+    }, interval);
+  }
+
   private startAnimationLoop() {
-    const loop = () => {
-      this.drawWaveforms();
-      this.drawMeters();
+    const loop = (timestamp: number) => {
+      const frameBudget =
+        this.isMobile() || this.uiService.isLowPower() ? 1000 / 30 : 1000 / 60;
+
+      if (
+        !this.lastRenderTimestamp ||
+        timestamp - this.lastRenderTimestamp >= frameBudget
+      ) {
+        this.drawWaveforms();
+        this.drawMeters();
+        this.lastRenderTimestamp = timestamp;
+      }
+
       this.animFrame = requestAnimationFrame(loop);
     };
-    loop();
+    this.animFrame = requestAnimationFrame(loop);
   }
 
   private drawWaveforms() {
@@ -268,14 +327,102 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  handlePadDown(
+    deck: 'A' | 'B',
+    index: number,
+    event?: MouseEvent | TouchEvent
+  ) {
+    if (this.performanceMode() !== 'roll') return;
+    event?.preventDefault();
+    this.startRoll(deck, index);
+  }
+
+  handlePadRelease(deck: 'A' | 'B', index: number) {
+    if (this.performanceMode() !== 'roll') return;
+    const activePad = deck === 'A' ? this.activeRollPadA() : this.activeRollPadB();
+    if (activePad !== index) return;
+    this.stopRoll(deck);
+  }
+
   handlePadPress(deck: 'A' | 'B', index: number) {
     const mode = this.performanceMode();
+    const d =
+      deck === 'A' ? this.deckService.deckA() : this.deckService.deckB();
+
     if (mode === 'cue') {
-      const d =
-        deck === 'A' ? this.deckService.deckA() : this.deckService.deckB();
       if (d.hotCues[index] === null) this.deckService.setHotCue(deck, index);
       else this.deckService.jumpToHotCue(deck, index);
+      this.sessionNotice.set(
+        d.hotCues[index] === null
+          ? `Deck ${deck} hot cue ${index + 1} captured.`
+          : `Deck ${deck} jumped to hot cue ${index + 1}.`
+      );
+      return;
     }
+
+    if (mode === 'roll') return;
+
+    if (d.samplerPads[index] === null) {
+      this.deckService.setSamplerPad(deck, index);
+      this.sessionNotice.set(`Deck ${deck} sample pad ${index + 1} armed.`);
+      return;
+    }
+
+    this.triggerSamplerPad(deck, index);
+  }
+
+  clearHotCue(
+    deck: 'A' | 'B',
+    index: number,
+    event: MouseEvent
+  ) {
+    event.preventDefault();
+    this.deckService.clearHotCue(deck, index);
+    this.sessionNotice.set(`Deck ${deck} hot cue ${index + 1} cleared.`);
+  }
+
+  clearPad(deck: 'A' | 'B', index: number, event: MouseEvent) {
+    event.preventDefault();
+    if (this.performanceMode() === 'roll') {
+      this.sessionNotice.set(
+        'Roll pads cannot be cleared - they are live performance triggers without stored state.'
+      );
+      return;
+    }
+
+    if (this.performanceMode() === 'sampler') {
+      this.deckService.clearSamplerPad(deck, index);
+      this.clearSamplerActivePad(deck);
+      this.sessionNotice.set(`Deck ${deck} sample pad ${index + 1} cleared.`);
+      return;
+    }
+
+    this.clearHotCue(deck, index, event);
+  }
+
+  getPadLabel(index: number) {
+    const mode = this.performanceMode();
+    if (mode === 'cue') return `Cue ${index + 1}`;
+    if (mode === 'roll') return `${this.rollPadLabels[index] || '1'} Roll`;
+    return `Shot ${index + 1}`;
+  }
+
+  isCuePadSet(deck: 'A' | 'B', index: number) {
+    return this.getDeckState(deck).hotCues[index] !== null;
+  }
+
+  isSamplerPadSet(deck: 'A' | 'B', index: number) {
+    return this.getDeckState(deck).samplerPads[index] !== null;
+  }
+
+  isRollPadActive(deck: 'A' | 'B', index: number) {
+    return (deck === 'A' ? this.activeRollPadA() : this.activeRollPadB()) === index;
+  }
+
+  isSamplerPadActive(deck: 'A' | 'B', index: number) {
+    return (
+      (deck === 'A' ? this.activeSamplerPadA() : this.activeSamplerPadB()) === index
+    );
   }
 
   setPlaybackRate(deck: 'A' | 'B', rate: any) {
@@ -316,20 +463,38 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
 
   startStopRecording() {
     if (this.recording()) {
+      this.sessionNotice.set('Finalizing live mix capture...');
       this.recorder?.stop();
-      this.recording.set(false);
-      this.recorder = null;
       return;
     }
+
     const { recorder, result } = this.exportService.startLiveRecording();
     this.recorder = recorder;
     this.recording.set(true);
+    this.startRecordingTimer();
+    this.sessionNotice.set('Recording live mix...');
+
+    recorder.onerror = () => {
+      this.sessionNotice.set('Recording failed to complete.');
+      this.cleanupRecordingState();
+    };
+
     result.then((blob) => {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `mix-${Date.now()}.webm`;
-      a.click();
+      const extension = blob.type.includes('ogg')
+        ? 'ogg'
+        : blob.type.includes('wav')
+          ? 'wav'
+          : 'webm';
+      return this.exportService.downloadBlob(blob, `mix-${Date.now()}.${extension}`);
+    })
+    .then(() => {
+      this.sessionNotice.set('Live mix exported successfully.');
+    })
+    .catch(() => {
+      this.sessionNotice.set('Live mix export failed.');
+    })
+    .finally(() => {
+      this.cleanupRecordingState();
     });
   }
 
@@ -465,5 +630,261 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
     if (type === 'brake') this.engine.brakeDeck(deck);
     else if (type === 'spinback') this.engine.spinbackDeck(deck);
     else if (type === 'transform') this.engine.transformDeck(deck);
+  }
+
+  async saveSessionSnapshot() {
+    const now = new Date();
+    const title = `DJ Session ${now.toLocaleString()}`;
+    const projectId = `dj-session-${now.getTime()}`;
+    const userId = this.profileService.profile().id || 'anonymous';
+
+    try {
+      await this.databaseService.saveProject(
+        projectId,
+        title,
+        this.buildSessionSnapshot(),
+        userId
+      );
+      this.sessionNotice.set(`${title} saved.`);
+    } catch {
+      this.sessionNotice.set('Session save failed.');
+    }
+  }
+
+  async exportSessionSnapshot() {
+    const snapshot = this.buildSessionSnapshot();
+    const blob = new Blob([JSON.stringify(snapshot, null, 2)], {
+      type: 'application/json',
+    });
+
+    try {
+      await this.exportService.downloadBlob(
+        blob,
+        `dj-session-${Date.now()}.json`
+      );
+      this.sessionNotice.set('Session snapshot exported.');
+    } catch {
+      this.sessionNotice.set('Session export failed.');
+    }
+  }
+
+  private buildSessionSnapshot() {
+    const deckSnapshot = (deck: ReturnType<typeof this.deckService.deckA>) => ({
+      trackName: deck.track?.name || 'No Track Loaded',
+      bpm: deck.bpm,
+      playbackRate: deck.playbackRate,
+      progress: deck.progress,
+      duration: deck.duration,
+      gain: deck.gain,
+      filterFreq: deck.filterFreq,
+      eqHigh: deck.eqHigh,
+      eqMid: deck.eqMid,
+      eqLow: deck.eqLow,
+      slip: deck.slip,
+      hotCues: [...deck.hotCues],
+      samplerPads: [...deck.samplerPads],
+    });
+
+    return {
+      type: 'dj-session-snapshot',
+      exportedAt: new Date().toISOString(),
+      performanceMode: this.performanceMode(),
+      crossfade: this.deckService.crossfade(),
+      masterVolume: this.masterVolume(),
+      deckA: deckSnapshot(this.deckService.deckA()),
+      deckB: deckSnapshot(this.deckService.deckB()),
+    };
+  }
+
+  private startRecordingTimer() {
+    this.recordingStartedAt = Date.now();
+    this.recordingElapsedMs.set(0);
+    if (this.recordingInterval) clearInterval(this.recordingInterval);
+    this.recordingInterval = setInterval(() => {
+      if (this.recordingStartedAt) {
+        this.recordingElapsedMs.set(Date.now() - this.recordingStartedAt);
+      }
+    }, RECORDING_TIMER_UPDATE_INTERVAL_MILLIS);
+  }
+
+  private cleanupRecordingState() {
+    this.recording.set(false);
+    this.recorder = null;
+    this.recordingStartedAt = null;
+    this.recordingElapsedMs.set(0);
+    if (this.recordingInterval) {
+      clearInterval(this.recordingInterval);
+      this.recordingInterval = null;
+    }
+  }
+
+  private formatDuration(durationMs: number) {
+    const totalSeconds = Math.max(0, Math.floor(durationMs / 1000));
+    const minutes = Math.floor(totalSeconds / 60)
+      .toString()
+      .padStart(2, '0');
+    const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+    return `${minutes}:${seconds}`;
+  }
+
+  private formatPadWindow(durationSeconds: number) {
+    return durationSeconds < 1
+      ? `${durationSeconds.toFixed(2)}s`
+      : `${durationSeconds.toFixed(1)}s`;
+  }
+
+  private startRoll(deck: 'A' | 'B', index: number) {
+    const progress = this.engine.getDeckProgress(deck);
+    const deckState = this.getDeckState(deck);
+    const duration = progress.duration || deckState.duration;
+    if (!duration) {
+      this.sessionNotice.set(`Load a track on deck ${deck} before rolling.`);
+      return;
+    }
+
+    this.stopRoll(deck, false);
+    const playbackRate = Math.max(0.25, Math.abs(deckState.playbackRate || 1));
+    const loopDuration = this.getBeatWindowSeconds(
+      deck,
+      this.rollPadBeats[index] || 1
+    );
+    const origin = progress.position;
+    const loopStart = this.getLoopStart(origin, loopDuration);
+    const wasPlaying = progress.isPlaying || deckState.isPlaying;
+
+    this.rollState[deck] = {
+      padIndex: index,
+      origin,
+      duration,
+      loopDuration,
+      startedAt: Date.now(),
+      playbackRate,
+      wasPlaying,
+    };
+    this.setActiveRollPad(deck, index);
+    this.engine.seekDeck(deck, loopStart);
+    this.engine.playDeck(deck);
+    this.clearRollInterval(deck);
+    this.rollIntervals[deck] = setInterval(() => {
+      const state = this.rollState[deck];
+      if (!state) return;
+      this.engine.seekDeck(deck, this.getLoopStart(state.origin, state.loopDuration));
+      this.engine.playDeck(deck);
+    }, Math.max(MIN_ROLL_INTERVAL_MILLIS, loopDuration * 1000));
+    this.deckService.syncProgress();
+    this.sessionNotice.set(
+      `Deck ${deck} ${this.rollPadLabels[index]} beat slip roll engaged.`
+    );
+  }
+
+  private stopRoll(deck: 'A' | 'B', announce = true) {
+    const state = this.rollState[deck];
+    this.clearRollInterval(deck);
+    this.setActiveRollPad(deck, null);
+    this.rollState[deck] = null;
+    if (!state) return;
+
+    if (state.wasPlaying) {
+      const elapsed =
+        ((Date.now() - state.startedAt) / 1000) * state.playbackRate;
+      const resumePosition = Math.max(
+        0,
+        Math.min(state.duration, state.origin + elapsed)
+      );
+      this.engine.seekDeck(deck, resumePosition);
+      this.engine.playDeck(deck);
+    } else {
+      this.engine.pauseDeck(deck);
+      this.engine.seekDeck(deck, state.origin);
+    }
+
+    this.deckService.syncProgress();
+    if (announce) {
+      this.sessionNotice.set(`Deck ${deck} roll released back to groove.`);
+    }
+  }
+
+  private triggerSamplerPad(deck: 'A' | 'B', index: number) {
+    const deckState = this.getDeckState(deck);
+    const cuePosition = deckState.samplerPads[index];
+    if (cuePosition === null) return;
+
+    const progress = this.engine.getDeckProgress(deck);
+    const duration = progress.duration || deckState.duration;
+    const playbackRate = Math.max(0.25, Math.abs(deckState.playbackRate || 1));
+    const wasPlaying = progress.isPlaying || deckState.isPlaying;
+    const shotDuration = Math.min(
+      this.getBeatWindowSeconds(deck, this.samplerPadBeats[index] || 1),
+      Math.max(0.05, duration - cuePosition)
+    );
+    const origin = progress.position;
+
+    this.clearSamplerReturnTimer(deck);
+    this.setActiveSamplerPad(deck, index);
+    this.engine.seekDeck(deck, cuePosition);
+    this.engine.playDeck(deck);
+    this.samplerReturnTimers[deck] = setTimeout(() => {
+      if (wasPlaying) {
+        const resumePosition = Math.max(
+          0,
+          Math.min(duration, origin + shotDuration * playbackRate)
+        );
+        this.engine.seekDeck(deck, resumePosition);
+        this.engine.playDeck(deck);
+      } else {
+        this.engine.pauseDeck(deck);
+        this.engine.seekDeck(deck, cuePosition);
+      }
+      this.clearSamplerActivePad(deck);
+      this.deckService.syncProgress();
+    }, Math.max(MIN_SAMPLER_RETURN_MILLIS, shotDuration * 1000));
+    this.deckService.syncProgress();
+    this.sessionNotice.set(
+      `Deck ${deck} sampler pad ${index + 1} fired for ${this.formatPadWindow(shotDuration)}.`
+    );
+  }
+
+  private getDeckState(deck: 'A' | 'B') {
+    return deck === 'A' ? this.deckService.deckA() : this.deckService.deckB();
+  }
+
+  private getBeatWindowSeconds(deck: 'A' | 'B', beats: number) {
+    const deckState = this.getDeckState(deck);
+    const bpm = Math.max(1, deckState.bpm || 128);
+    const playbackRate = Math.max(0.25, Math.abs(deckState.playbackRate || 1));
+    return (60 / bpm / playbackRate) * beats;
+  }
+
+  private getLoopStart(origin: number, loopDuration: number) {
+    return Math.max(0, origin - loopDuration);
+  }
+
+  private setActiveRollPad(deck: 'A' | 'B', index: number | null) {
+    if (deck === 'A') this.activeRollPadA.set(index);
+    else this.activeRollPadB.set(index);
+  }
+
+  private setActiveSamplerPad(deck: 'A' | 'B', index: number | null) {
+    if (deck === 'A') this.activeSamplerPadA.set(index);
+    else this.activeSamplerPadB.set(index);
+  }
+
+  private clearRollInterval(deck: 'A' | 'B') {
+    if (this.rollIntervals[deck]) {
+      clearInterval(this.rollIntervals[deck]);
+      this.rollIntervals[deck] = null;
+    }
+  }
+
+  private clearSamplerReturnTimer(deck: 'A' | 'B') {
+    if (this.samplerReturnTimers[deck]) {
+      clearTimeout(this.samplerReturnTimers[deck]);
+      this.samplerReturnTimers[deck] = null;
+    }
+  }
+
+  private clearSamplerActivePad(deck: 'A' | 'B') {
+    this.clearSamplerReturnTimer(deck);
+    this.setActiveSamplerPad(deck, null);
   }
 }

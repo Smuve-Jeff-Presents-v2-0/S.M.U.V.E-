@@ -743,6 +743,9 @@ export class AudioEngineService {
     const pos = this.getDeckProgress(id).position;
     this.getDeck(id).hotCues[slot] = pos;
   }
+  clearHotCue(id: DeckId, slot: number) {
+    this.getDeck(id).hotCues[slot] = null;
+  }
   jumpToHotCue(id: DeckId, slot: number) {
     const pos = this.getDeck(id).hotCues[slot];
     if (pos !== null) this.seekDeck(id, pos);
