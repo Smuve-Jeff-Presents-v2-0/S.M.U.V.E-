@@ -53,6 +53,7 @@ export class DeckService {
     } else {
       this.engine.playDeck(deck);
     }
+    this.syncDeckState(deck);
   }
 
   onStemGainChange(deck: DeckId, event: { stem: string; gain: number }) {
@@ -109,6 +110,7 @@ export class DeckService {
 
   jumpToHotCue(deck: DeckId, slot: number) {
     this.engine.jumpToHotCue(deck, slot);
+    this.syncDeckState(deck);
   }
 
   setDeckEq(deck: DeckId, high: number, mid: number, low: number) {
@@ -179,17 +181,21 @@ export class DeckService {
   syncProgress() {
     // In a real app we would use an analyzer for BPM detection
     // for now we just sync the positions and playing state
-    const progA = this.engine.getDeckProgress('A');
-    const progB = this.engine.getDeckProgress('B');
-    this.deckA.update((d) => ({
+    this.syncDeckState('A');
+    this.syncDeckState('B');
+  }
+
+  private syncDeckState(deck: DeckId) {
+    const progress = this.engine.getDeckProgress(deck);
+    const playbackRate = this.engine.getDeck(deck).rate;
+    const target = deck === 'A' ? this.deckA : this.deckB;
+
+    target.update((d) => ({
       ...d,
-      progress: progA.position,
-      isPlaying: progA.isPlaying,
-    }));
-    this.deckB.update((d) => ({
-      ...d,
-      progress: progB.position,
-      isPlaying: progB.isPlaying,
+      progress: progress.position,
+      duration: progress.duration || d.duration,
+      isPlaying: progress.isPlaying,
+      playbackRate,
     }));
   }
 }
