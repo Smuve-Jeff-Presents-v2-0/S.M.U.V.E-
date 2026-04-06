@@ -21,6 +21,7 @@ export interface AutomationLane {
   points: AutomationPoint[];
   enabled: boolean;
   interpolation: AutomationInterpolation;
+  /** Additional scalar applied to macro bias for this lane. Typical range: 0..1. */
   modulationDepth: number;
   macroId?: string;
 }
@@ -54,6 +55,12 @@ export interface PerformanceMacro {
 })
 export class AutomationService {
   private readonly engine = inject(AudioEngineService);
+  private idCounter = 0;
+
+  private nextId(prefix: string): string {
+    this.idCounter += 1;
+    return `${prefix}-${Date.now().toString(36)}-${this.idCounter.toString(36)}`;
+  }
 
   lanes = signal<AutomationLane[]>([]);
   modulationSources = signal<ModulationSource[]>([]);
@@ -71,7 +78,7 @@ export class AutomationService {
     }
   ) {
     const lane: AutomationLane = {
-      id: Math.random().toString(36).substring(7),
+      id: this.nextId('auto-lane'),
       target: {
         trackId,
         parameter,
@@ -213,7 +220,7 @@ export class AutomationService {
     config?: Partial<ModulationSource>
   ): ModulationSource {
     const source: ModulationSource = {
-      id: Math.random().toString(36).substring(7),
+      id: this.nextId('auto-mod'),
       type,
       enabled: true,
       amount: config?.amount ?? 0.25,
@@ -252,7 +259,7 @@ export class AutomationService {
 
   createMacro(name: string): PerformanceMacro {
     const macro: PerformanceMacro = {
-      id: Math.random().toString(36).substring(7),
+      id: this.nextId('auto-macro'),
       name,
       value: 0,
       mappings: [],

@@ -86,6 +86,17 @@ const COMMAND_ROUTES: Record<string, string> = {
     'Identify ideal collaboration targets (features, producers, remixers) based on genre alignment and growth-stage synergy. Prescribe outreach approach.',
 };
 
+const HIGH_DENSITY_THRESHOLD = 0.72;
+const HIGH_MASKING_THRESHOLD = 0.65;
+const HIGH_TRANSIENT_THRESHOLD = 0.7;
+const AGGRESSIVE_COMP_THRESHOLD = -20;
+const SAFE_COMP_THRESHOLD = -16;
+const AGGRESSIVE_COMP_RATIO = 4.2;
+const SAFE_COMP_RATIO = 3.1;
+const DENSE_TARGET_LUFS = -13.5;
+const DEFAULT_TARGET_LUFS = -14;
+const SAFE_LIMITER_CEILING = -0.1;
+
 @Injectable({
   providedIn: 'root',
 })
@@ -668,19 +679,26 @@ getUpgradeRecommendations(): UpgradeRecommendation[] {
     const transient = input.transientSharpness ?? 0.6;
 
     const arrangementSuggestion =
-      density > 0.72
+      density > HIGH_DENSITY_THRESHOLD
         ? 'Arrangement density is high; mute one harmonic layer every 8 bars to improve vocal slot clarity.'
         : 'Arrangement density is moderate; introduce a controlled counter-layer in the final chorus for lift.';
     const eqMaskingHint =
-      masking > 0.65
+      masking > HIGH_MASKING_THRESHOLD
         ? 'High mid masking risk at 1.5–3kHz; carve 1.5dB from supporting synths and prioritize lead presence.'
         : 'Masking is acceptable; preserve 2kHz pocket while widening upper harmonics above 8kHz.';
 
     const correctivePreset = {
-      compressorThreshold: transient > 0.7 ? -20 : -16,
-      compressorRatio: transient > 0.7 ? 4.2 : 3.1,
-      limiterCeiling: -0.1,
-      targetLufs: density > 0.72 ? -13.5 : -14,
+      compressorThreshold:
+        transient > HIGH_TRANSIENT_THRESHOLD
+          ? AGGRESSIVE_COMP_THRESHOLD
+          : SAFE_COMP_THRESHOLD,
+      compressorRatio:
+        transient > HIGH_TRANSIENT_THRESHOLD
+          ? AGGRESSIVE_COMP_RATIO
+          : SAFE_COMP_RATIO,
+      limiterCeiling: SAFE_LIMITER_CEILING,
+      targetLufs:
+        density > HIGH_DENSITY_THRESHOLD ? DENSE_TARGET_LUFS : DEFAULT_TARGET_LUFS,
     };
 
     return { arrangementSuggestion, eqMaskingHint, correctivePreset };

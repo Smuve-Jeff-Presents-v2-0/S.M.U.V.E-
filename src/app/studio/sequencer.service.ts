@@ -61,6 +61,7 @@ export class SequencerService {
   private logger = inject(LoggingService);
   private readonly instrumentsService = inject(InstrumentsService);
   private readonly engine = inject(AudioEngineService);
+  private idCounter = 0;
 
   patterns = signal<SequencerPattern[]>([]);
   variations = signal<PatternVariation[]>([]);
@@ -84,6 +85,24 @@ export class SequencerService {
     this.initDefaultPattern();
     this.engine.onScheduleStep = (stepIndex, when, stepDur) => {
       this.scheduleTick(stepIndex, when, stepDur);
+    };
+  }
+
+  private nextId(prefix: string): string {
+    this.idCounter += 1;
+    return `${prefix}-${Date.now().toString(36)}-${this.idCounter.toString(36)}`;
+  }
+
+  private clonePattern(pattern: SequencerPattern): SequencerPattern {
+    return {
+      ...pattern,
+      tracks: pattern.tracks.map((track) => ({
+        ...track,
+        notes: track.notes.map((note) => ({ ...note })),
+        steps: [...track.steps],
+        stepProbability: [...track.stepProbability],
+        ratchets: [...track.ratchets],
+      })),
     };
   }
 
@@ -185,7 +204,7 @@ export class SequencerService {
     steps.forEach((active, i) => {
       if (active) {
         notes.push({
-          id: Math.random().toString(36).substring(7),
+          id: this.nextId('seq-note'),
           pitch: defaultPitch,
           startTime: i,
           duration: 1,
@@ -200,7 +219,7 @@ export class SequencerService {
     });
 
     return {
-      id: Math.random().toString(36).substring(7),
+      id: this.nextId('seq-track'),
       name,
       instrumentId,
       volume: 80,
@@ -226,7 +245,7 @@ export class SequencerService {
         track.steps[stepIndex] = !track.steps[stepIndex];
         if (track.steps[stepIndex]) {
           track.notes.push({
-            id: Math.random().toString(36).substring(7),
+            id: this.nextId('seq-note'),
             pitch: this.getDefaultPitchForTrack(track),
             startTime: stepIndex,
             duration: 1,
@@ -342,7 +361,7 @@ export class SequencerService {
       if (track) {
         track.notes.push({
           ...note,
-          id: Math.random().toString(36).substring(7),
+          id: this.nextId('seq-note'),
         });
         this.refreshSteps(track);
       }
@@ -462,10 +481,10 @@ export class SequencerService {
     const pattern = this.activePattern();
     if (!pattern) return null;
     const variation: PatternVariation = {
-      id: Math.random().toString(36).substring(7),
+      id: this.nextId('seq-variation'),
       patternId: pattern.id,
       name,
-      patternSnapshot: JSON.parse(JSON.stringify(pattern)),
+      patternSnapshot: this.clonePattern(pattern),
     };
     this.variations.update((vars) => [...vars, variation]);
     return variation;
@@ -476,9 +495,7 @@ export class SequencerService {
     if (!variation) return;
     this.patterns.update((ps) =>
       ps.map((pattern, idx) =>
-        idx === this.activePatternIndex()
-          ? { ...JSON.parse(JSON.stringify(variation.patternSnapshot)) }
-          : pattern
+        idx === this.activePatternIndex() ? this.clonePattern(variation.patternSnapshot) : pattern
       )
     );
   }
@@ -487,7 +504,7 @@ export class SequencerService {
     this.variations.update((vars) =>
       vars.map((variation) => {
         if (variation.id !== variationId) return variation;
-        const next = JSON.parse(JSON.stringify(variation.patternSnapshot)) as SequencerPattern;
+        const next = this.clonePattern(variation.patternSnapshot);
         next.tracks.forEach((track) => {
           track.notes = track.notes.map((note) => ({
             ...note,
@@ -507,7 +524,7 @@ export class SequencerService {
 
   createScene(name: string, patternId: string, variationId?: string) {
     const scene: PatternScene = {
-      id: Math.random().toString(36).substring(7),
+      id: this.nextId('seq-scene'),
       name,
       patternId,
       variationId,

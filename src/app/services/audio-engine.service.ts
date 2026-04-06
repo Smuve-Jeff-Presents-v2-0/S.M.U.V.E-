@@ -42,6 +42,7 @@ interface DeckChannel {
   providedIn: 'root',
 })
 export class AudioEngineService {
+  private static readonly INTEGER_TRACK_ID_PATTERN = /^-?\d+$/;
   public outputMode = signal<'speakers' | 'headphones'>('speakers');
   public performanceTier = signal<'ultra' | 'performance'>('ultra');
   public sidechainEnabled = signal(false);
@@ -782,10 +783,11 @@ export class AudioEngineService {
     value: number,
     duration = 0.01
   ) {
-    const numericTrackId = Number(trackId);
-    const track = Number.isNaN(numericTrackId)
-      ? undefined
-      : this.tracks.get(numericTrackId);
+    const trimmedTrackId = `${trackId}`.trim();
+    const isNumericTrackId =
+      AudioEngineService.INTEGER_TRACK_ID_PATTERN.test(trimmedTrackId);
+    const numericTrackId = isNumericTrackId ? Number(trimmedTrackId) : NaN;
+    const track = isNumericTrackId ? this.tracks.get(numericTrackId) : undefined;
     const now = this.ctx.currentTime;
     const tau = Math.max(0.001, duration);
 

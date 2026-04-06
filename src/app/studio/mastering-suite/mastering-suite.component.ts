@@ -98,35 +98,42 @@ export class MasteringSuiteComponent implements AfterViewInit {
     this.isProcessing.set(true);
     try {
       const settings = await this.aiService.getAutoMixSettings();
-      this.audioEngine.configureCompressor({
-        threshold: settings.threshold,
-        ratio: settings.ratio,
-      });
-      this.audioEngine.configureLimiter({ ceiling: settings.ceiling });
-      this.audioEngine.setMasteringTargets({
-        lufs: settings.targetLufs,
-        truePeak: settings.ceiling,
-      });
-      this.targetLufs.set(settings.targetLufs);
-      this.safeCeiling.set(settings.ceiling);
-
       const assist = this.aiService.getProductionSmartAssist({
         arrangementDensity: 0.68,
         midMaskingRisk: 0.61,
         transientSharpness: 0.74,
       });
+
+      const mergedThreshold = Math.min(
+        settings.threshold,
+        assist.correctivePreset.compressorThreshold
+      );
+      const mergedRatio = Math.max(
+        settings.ratio,
+        assist.correctivePreset.compressorRatio
+      );
+      const mergedCeiling = Math.min(
+        settings.ceiling,
+        assist.correctivePreset.limiterCeiling
+      );
+      const mergedTargetLufs = Math.min(
+        settings.targetLufs,
+        assist.correctivePreset.targetLufs
+      );
+
+      this.audioEngine.configureCompressor({
+        threshold: mergedThreshold,
+        ratio: mergedRatio,
+      });
+      this.audioEngine.configureLimiter({ ceiling: mergedCeiling });
+      this.audioEngine.setMasteringTargets({
+        lufs: mergedTargetLufs,
+        truePeak: mergedCeiling,
+      });
+      this.targetLufs.set(mergedTargetLufs);
+      this.safeCeiling.set(mergedCeiling);
       this.smartAssistSuggestion.set(assist.arrangementSuggestion);
       this.eqMaskingHint.set(assist.eqMaskingHint);
-      this.audioEngine.configureCompressor({
-        threshold: assist.correctivePreset.compressorThreshold,
-        ratio: assist.correctivePreset.compressorRatio,
-      });
-      this.audioEngine.setMasteringTargets({
-        lufs: assist.correctivePreset.targetLufs,
-        truePeak: assist.correctivePreset.limiterCeiling,
-      });
-      this.targetLufs.set(assist.correctivePreset.targetLufs);
-      this.safeCeiling.set(assist.correctivePreset.limiterCeiling);
     } finally {
       this.isProcessing.set(false);
     }
