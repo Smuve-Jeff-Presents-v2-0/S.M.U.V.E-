@@ -43,6 +43,8 @@ interface DeckChannel {
 })
 export class AudioEngineService {
   public outputMode = signal<'speakers' | 'headphones'>('speakers');
+  public performanceTier = signal<'ultra' | 'performance'>('ultra');
+  public sidechainEnabled = signal(false);
   private logger = inject(LoggingService);
   private stemSeparationService = inject(StemSeparationService);
   public ctx: AudioContext;
@@ -83,6 +85,11 @@ export class AudioEngineService {
 
   private tracks = new Map<number, any>();
   private busses = new Map<string, GainNode>();
+  private sidechainMatrix = new Map<string, Set<string>>();
+  private masteringTargets = {
+    lufs: -14,
+    truePeak: -0.1,
+  };
 
   constructor() {
     this.ctx = new (
@@ -140,6 +147,28 @@ export class AudioEngineService {
 
   setOutputMode(mode: 'speakers' | 'headphones') {
     this.outputMode.set(mode);
+  }
+  setPerformanceTier(tier: 'ultra' | 'performance') {
+    this.performanceTier.set(tier);
+    if (tier === 'performance') {
+      this.lookahead = 0.16;
+      this.scheduleAheadTime = 0.28;
+      this.masterAnalyser.fftSize = 1024;
+      return;
+    }
+    this.lookahead = 0.1;
+    this.scheduleAheadTime = 0.2;
+    this.masterAnalyser.fftSize = 2048;
+  }
+
+  updateAdaptivePerformance(cpuLoadPercent: number) {
+    if (cpuLoadPercent > 75 && this.performanceTier() !== 'performance') {
+      this.setPerformanceTier('performance');
+      return;
+    }
+    if (cpuLoadPercent < 45 && this.performanceTier() !== 'ultra') {
+      this.setPerformanceTier('ultra');
+    }
   }
   resume() {
     if (this.ctx.state === 'suspended') this.ctx.resume();
@@ -705,6 +734,100 @@ export class AudioEngineService {
       );
     if (release !== undefined)
       this.limiter.release.setTargetAtTime(release, this.ctx.currentTime, 0.01);
+  }
+
+  setMasteringTargets(params: { lufs?: number; truePeak?: number }) {
+    if (typeof params.lufs === 'number') this.masteringTargets.lufs = params.lufs;
+    if (typeof params.truePeak === 'number') {
+      this.masteringTargets.truePeak = params.truePeak;
+      this.configureLimiter({ ceiling: params.truePeak });
+    }
+  }
+
+  getMasteringTargets() {
+    return { ...this.masteringTargets };
+  }
+
+  setSidechainEnabled(enabled: boolean) {
+    this.sidechainEnabled.set(enabled);
+  }
+
+  connectSidechain(triggerTrackId: string, targetTrackId: string) {
+    const key = `${triggerTrackId}`;
+    if (!this.sidechainMatrix.has(key)) {
+      this.sidechainMatrix.set(key, new Set<string>());
+    }
+    this.sidechainMatrix.get(key)!.add(`${targetTrackId}`);
+    this.sidechainEnabled.set(true);
+  }
+
+  disconnectSidechain(triggerTrackId: string, targetTrackId: string) {
+    const key = `${triggerTrackId}`;
+    const set = this.sidechainMatrix.get(key);
+    if (!set) return;
+    set.delete(`${targetTrackId}`);
+    if (set.size === 0) this.sidechainMatrix.delete(key);
+  }
+
+  getSidechainRouting() {
+    return Array.from(this.sidechainMatrix.entries()).map(([trigger, targets]) => ({
+      triggerTrackId: trigger,
+      targetTrackIds: Array.from(targets),
+    }));
+  }
+
+  applyProductionParameter(
+    trackId: string,
+    parameter: string,
+    value: number,
+    duration = 0.01
+  ) {
+    const numericTrackId = Number(trackId);
+    const track = Number.isNaN(numericTrackId)
+      ? undefined
+      : this.tracks.get(numericTrackId);
+    const now = this.ctx.currentTime;
+    const tau = Math.max(0.001, duration);
+
+    if (parameter === 'masterGain') {
+      this.masterGain.gain.setTargetAtTime(value, now, tau);
+      return;
+    }
+    if (parameter === 'compressor.threshold') {
+      this.compressor.threshold.setTargetAtTime(value, now, tau);
+      return;
+    }
+    if (parameter === 'limiter.ceiling') {
+      this.limiter.threshold.setTargetAtTime(value, now, tau);
+      return;
+    }
+    if (parameter === 'tempo') {
+      this.tempo.set(Math.max(30, Math.min(300, value)));
+      return;
+    }
+
+    if (!track) return;
+
+    const patch: any = {};
+    if (parameter === 'gain' || parameter === 'volume') {
+      patch.gain = Math.max(0, Math.min(1.5, value));
+    } else if (parameter === 'pan') {
+      patch.pan = Math.max(-1, Math.min(1, value));
+    } else if (parameter === 'sendA') {
+      patch.sendA = Math.max(0, Math.min(1, value));
+    } else if (parameter === 'sendB') {
+      patch.sendB = Math.max(0, Math.min(1, value));
+    } else if (parameter === 'filter.cutoff') {
+      patch.cutoff = Math.max(20, Math.min(22000, value));
+    } else if (parameter === 'velocity') {
+      patch.velocityScale = Math.max(0, Math.min(2, value));
+    } else {
+      patch[parameter] = value;
+    }
+    const resolvedId = typeof track.id === 'number' ? track.id : numericTrackId;
+    if (!Number.isNaN(resolvedId)) {
+      this.updateTrack(resolvedId, patch);
+    }
   }
 
   // Aliases for compatibility

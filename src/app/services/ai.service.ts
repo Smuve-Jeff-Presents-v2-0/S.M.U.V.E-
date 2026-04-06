@@ -636,8 +636,54 @@ getUpgradeRecommendations(): UpgradeRecommendation[] {
     threshold: number;
     ratio: number;
     ceiling: number;
+    targetLufs: number;
+    eqTilt: number;
   }> {
-    return { threshold: -18, ratio: 3.5, ceiling: -0.2 };
+    return {
+      threshold: -18,
+      ratio: 3.5,
+      ceiling: -0.2,
+      targetLufs: -14,
+      eqTilt: 0.15,
+    };
+  }
+
+  getProductionSmartAssist(input: {
+    arrangementDensity?: number;
+    lowBandEnergy?: number;
+    midMaskingRisk?: number;
+    transientSharpness?: number;
+  }): {
+    arrangementSuggestion: string;
+    eqMaskingHint: string;
+    correctivePreset: {
+      compressorThreshold: number;
+      compressorRatio: number;
+      limiterCeiling: number;
+      targetLufs: number;
+    };
+  } {
+    const density = input.arrangementDensity ?? 0.5;
+    const masking = input.midMaskingRisk ?? 0.4;
+    const transient = input.transientSharpness ?? 0.6;
+
+    const arrangementSuggestion =
+      density > 0.72
+        ? 'Arrangement density is high; mute one harmonic layer every 8 bars to improve vocal slot clarity.'
+        : 'Arrangement density is moderate; introduce a controlled counter-layer in the final chorus for lift.';
+    const eqMaskingHint =
+      masking > 0.65
+        ? 'High mid masking risk at 1.5–3kHz; carve 1.5dB from supporting synths and prioritize lead presence.'
+        : 'Masking is acceptable; preserve 2kHz pocket while widening upper harmonics above 8kHz.';
+
+    const correctivePreset = {
+      compressorThreshold: transient > 0.7 ? -20 : -16,
+      compressorRatio: transient > 0.7 ? 4.2 : 3.1,
+      limiterCeiling: -0.1,
+      targetLufs: density > 0.72 ? -13.5 : -14,
+    };
+
+    return { arrangementSuggestion, eqMaskingHint, correctivePreset };
   }
 
   getViralHooks(): string[] {

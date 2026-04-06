@@ -81,14 +81,67 @@ export class MasteringSuiteComponent implements AfterViewInit {
   truePeak = signal(-0.08);
   lra = signal(6.2);
   correlation = signal(0.82);
+  targetLufs = signal(-14);
+  safeCeiling = signal(-0.1);
+  isProcessing = signal(false);
+  smartAssistSuggestion = signal<string>('');
+  eqMaskingHint = signal<string>('');
 
   ngAfterViewInit() {
+    const targets = this.audioEngine.getMasteringTargets();
+    this.targetLufs.set(targets.lufs);
+    this.safeCeiling.set(targets.truePeak);
     this.startSpectrogram();
   }
 
   async processMastering() {
-    // Logic to trigger AI mastering process via AiService
-    await this.aiService.getAutoMixSettings();
+    this.isProcessing.set(true);
+    try {
+      const settings = await this.aiService.getAutoMixSettings();
+      this.audioEngine.configureCompressor({
+        threshold: settings.threshold,
+        ratio: settings.ratio,
+      });
+      this.audioEngine.configureLimiter({ ceiling: settings.ceiling });
+      this.audioEngine.setMasteringTargets({
+        lufs: settings.targetLufs,
+        truePeak: settings.ceiling,
+      });
+      this.targetLufs.set(settings.targetLufs);
+      this.safeCeiling.set(settings.ceiling);
+
+      const assist = this.aiService.getProductionSmartAssist({
+        arrangementDensity: 0.68,
+        midMaskingRisk: 0.61,
+        transientSharpness: 0.74,
+      });
+      this.smartAssistSuggestion.set(assist.arrangementSuggestion);
+      this.eqMaskingHint.set(assist.eqMaskingHint);
+      this.audioEngine.configureCompressor({
+        threshold: assist.correctivePreset.compressorThreshold,
+        ratio: assist.correctivePreset.compressorRatio,
+      });
+      this.audioEngine.setMasteringTargets({
+        lufs: assist.correctivePreset.targetLufs,
+        truePeak: assist.correctivePreset.limiterCeiling,
+      });
+      this.targetLufs.set(assist.correctivePreset.targetLufs);
+      this.safeCeiling.set(assist.correctivePreset.limiterCeiling);
+    } finally {
+      this.isProcessing.set(false);
+    }
+  }
+
+  updateTargetLufs(value: number) {
+    const next = Math.max(-24, Math.min(-8, value));
+    this.targetLufs.set(next);
+    this.audioEngine.setMasteringTargets({ lufs: next });
+  }
+
+  updateSafeCeiling(value: number) {
+    const next = Math.max(-1.2, Math.min(-0.01, value));
+    this.safeCeiling.set(next);
+    this.audioEngine.setMasteringTargets({ truePeak: next });
   }
 
   private startSpectrogram() {
