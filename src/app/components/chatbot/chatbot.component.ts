@@ -58,6 +58,7 @@ export class ChatbotComponent implements OnInit, AfterViewChecked {
   isTyping = signal(false);
   profile = this.userProfileService.profile;
   activeCommandCategory = signal<CommandCategory | null>(null);
+  private conversationCounter = 0;
 
   readonly quickCommands = QUICK_COMMANDS;
 
@@ -110,6 +111,7 @@ export class ChatbotComponent implements OnInit, AfterViewChecked {
     const text = this.userInput.trim();
     if (!text || this.isTyping()) return;
 
+    const conversationId = `conv-${++this.conversationCounter}`;
     const category = this.detectMessageCategory(text);
     this.messages.update((m) => [
       ...m,
@@ -126,7 +128,7 @@ export class ChatbotComponent implements OnInit, AfterViewChecked {
         ...m,
         { role: 'assistant', text: content, timestamp: Date.now(), category },
       ]);
-      this.speechSynthesisService.speak(content);
+      this.speechSynthesisService.speak(content, { conversationId });
     } catch (e) {
       this.handleError(e, 'message generation');
     }
