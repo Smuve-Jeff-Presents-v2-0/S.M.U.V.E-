@@ -108,6 +108,16 @@ export class DeckService {
     }
   }
 
+  clearHotCue(deck: DeckId, slot: number) {
+    this.engine.clearHotCue(deck, slot);
+    const target = deck === 'A' ? this.deckA : this.deckB;
+    target.update((d) => {
+      const cues = [...d.hotCues];
+      cues[slot] = null;
+      return { ...d, hotCues: cues };
+    });
+  }
+
   jumpToHotCue(deck: DeckId, slot: number) {
     this.engine.jumpToHotCue(deck, slot);
     this.syncDeckState(deck);

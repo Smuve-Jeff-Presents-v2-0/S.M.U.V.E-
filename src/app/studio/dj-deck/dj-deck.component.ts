@@ -20,6 +20,7 @@ import { LibraryService } from '../../services/library.service';
 import { FormsModule } from '@angular/forms';
 import { DeckService } from '../../services/deck.service';
 import { AudioEngineService } from '../../services/audio-engine.service';
+import { DatabaseService } from '../../services/database.service';
 import { UIService } from '../../services/ui.service';
 import { UserProfileService } from '../../services/user-profile.service';
 import { PlayerService } from '../../services/player.service';
@@ -48,11 +49,20 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private recorder: MediaRecorder | null = null;
   recording = signal(false);
+  recordingElapsedMs = signal(0);
+  recordingDurationLabel = computed(() =>
+    this.formatDuration(this.recordingElapsedMs())
+  );
+  sessionNotice = signal('Ready to scratch, save, and export.');
 
   private animFrame: number | null = null;
   private syncInterval: any = null;
+  private recordingInterval: any = null;
+  private recordingStartedAt: number | null = null;
+  private lastRenderTimestamp = 0;
   performanceMode = signal<'cue' | 'roll' | 'sampler'>('cue');
   private tapTimes: { [key: string]: number[] } = { A: [], B: [] };
+  readonly rollPadLabels = ['1/8', '1/4', '1/2', '1', '2', '4', '8', '16'];
 
   isScratchingA = signal(false);
   isScratchingB = signal(false);
@@ -67,6 +77,7 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
 
   public uiService = inject(UIService);
   private profileService = inject(UserProfileService);
+  private databaseService = inject(DatabaseService);
   public playerService = inject(PlayerService);
 
   hasNeuralStems = computed(() => {
@@ -94,9 +105,8 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
   ) {}
 
   ngOnInit() {
-    this.syncInterval = setInterval(() => {
-      this.deckService.syncProgress();
-    }, 50);
+    this.checkMobile();
+    this.configureSyncInterval();
   }
 
   ngAfterViewInit() {
@@ -106,11 +116,13 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnDestroy() {
     if (this.animFrame) cancelAnimationFrame(this.animFrame);
     if (this.syncInterval) clearInterval(this.syncInterval);
+    if (this.recordingInterval) clearInterval(this.recordingInterval);
   }
 
   @HostListener('window:resize')
   onResize() {
     this.checkMobile();
+    this.configureSyncInterval();
   }
 
   private checkMobile() {
@@ -119,13 +131,31 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  private configureSyncInterval() {
+    if (this.syncInterval) clearInterval(this.syncInterval);
+    const interval = this.isMobile() || this.uiService.isLowPower() ? 90 : 50;
+    this.syncInterval = setInterval(() => {
+      this.deckService.syncProgress();
+    }, interval);
+  }
+
   private startAnimationLoop() {
-    const loop = () => {
-      this.drawWaveforms();
-      this.drawMeters();
+    const loop = (timestamp: number) => {
+      const frameBudget =
+        this.isMobile() || this.uiService.isLowPower() ? 1000 / 30 : 1000 / 60;
+
+      if (
+        !this.lastRenderTimestamp ||
+        timestamp - this.lastRenderTimestamp >= frameBudget
+      ) {
+        this.drawWaveforms();
+        this.drawMeters();
+        this.lastRenderTimestamp = timestamp;
+      }
+
       this.animFrame = requestAnimationFrame(loop);
     };
-    loop();
+    this.animFrame = requestAnimationFrame(loop);
   }
 
   private drawWaveforms() {
@@ -275,7 +305,54 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
         deck === 'A' ? this.deckService.deckA() : this.deckService.deckB();
       if (d.hotCues[index] === null) this.deckService.setHotCue(deck, index);
       else this.deckService.jumpToHotCue(deck, index);
+      this.sessionNotice.set(
+        d.hotCues[index] === null
+          ? `Deck ${deck} hot cue ${index + 1} captured.`
+          : `Deck ${deck} jumped to hot cue ${index + 1}.`
+      );
+      return;
     }
+
+    if (mode === 'roll') {
+      const rollSize = this.rollPadLabels[index] || '1';
+      const rollSeconds = [0.125, 0.25, 0.5, 1, 2, 4, 8, 16][index] || 1;
+      const currentPosition = this.engine.getDeckProgress(deck).position;
+      const nextPosition = Math.max(0, currentPosition - rollSeconds);
+      this.engine.seekDeck(deck, nextPosition);
+      this.engine.playDeck(deck);
+      this.deckService.syncProgress();
+      this.sessionNotice.set(`Deck ${deck} ${rollSize}-beat roll triggered.`);
+      return;
+    }
+
+    const d = deck === 'A' ? this.deckService.deckA() : this.deckService.deckB();
+    if (d.hotCues[index] === null) {
+      this.deckService.setHotCue(deck, index);
+      this.sessionNotice.set(`Deck ${deck} sample pad ${index + 1} armed.`);
+      return;
+    }
+
+    this.engine.seekDeck(deck, d.hotCues[index] ?? 0);
+    this.engine.playDeck(deck);
+    this.deckService.syncProgress();
+    this.sessionNotice.set(`Deck ${deck} sample pad ${index + 1} fired.`);
+  }
+
+  clearHotCue(
+    deck: 'A' | 'B',
+    index: number,
+    event: MouseEvent
+  ) {
+    event.preventDefault();
+    this.deckService.clearHotCue(deck, index);
+    this.sessionNotice.set(`Deck ${deck} hot cue ${index + 1} cleared.`);
+  }
+
+  getPadLabel(index: number) {
+    const mode = this.performanceMode();
+    if (mode === 'cue') return `Cue ${index + 1}`;
+    if (mode === 'roll') return `${this.rollPadLabels[index] || '1'} Roll`;
+    return `Shot ${index + 1}`;
   }
 
   setPlaybackRate(deck: 'A' | 'B', rate: any) {
@@ -316,20 +393,38 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
 
   startStopRecording() {
     if (this.recording()) {
+      this.sessionNotice.set('Finalizing live mix capture...');
       this.recorder?.stop();
-      this.recording.set(false);
-      this.recorder = null;
       return;
     }
+
     const { recorder, result } = this.exportService.startLiveRecording();
     this.recorder = recorder;
     this.recording.set(true);
+    this.startRecordingTimer();
+    this.sessionNotice.set('Recording live mix...');
+
+    recorder.onerror = () => {
+      this.sessionNotice.set('Recording failed to complete.');
+      this.cleanupRecordingState();
+    };
+
     result.then((blob) => {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `mix-${Date.now()}.webm`;
-      a.click();
+      const extension = blob.type.includes('ogg')
+        ? 'ogg'
+        : blob.type.includes('wav')
+          ? 'wav'
+          : 'webm';
+      return this.exportService.downloadBlob(blob, `mix-${Date.now()}.${extension}`);
+    })
+    .then(() => {
+      this.sessionNotice.set('Live mix exported successfully.');
+    })
+    .catch(() => {
+      this.sessionNotice.set('Live mix export failed.');
+    })
+    .finally(() => {
+      this.cleanupRecordingState();
     });
   }
 
@@ -465,5 +560,99 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
     if (type === 'brake') this.engine.brakeDeck(deck);
     else if (type === 'spinback') this.engine.spinbackDeck(deck);
     else if (type === 'transform') this.engine.transformDeck(deck);
+  }
+
+  async saveSessionSnapshot() {
+    const now = new Date();
+    const title = `DJ Session ${now.toLocaleString()}`;
+    const projectId = `dj-session-${now.getTime()}`;
+    const userId = this.profileService.profile().id || 'anonymous';
+
+    try {
+      await this.databaseService.saveProject(
+        projectId,
+        title,
+        this.buildSessionSnapshot(),
+        userId
+      );
+      this.sessionNotice.set(`${title} saved.`);
+    } catch {
+      this.sessionNotice.set('Session save failed.');
+    }
+  }
+
+  async exportSessionSnapshot() {
+    const snapshot = this.buildSessionSnapshot();
+    const blob = new Blob([JSON.stringify(snapshot, null, 2)], {
+      type: 'application/json',
+    });
+
+    try {
+      await this.exportService.downloadBlob(
+        blob,
+        `dj-session-${Date.now()}.json`
+      );
+      this.sessionNotice.set('Session snapshot exported.');
+    } catch {
+      this.sessionNotice.set('Session export failed.');
+    }
+  }
+
+  private buildSessionSnapshot() {
+    const deckSnapshot = (deck: ReturnType<typeof this.deckService.deckA>) => ({
+      trackName: deck.track?.name || 'No Track Loaded',
+      bpm: deck.bpm,
+      playbackRate: deck.playbackRate,
+      progress: deck.progress,
+      duration: deck.duration,
+      gain: deck.gain,
+      filterFreq: deck.filterFreq,
+      eqHigh: deck.eqHigh,
+      eqMid: deck.eqMid,
+      eqLow: deck.eqLow,
+      slip: deck.slip,
+      hotCues: [...deck.hotCues],
+    });
+
+    return {
+      type: 'dj-session-snapshot',
+      exportedAt: new Date().toISOString(),
+      performanceMode: this.performanceMode(),
+      crossfade: this.deckService.crossfade(),
+      masterVolume: this.masterVolume(),
+      deckA: deckSnapshot(this.deckService.deckA()),
+      deckB: deckSnapshot(this.deckService.deckB()),
+    };
+  }
+
+  private startRecordingTimer() {
+    this.recordingStartedAt = Date.now();
+    this.recordingElapsedMs.set(0);
+    if (this.recordingInterval) clearInterval(this.recordingInterval);
+    this.recordingInterval = setInterval(() => {
+      if (this.recordingStartedAt) {
+        this.recordingElapsedMs.set(Date.now() - this.recordingStartedAt);
+      }
+    }, 250);
+  }
+
+  private cleanupRecordingState() {
+    this.recording.set(false);
+    this.recorder = null;
+    this.recordingStartedAt = null;
+    this.recordingElapsedMs.set(0);
+    if (this.recordingInterval) {
+      clearInterval(this.recordingInterval);
+      this.recordingInterval = null;
+    }
+  }
+
+  private formatDuration(durationMs: number) {
+    const totalSeconds = Math.max(0, Math.floor(durationMs / 1000));
+    const minutes = Math.floor(totalSeconds / 60)
+      .toString()
+      .padStart(2, '0');
+    const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+    return `${minutes}:${seconds}`;
   }
 }

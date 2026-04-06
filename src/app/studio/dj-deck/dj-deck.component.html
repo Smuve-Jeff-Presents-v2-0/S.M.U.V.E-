@@ -133,8 +133,9 @@
       <div class="mt-4 grid grid-cols-4 gap-2 performance-grid">
         @for (pad of [0,1,2,3,4,5,6,7]; track pad) {
           <button class="pad-btn border-brand-primary/30 hover:bg-brand-primary/10"
-                  (click)="handlePadPress('A', pad)">
-            Cue {{ pad + 1 }}
+                  (click)="handlePadPress('A', pad)"
+                  (contextmenu)="clearHotCue('A', pad, $event)">
+            {{ getPadLabel(pad) }}
           </button>
         }
       </div>
@@ -234,6 +235,28 @@
         <div class="flex justify-between mt-2 text-[8px] font-black text-slate-500">
           <span>A</span><span>CENTER</span><span>B</span>
         </div>
+      </div>
+
+      <div class="session-status-bar">
+        <div class="session-status-copy">
+          <span class="session-status-dot" [class.live]="recording()"></span>
+          <span>{{ recording() ? 'REC ' + recordingDurationLabel() : sessionNotice() }}</span>
+        </div>
+        <div class="session-status-copy text-right">
+          <span>{{ isMobile() ? 'Mobile Optimized' : 'Full Speed' }}</span>
+        </div>
+      </div>
+
+      <div class="session-tools-grid">
+        <button (click)="startStopRecording()" class="btn-chrome emphasis text-[9px] py-3">
+          {{ recording() ? 'Stop Rec' : 'Record Mix' }}
+        </button>
+        <button (click)="saveSessionSnapshot()" class="btn-chrome text-[9px] py-3">
+          Save Set
+        </button>
+        <button (click)="exportSessionSnapshot()" class="btn-chrome text-[9px] py-3">
+          Export JSON
+        </button>
       </div>
 
       <div class="flex items-center justify-between gap-3">
@@ -348,8 +371,9 @@
       <div class="mt-4 grid grid-cols-4 gap-2 performance-grid">
         @for (pad of [0,1,2,3,4,5,6,7]; track pad) {
           <button class="pad-btn border-brand-secondary/30 hover:bg-brand-secondary/10"
-                  (click)="handlePadPress('B', pad)">
-            Cue {{ pad + 1 }}
+                  (click)="handlePadPress('B', pad)"
+                  (contextmenu)="clearHotCue('B', pad, $event)">
+            {{ getPadLabel(pad) }}
           </button>
         }
       </div>
@@ -636,6 +660,43 @@
     letter-spacing: 0.18em;
     font-family: ui-monospace, SFMono-Regular, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
   }
+  .session-status-bar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(2,6,23,0.88), rgba(15,23,42,0.82));
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .session-status-copy {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #cbd5e1;
+  }
+  .session-status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 9999px;
+    background: rgba(100,116,139,0.9);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    flex-shrink: 0;
+  }
+  .session-status-dot.live {
+    background: radial-gradient(circle, #fda4af, #ef4444 70%);
+    box-shadow: 0 0 12px rgba(239,68,68,0.5);
+  }
+  .session-tools-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
   .btn-chrome {
     display: inline-flex;
     align-items: center;
@@ -861,6 +922,11 @@
 
     .central-mixer-console {
       order: 3;
+    }
+
+    .session-status-bar,
+    .session-tools-grid {
+      grid-template-columns: 1fr;
     }
   }
 </style>

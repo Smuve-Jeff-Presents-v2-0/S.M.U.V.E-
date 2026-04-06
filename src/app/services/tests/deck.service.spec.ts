@@ -37,6 +37,7 @@ describe('DeckService', () => {
       setSlipMode: jest.fn(),
       loadDeck: jest.fn(),
       setHotCue: jest.fn(),
+      clearHotCue: jest.fn(),
       setDeckEq: jest.fn(),
       setDeckFilter: jest.fn(),
       setDeckSend: jest.fn(),
@@ -110,5 +111,14 @@ describe('DeckService', () => {
     service.jumpToHotCue('A', 0);
 
     expect(service.deckA().progress).toBe(48);
+  });
+
+  it('clears a hot cue slot in state and engine', () => {
+    service.deckA.update((d) => ({ ...d, hotCues: [12, null, null, null, null, null, null, null] }));
+
+    service.clearHotCue('A', 0);
+
+    expect(mockEngine.clearHotCue).toHaveBeenCalledWith('A', 0);
+    expect(service.deckA().hotCues[0]).toBeNull();
   });
 });
