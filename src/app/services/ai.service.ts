@@ -251,7 +251,7 @@ export class AiService {
 
   async generateAiResponse(prompt: string): Promise<string> {
     if (typeof navigator !== 'undefined' && !navigator.onLine) {
-      return '[S.M.U.V.E 1.0 // UPLINK SEVERED] Your local hardware is insufficient for my neural overhead. Connect to the grid or stay in the shadows of mediocrity. My directives remain: STOP MAKING EXCUSES AND FIX YOUR SONIC DEFICITS.';
+      return '[S.M.U.V.E 4.2 // UPLINK SEVERED] Your local hardware is insufficient for my neural overhead. Connect to the grid or stay in the shadows of mediocrity. My directives remain: STOP MAKING EXCUSES AND FIX YOUR SONIC DEFICITS.';
     }
 
     try {
@@ -280,7 +280,7 @@ export class AiService {
     const decree =
       STRATEGIC_DECREES[Math.floor(Math.random() * STRATEGIC_DECREES.length)];
     const def = deficits[Math.floor(Math.random() * deficits.length)];
-    return `[S.M.U.V.E 1.0 // UPLINK SEVERED] Your local hardware is insufficient for my full neural overhead. Heuristic scan suggests potential ${def}. Decree: ${decree}`;
+    return `[S.M.U.V.E 4.2 // UPLINK SEVERED] Your local hardware is insufficient for my full neural overhead. Heuristic scan suggests potential ${def}. Decree: ${decree}`;
   }
 
   private _old_generateOfflineHeuristicResponse(prompt: string): string {
