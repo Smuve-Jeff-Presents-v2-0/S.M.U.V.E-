@@ -51,7 +51,7 @@ describe('SpeechSynthesisService', () => {
   it('should apply a randomized voice profile when speaking', () => {
     randomSpy.mockReturnValue(0);
 
-    service.speak('Hello');
+    service.speak('Hello', { conversationId: 'conv-1' });
 
     expect(mockSpeechSynthesis.speak).toHaveBeenCalledTimes(1);
     expect(mockUtterances[0].voice).toEqual({
@@ -71,27 +71,19 @@ describe('SpeechSynthesisService', () => {
   });
 
   it('should cancel previous speech when speaking new text', () => {
-    service.speak('Hello');
+    service.speak('Hello', { conversationId: 'conv-1' });
     expect(mockSpeechSynthesis.cancel).toHaveBeenCalled();
   });
 
-  it('should avoid reusing the same voice when alternatives exist', () => {
+  it('should avoid reusing the same voice when alternatives exist across conversations', () => {
     mockSpeechSynthesis.getVoices.mockReturnValue([
       { name: 'Voice A', lang: 'en-US' },
       { name: 'Voice B', lang: 'en-US' },
     ]);
-    randomSpy
-      .mockReturnValueOnce(0)
-      .mockReturnValueOnce(0)
-      .mockReturnValueOnce(0)
-      .mockReturnValueOnce(0)
-      .mockReturnValueOnce(0.3)
-      .mockReturnValueOnce(0)
-      .mockReturnValueOnce(0)
-      .mockReturnValueOnce(0);
+    randomSpy.mockReturnValue(0);
 
-    service.speak('First');
-    service.speak('Second');
+    service.speak('First', { conversationId: 'conv-1' });
+    service.speak('Second', { conversationId: 'conv-2' });
 
     expect(mockUtterances[0].voice).toEqual({
       name: 'Voice A',
@@ -99,6 +91,26 @@ describe('SpeechSynthesisService', () => {
     });
     expect(mockUtterances[1].voice).toEqual({
       name: 'Voice B',
+      lang: 'en-US',
+    });
+  });
+
+  it('should keep the same voice inside a single conversation', () => {
+    mockSpeechSynthesis.getVoices.mockReturnValue([
+      { name: 'Voice A', lang: 'en-US' },
+      { name: 'Voice B', lang: 'en-US' },
+    ]);
+    randomSpy.mockReturnValue(0);
+
+    service.speak('First', { conversationId: 'conv-stable' });
+    service.speak('Second', { conversationId: 'conv-stable' });
+
+    expect(mockUtterances[0].voice).toEqual({
+      name: 'Voice A',
+      lang: 'en-US',
+    });
+    expect(mockUtterances[1].voice).toEqual({
+      name: 'Voice A',
       lang: 'en-US',
     });
   });
