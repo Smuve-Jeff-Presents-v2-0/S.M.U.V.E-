@@ -29,7 +29,7 @@ export const appConfig: ApplicationConfig = {
       provide: APP_INITIALIZER,
       useFactory: () => {
         const logger = inject(LoggingService);
-        const autoSave = inject(AutoSaveService);
+        const _autoSave = inject(AutoSaveService);
         return () => {
           logger.system('S.M.U.V.E 4.2 Executive Suite Initialized');
           logger.info('Auto-Save Service Initialized');

@@ -1,12 +1,12 @@
 {
-  "name": "s.m.u.v.e-4.0",
+  "name": "s.m.u.v.e-4.2",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "ng serve",
     "build": "ng build",
-    "start": "serve -s Build/browser",
+    "start": "serve -s Build",
     "preview": "ng serve --configuration=production",
     "test": "jest",
     "lint": "eslint .",

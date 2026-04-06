@@ -4,6 +4,7 @@ import { LoggingService } from './logging.service';
 import { HttpClient } from '@angular/common/http';
 import { LocalStorageService } from './local-storage.service';
 import { firstValueFrom } from 'rxjs';
+import { SMUVE_API_URL } from './api-config';
 
 @Injectable({
   providedIn: 'root',
@@ -12,8 +13,7 @@ export class DatabaseService {
   private logger = inject(LoggingService);
   private http = inject(HttpClient);
   private localStorageService = inject(LocalStorageService);
-  private API_URL =
-    'https://smuve-v4-backend-9951606049235487441.onrender.com/api';
+  private readonly API_URL = SMUVE_API_URL;
 
   isSyncing = signal(false);
   lastSyncTime = signal<number | null>(null);

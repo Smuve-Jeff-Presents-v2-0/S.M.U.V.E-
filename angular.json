@@ -15,30 +15,29 @@
             "index": "src/index.html",
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.json",
-            "polyfills": [
-              "zone.js"
-            ],
-            "assets": [
-              "src/assets",
-              "src/manifest.webmanifest"
-            ],
+            "polyfills": ["zone.js"],
+            "assets": ["src/assets", "src/manifest.webmanifest"],
             "styles": [
               "src/styles.css",
               "node_modules/animate.css/animate.min.css"
             ],
-            "scripts": [
-              "node_modules/wow.js/dist/wow.min.js"
-            ],
+            "scripts": ["node_modules/wow.js/dist/wow.min.js"],
             "optimization": true,
             "outputHashing": "all",
             "sourceMap": false,
-            "extractLicenses": true,
-            "buildOptimizer": true
+            "extractLicenses": true
           },
           "configurations": {
             "production": {
               "outputHashing": "all",
-              "optimization": true,
+              "optimization": {
+                "scripts": true,
+                "styles": true,
+                "fonts": {
+                  "inline": false
+                }
+              },
+              "serviceWorker": "ngsw-config.json",
               "budgets": [
                 {
                   "type": "initial",
@@ -49,11 +48,16 @@
             },
             "ghpages": {
               "outputHashing": "all",
-              "optimization": true,
+              "optimization": {
+                "scripts": true,
+                "styles": true,
+                "fonts": {
+                  "inline": false
+                }
+              },
               "baseHref": "./",
-              "assets": [
-                "src/assets"
-              ]
+              "serviceWorker": "ngsw-config.json",
+              "assets": ["src/assets", "src/manifest.webmanifest"]
             },
             "development": {
               "optimization": false,

@@ -42,6 +42,7 @@ export interface UserProfile {
   expertise?: any;
   team?: any[];
   marketingCampaigns?: any[];
+  strategicGoals?: string[];
   proName?: string;
   proIpi?: string;
   catalog: CatalogItem[];
@@ -77,6 +78,7 @@ export const initialProfile: UserProfile = {
   },
   artistName: 'New Artist',
   primaryGenre: 'Hip Hop',
+  strategicGoals: [],
   knowledgeBase: {
     learnedStyles: [],
     productionSecrets: [],

@@ -1,18 +1,14 @@
 import { test, expect } from '@playwright/test';
 
-test('S.M.U.V.E 4.0 Branding and Navigation Check', async ({ page }) => {
+test('S.M.U.V.E 4.2 branding and navigation check', async ({ page }) => {
   await page.goto('/hub');
 
-  // Verify Title
-  const title = await page.textContent('h1');
-  expect(title).toContain('S.M.U.V.E 4.0');
+  await expect(page).toHaveTitle(/S\.M\.U\.V\.E 4\.2/);
 
-  // Verify Navigation items exist
-  await expect(page.locator('.nav-item[title="Artist Profile"]')).toBeVisible();
-  await expect(page.locator('.nav-item[title="Hub"]')).toBeVisible();
-  await expect(page.locator('.nav-item[title="The Studio"]')).toBeVisible();
+  await expect(page.locator('.nav-item[title="Label Hub"]')).toBeVisible();
+  await expect(page.locator('.nav-item[title="Studio"]')).toBeVisible();
+  await expect(page.locator('.nav-item[title="Profile"]')).toBeVisible();
 
-  // Check footer branding
-  const footer = page.locator('.app-footer');
+  const footer = page.locator('footer');
   await expect(footer).toContainText('Smuve Jeff Presents');
 });

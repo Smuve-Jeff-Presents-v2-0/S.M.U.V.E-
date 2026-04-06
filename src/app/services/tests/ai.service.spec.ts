@@ -1,12 +1,13 @@
 import { MarketingService } from '../marketing.service';
 import { AnalyticsService } from '../analytics.service';
 import { TestBed, fakeAsync } from '@angular/core/testing';
-import { AiService, API_KEY_TOKEN } from '../ai.service';
+import { AiService } from '../ai.service';
 import { UserProfileService } from '../user-profile.service';
 import { UserContextService } from '../user-context.service';
-import { StemSeparationService } from '../stem-separation.service';
 import { AudioEngineService } from '../audio-engine.service';
 import { signal } from '@angular/core';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('AiService', () => {
   let service: AiService;
@@ -43,16 +44,20 @@ describe('AiService', () => {
     TestBed.configureTestingModule({
       providers: [
         AiService,
+        provideHttpClient(),
+        provideHttpClientTesting(),
         MarketingService,
         { provide: AnalyticsService, useValue: analyticsService },
-        {
-          provide: API_KEY_TOKEN,
-          useValue: 'AIzaSyCVdPtw0C_5rgiHDRi5mQYL4GXZMrdiDj4',
-        },
         { provide: UserProfileService, useValue: userProfileService },
         { provide: UserContextService, useValue: userContextService },
-        { provide: StemSeparationService, useValue: {} },
-        { provide: AudioEngineService, useValue: { resume: jest.fn(), ensureTrack: jest.fn(), updateTrack: jest.fn() } },
+        {
+          provide: AudioEngineService,
+          useValue: {
+            resume: jest.fn(),
+            ensureTrack: jest.fn(),
+            updateTrack: jest.fn(),
+          },
+        },
       ],
     });
     service = TestBed.inject(AiService);
