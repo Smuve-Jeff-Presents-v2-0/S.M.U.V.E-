@@ -562,7 +562,8 @@ export class AudioEngineService {
     outGain = 0.6,
     sendA = 0.1,
     sendB = 0.05,
-    params?: any
+    params?: any,
+    velocityScale = 1
   ) {
     this.resume();
     const osc = this.ctx.createOscillator();
@@ -577,8 +578,9 @@ export class AudioEngineService {
     const s = params?.sustain ?? 0.7;
     const r = params?.release ?? 0.15;
     vca.gain.setValueAtTime(0, when);
-    vca.gain.linearRampToValueAtTime(velocity * outGain, when + a);
-    vca.gain.linearRampToValueAtTime(velocity * outGain * s, when + a + d);
+    const scaledVelocity = Math.max(0.1, Math.min(1.8, velocity * velocityScale));
+    vca.gain.linearRampToValueAtTime(scaledVelocity * outGain, when + a);
+    vca.gain.linearRampToValueAtTime(scaledVelocity * outGain * s, when + a + d);
     vca.gain.setTargetAtTime(0, when + duration, r);
     osc.frequency.value = freq;
     osc.connect(filter).connect(vca).connect(p).connect(this.masterGain);
@@ -591,12 +593,19 @@ export class AudioEngineService {
     const src = this.ctx.createBufferSource();
     src.buffer = buffer;
     const vca = this.ctx.createGain();
-    vca.gain.setValueAtTime(velocity * gain, when);
+    const safeVelocity = Math.max(0.05, Math.min(1.8, velocity));
+    const safeGain = Math.max(0.05, Math.min(1.5, gain));
+    const attack = 0.002;
+    const releaseTail = 0.012;
+    const stopAt = Math.max(when + attack + releaseTail, when + duration);
+    vca.gain.setValueAtTime(0, when);
+    vca.gain.linearRampToValueAtTime(safeVelocity * safeGain, when + attack);
+    vca.gain.setTargetAtTime(0, Math.max(when + duration - releaseTail, when + attack), releaseTail);
     const p = this.ctx.createStereoPanner();
     p.pan.value = pan;
     src.connect(vca).connect(p).connect(this.masterGain);
     src.start(when);
-    src.stop(when + duration);
+    src.stop(stopAt);
   }
 
   setMasterOutputLevel(normalized: number) {
@@ -805,6 +814,13 @@ export class AudioEngineService {
     }
     if (parameter === 'tempo') {
       this.tempo.set(Math.max(30, Math.min(300, value)));
+      return;
+    }
+    if (parameter === 'qualityMode') {
+      const normalized = value >= 0.5 ? 'ultra' : 'performance';
+      if (isNumericTrackId && !Number.isNaN(numericTrackId)) {
+        this.updateTrack(numericTrackId, { qualityMode: normalized });
+      }
       return;
     }
 
