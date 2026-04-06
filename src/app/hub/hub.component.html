@@ -54,7 +54,7 @@
     <div class="bento-grid">
 
       <!-- Module 1: S.M.U.V.E Audit (2x2) -->
-      <div class="bento-item bento-2x2 bento-card glass-v42" (click)="uiService.navigateToView('knowledge-base')">
+      <div class="bento-item bento-2x2 bento-card glass-v42 audit-module" (click)="uiService.navigateToView('knowledge-base')">
         <div class="card-overlay"></div>
         <div class="card-content">
           <div class="flex justify-between items-start mb-6">
@@ -101,7 +101,7 @@
       </div>
 
       <!-- Module 2: Current Project (2x1 Wide) -->
-      <div class="bento-item bento-2x1 bento-card glass-v42 interactive-playback">
+      <div class="bento-item bento-2x1 bento-card glass-v42 interactive-playback playback-module">
         <div class="card-content flex items-center gap-6">
           <div class="vinyl-display" [class.spinning]="playerService.isPlaying()">
             <div class="vinyl-outer"></div>
@@ -129,7 +129,7 @@
       </div>
 
       <!-- Module 3: Career Trajectory (1x2 Tall) -->
-      <div class="bento-item bento-1x2 bento-card glass-v42" (click)="uiService.navigateToView('career')">
+      <div class="bento-item bento-1x2 bento-card glass-v42 career-module" (click)="uiService.navigateToView('career')">
         <div class="card-content h-full flex flex-col">
           <div class="card-icon-box bg-secondary/20 text-secondary mb-4">
             <span class="material-symbols-outlined">insights</span>

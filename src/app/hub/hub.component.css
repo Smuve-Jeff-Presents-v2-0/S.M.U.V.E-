@@ -2,14 +2,40 @@
   position: relative;
   min-height: 100vh;
   width: 100%;
+  --color-text: #f8fafc;
+  --color-text-dim: #cbd5e1;
+  --glass: rgba(15, 23, 42, 0.54);
+  --glass-border: rgba(255, 255, 255, 0.12);
   background-color: var(--color-bg);
+  background-image:
+    linear-gradient(145deg, rgba(3, 7, 18, 0.88), rgba(2, 6, 23, 0.72)),
+    url('/assets/hub/hub-shell-bg.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
   overflow-x: hidden;
   overflow-y: auto;
-  transition: background-color 0.5s ease;
+  transition: background-color 0.5s ease, background-image 0.5s ease;
 }
 
 .hub-wrapper.playing {
   background-color: #050505; /* Deep club mood */
+  background-image:
+    linear-gradient(145deg, rgba(5, 5, 5, 0.7), rgba(2, 6, 23, 0.78)),
+    url('/assets/hub/hub-shell-bg.svg');
+}
+
+.hub-wrapper::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 24%, transparent 76%, rgba(15, 23, 42, 0.45)),
+    url('/assets/noise_pattern.svg');
+  background-size: auto, 160px 160px;
+  opacity: 0.4;
+  z-index: 0;
+  pointer-events: none;
 }
 
 /* Background Reactive Layers */
@@ -116,13 +142,44 @@
   position: relative;
   border-radius: 24px;
   overflow: hidden;
+  isolation: isolate;
   transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
   cursor: pointer;
+}
+
+.bento-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(160deg, rgba(2, 6, 23, 0.18), rgba(2, 6, 23, 0.75)),
+    var(--hub-card-image);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  opacity: 0.92;
+  z-index: 0;
+  transition: transform 0.5s ease, opacity 0.3s ease;
+}
+
+.bento-item::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.12), transparent 26%, transparent 72%, rgba(15, 23, 42, 0.36)),
+    linear-gradient(180deg, rgba(2, 6, 23, 0.06), rgba(2, 6, 23, 0.48));
+  z-index: 1;
+  pointer-events: none;
 }
 
 .bento-item:hover {
   transform: translateY(-4px) scale(1.01);
   box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+.bento-item:hover::before {
+  transform: scale(1.04);
 }
 
 /* Bento Module Sizing */
@@ -136,6 +193,25 @@
   z-index: 2;
   padding: 24px;
   height: 100%;
+}
+
+.audit-module {
+  --hub-card-image: url('/assets/hub/hub-audit-card-bg.svg');
+}
+
+.playback-module {
+  --hub-card-image: url('/assets/hub/hub-playback-card-bg.svg');
+}
+
+.career-module {
+  --hub-card-image: url('/assets/hub/hub-career-card-bg.svg');
+}
+
+.club-module,
+.cinema-module,
+.studio-module,
+.intel-module {
+  --hub-card-image: url('/assets/hub/hub-module-card-bg.svg');
 }
 
 .card-icon-box {
@@ -327,6 +403,12 @@
   100% { transform: scale(2); opacity: 0; }
 }
 
+.club-module::after {
+  background:
+    linear-gradient(180deg, rgba(16, 185, 129, 0.12), rgba(2, 6, 23, 0.56)),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.12), transparent 36%);
+}
+
 .cinema-module .cinema-scan {
   position: absolute;
   top: 0; left: 0; width: 100%; height: 2px;
@@ -336,6 +418,24 @@
 }
 
 @keyframes scanline { 0% { top: 0; } 100% { top: 100%; } }
+
+.cinema-module::after {
+  background:
+    linear-gradient(180deg, rgba(236, 91, 19, 0.12), rgba(2, 6, 23, 0.56)),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.12), transparent 36%);
+}
+
+.studio-module::after {
+  background:
+    linear-gradient(180deg, rgba(99, 102, 241, 0.12), rgba(2, 6, 23, 0.58)),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.12), transparent 36%);
+}
+
+.intel-module::after {
+  background:
+    linear-gradient(180deg, rgba(56, 189, 248, 0.12), rgba(2, 6, 23, 0.56)),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.12), transparent 36%);
+}
 
 /* Footer */
 .pill-action {
@@ -510,5 +610,13 @@
   /* Hide non-essential desktop visual layers */
   .hub-particles, .hub-ambient-glow {
     display: none !important;
+  }
+
+  .hub-wrapper {
+    background-position: center top;
+  }
+
+  .hub-wrapper::before {
+    opacity: 0.24;
   }
 }
