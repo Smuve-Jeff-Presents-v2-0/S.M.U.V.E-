@@ -2,11 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError, map, shareReplay } from 'rxjs/operators';
-import {
-  Game,
-  GameRoom,
-  ThaSpotFeed,
-} from './game';
+import { Game, GameRoom, ThaSpotFeed } from './game';
 import { THA_SPOT_FALLBACK_FEED } from './tha-spot-feed.fallback';
 
 function escapeSvgText(value: string) {
@@ -32,7 +28,9 @@ function buildGameCover(
   accentEnd: string
 ) {
   const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-  const hash = Array.from(`${title}|${eyebrow}|${accentStart}|${accentEnd}`).reduce(
+  const hash = Array.from(
+    `${title}|${eyebrow}|${accentStart}|${accentEnd}`
+  ).reduce(
     (total, char) => (total * 31 + char.charCodeAt(0)) >>> 0,
     COVER_HASH_SEED
   );
@@ -71,8 +69,7 @@ function normalizeGame(game: Game): Game {
   return {
     ...game,
     image:
-      game.image ||
-      buildGameCover(game.name, eyebrow, accentStart, accentEnd),
+      game.image || buildGameCover(game.name, eyebrow, accentStart, accentEnd),
     badgeIds: game.badgeIds || [],
     sessionObjectives:
       game.sessionObjectives || game.launchConfig?.objectives || [],
@@ -139,7 +136,9 @@ export class GameService {
   }
 
   getGame(id: string): Observable<Game | undefined> {
-    return this.listGames({}).pipe(map((games) => games.find((g) => g.id === id)));
+    return this.listGames({}).pipe(
+      map((games) => games.find((g) => g.id === id))
+    );
   }
 
   getTrending(): Observable<Game[]> {
@@ -155,7 +154,9 @@ export class GameService {
   getNew(): Observable<Game[]> {
     return this.feed$.pipe(
       map((feed) =>
-        feed.games.filter((game) => game.badgeIds?.includes('new-drop')).slice(0, 5)
+        feed.games
+          .filter((game) => game.badgeIds?.includes('new-drop'))
+          .slice(0, 5)
       )
     );
   }
@@ -171,9 +172,15 @@ export class GameService {
     }
 
     const normalizedTags = (game.tags || []).map((tag) => tag.toLowerCase());
-    const normalizedGenres = (rules.genres || []).map((genre) => genre.toLowerCase());
-    const normalizedRuleTags = (rules.tags || []).map((tag) => tag.toLowerCase());
-    const normalizedBadges = (game.badgeIds || []).map((badge) => badge.toLowerCase());
+    const normalizedGenres = (rules.genres || []).map((genre) =>
+      genre.toLowerCase()
+    );
+    const normalizedRuleTags = (rules.tags || []).map((tag) =>
+      tag.toLowerCase()
+    );
+    const normalizedBadges = (game.badgeIds || []).map((badge) =>
+      badge.toLowerCase()
+    );
 
     const genreMatch =
       !normalizedGenres.length ||
@@ -183,13 +190,18 @@ export class GameService {
       normalizedRuleTags.some((tag) => normalizedTags.includes(tag));
     const availabilityMatch =
       !rules.availability?.length ||
-      !!game.availability && rules.availability.includes(game.availability);
+      (!!game.availability && rules.availability.includes(game.availability));
     const badgeMatch =
       !rules.badgeIds?.length ||
-      rules.badgeIds.some((badge) => normalizedBadges.includes(badge.toLowerCase()));
-    const featuredMatch = !rules.featuredOnly || !!game.badgeIds?.includes('featured');
+      rules.badgeIds.some((badge) =>
+        normalizedBadges.includes(badge.toLowerCase())
+      );
+    const featuredMatch =
+      !rules.featuredOnly || !!game.badgeIds?.includes('featured');
 
-    return genreMatch && tagMatch && availabilityMatch && badgeMatch && featuredMatch;
+    return (
+      genreMatch && tagMatch && availabilityMatch && badgeMatch && featuredMatch
+    );
   }
 
   private applyFiltersAndSort(
@@ -214,7 +226,9 @@ export class GameService {
 
     switch (sort) {
       case 'Popular':
-        filtered.sort((a, b) => (b.playersOnline || 0) - (a.playersOnline || 0));
+        filtered.sort(
+          (a, b) => (b.playersOnline || 0) - (a.playersOnline || 0)
+        );
         break;
       case 'Rating':
         filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));

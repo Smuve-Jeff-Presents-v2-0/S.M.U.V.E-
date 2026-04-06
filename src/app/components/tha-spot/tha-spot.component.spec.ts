@@ -1,8 +1,16 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
-import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
+import {
+  provideHttpClientTesting,
+  HttpTestingController,
+} from '@angular/common/http/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ThaSpotComponent } from './tha-spot.component';
 import { UserProfileService } from '../../services/user-profile.service';
@@ -206,7 +214,9 @@ describe('ThaSpotComponent', () => {
     tick(241);
 
     expect(component.activeRoom()).toBe('producer-lounge');
-    expect(component.filteredGames().map((game) => game.name)).toEqual(['Tempo Lockdown']);
+    expect(component.filteredGames().map((game) => game.name)).toEqual([
+      'Tempo Lockdown',
+    ]);
     expect(component.getActiveRoomName()).toBe('Producer Lounge');
   }));
 

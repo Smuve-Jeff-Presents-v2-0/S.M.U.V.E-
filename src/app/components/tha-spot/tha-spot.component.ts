@@ -76,9 +76,13 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
   gamingRooms = signal<GameRoom[]>(THA_SPOT_FALLBACK_FEED.rooms);
   badges = signal<GameBadge[]>(THA_SPOT_FALLBACK_FEED.badges);
   liveEvents = signal<LiveEvent[]>(THA_SPOT_FALLBACK_FEED.liveEvents);
-  socialPresence = signal<SocialPresence[]>(THA_SPOT_FALLBACK_FEED.socialPresence);
+  socialPresence = signal<SocialPresence[]>(
+    THA_SPOT_FALLBACK_FEED.socialPresence
+  );
   promotions = signal<PromotionCard[]>(THA_SPOT_FALLBACK_FEED.promotions);
-  leaderboards = signal<LeaderboardEntry[]>(THA_SPOT_FALLBACK_FEED.leaderboards);
+  leaderboards = signal<LeaderboardEntry[]>(
+    THA_SPOT_FALLBACK_FEED.leaderboards
+  );
   games = signal<Game[]>(THA_SPOT_FALLBACK_FEED.games);
 
   activeRoom = signal<string>('all');
@@ -96,8 +100,8 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
   frameError = signal<string | null>(null);
   sessionStartedAt = signal<number | null>(null);
 
-  badgeMap = computed(() =>
-    new Map(this.badges().map((badge) => [badge.id, badge]))
+  badgeMap = computed(
+    () => new Map(this.badges().map((badge) => [badge.id, badge]))
   );
 
   activeRoomConfig = computed(
@@ -112,7 +116,9 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
       return this.games();
     }
 
-    return this.games().filter((game) => this.gameService.matchesRoom(game, room));
+    return this.games().filter((game) =>
+      this.gameService.matchesRoom(game, room)
+    );
   });
 
   activeEvents = computed(() => {
@@ -145,7 +151,8 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
     return [...this.games()]
       .map((game) => {
         const gameStats = stats[game.id];
-        const haystack = `${game.genre || ''} ${(game.tags || []).join(' ')}`.toLowerCase();
+        const haystack =
+          `${game.genre || ''} ${(game.tags || []).join(' ')}`.toLowerCase();
         const affinityScore = affinity.some((token) => haystack.includes(token))
           ? 18
           : 0;
@@ -155,7 +162,10 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
           (game.badgeIds?.includes('staff-pick') ? 6 : 0) +
           (game.badgeIds?.includes('trending') ? 4 : 0);
         const crowdScore = Math.min((game.playersOnline || 0) / 2500, 16);
-        return { game, score: affinityScore + historyScore + badgeScore + crowdScore };
+        return {
+          game,
+          score: affinityScore + historyScore + badgeScore + crowdScore,
+        };
       })
       .sort((a, b) => b.score - a.score)
       .slice(0, 4)
@@ -165,10 +175,7 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
   recentlyPlayed = computed(() => {
     const stats = this.profileService.profile().gameStats || {};
     return Object.entries(stats)
-      .sort(
-        (a, b) =>
-          (b[1]?.lastPlayedAt || 0) - (a[1]?.lastPlayedAt || 0)
-      )
+      .sort((a, b) => (b[1]?.lastPlayedAt || 0) - (a[1]?.lastPlayedAt || 0))
       .map(([gameId]) => this.games().find((game) => game.id === gameId))
       .filter((game): game is Game => !!game)
       .slice(0, 3);
@@ -224,7 +231,9 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
 
   tacticalAdvantage = computed(() => {
     const recommendations = this.recommendedGames();
-    const eventBonus = this.activeEvents().some((event) => event.status === 'live')
+    const eventBonus = this.activeEvents().some(
+      (event) => event.status === 'live'
+    )
       ? 8
       : 4;
     return Math.min(25, eventBonus + recommendations.length * 3);
@@ -266,25 +275,30 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
       achievements: (profile.achievements || []).length,
       totalPlays,
       masteryLabel: masteredRoom?.name || 'Choose a room',
-      streakLabel: totalPlays > 0 ? `${Math.min(totalPlays, 7)} session streak` : 'No streak yet',
+      streakLabel:
+        totalPlays > 0
+          ? `${Math.min(totalPlays, 7)} session streak`
+          : 'No streak yet',
     };
   });
 
   ngOnInit() {
-    this.feedSubscription = this.gameService.getThaSpotFeed().subscribe((feed) => {
-      this.feed.set(feed);
-      this.gamingRooms.set(feed.rooms);
-      this.badges.set(feed.badges);
-      this.liveEvents.set(feed.liveEvents);
-      this.socialPresence.set(feed.socialPresence);
-      this.promotions.set(feed.promotions);
-      this.leaderboards.set(feed.leaderboards);
-      this.games.set(feed.games);
+    this.feedSubscription = this.gameService
+      .getThaSpotFeed()
+      .subscribe((feed) => {
+        this.feed.set(feed);
+        this.gamingRooms.set(feed.rooms);
+        this.badges.set(feed.badges);
+        this.liveEvents.set(feed.liveEvents);
+        this.socialPresence.set(feed.socialPresence);
+        this.promotions.set(feed.promotions);
+        this.leaderboards.set(feed.leaderboards);
+        this.games.set(feed.games);
 
-      if (!feed.rooms.some((room) => room.id === this.activeRoom())) {
-        this.activeRoom.set(feed.rooms[0]?.id || 'all');
-      }
-    });
+        if (!feed.rooms.some((room) => room.id === this.activeRoom())) {
+          this.activeRoom.set(feed.rooms[0]?.id || 'all');
+        }
+      });
 
     this.clockId = setInterval(() => this.now.set(Date.now()), 30000);
   }
@@ -350,12 +364,18 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
 
     this.selectedGame.set(null);
 
-    if (!this.isTrustedGameUrl(game.url) || game.launchConfig?.inlinePolicy === 'external-only') {
+    if (
+      !this.isTrustedGameUrl(game.url) ||
+      game.launchConfig?.inlinePolicy === 'external-only'
+    ) {
       this.openGameInNewTab(game);
       return;
     }
 
-    if (game.multiplayerType === 'Server' || game.tags?.includes('Multiplayer')) {
+    if (
+      game.multiplayerType === 'Server' ||
+      game.tags?.includes('Multiplayer')
+    ) {
       this.startNeuralMatchmaking(game);
       return;
     }
@@ -373,31 +393,35 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
       clearInterval(this.matchmakingTimerId);
     }
 
-    this.matchmakingTimerId = setInterval(() => {
-      const progress = this.matchmakingProgress();
-      if (progress < 35) {
-        this.matchmakingStatus.set('LOCATING COMPETITIVE SIGNALS');
-      } else if (progress < 70) {
-        this.matchmakingStatus.set('MATCHING ROOM PRESENCE');
-      } else {
-        this.matchmakingStatus.set('LOCKING OPPONENT PROFILE');
-      }
-
-      this.matchmakingProgress.update((value) => Math.min(100, value + 10));
-
-      if (this.matchmakingProgress() >= 100) {
-        if (this.matchmakingTimerId) {
-          clearInterval(this.matchmakingTimerId);
+    this.matchmakingTimerId = setInterval(
+      () => {
+        const progress = this.matchmakingProgress();
+        if (progress < 35) {
+          this.matchmakingStatus.set('LOCATING COMPETITIVE SIGNALS');
+        } else if (progress < 70) {
+          this.matchmakingStatus.set('MATCHING ROOM PRESENCE');
+        } else {
+          this.matchmakingStatus.set('LOCKING OPPONENT PROFILE');
         }
-        this.matchedOpponent.set(
-          this.roomPresence()[0]?.name || `GRID_${Math.floor(Math.random() * 900 + 100)}`
-        );
-        setTimeout(() => {
-          this.isMatchmaking.set(false);
-          void this.launchGame(game);
-        }, 600);
-      }
-    }, Math.max(120, (game.queueEstimateMinutes || 1) * 120));
+
+        this.matchmakingProgress.update((value) => Math.min(100, value + 10));
+
+        if (this.matchmakingProgress() >= 100) {
+          if (this.matchmakingTimerId) {
+            clearInterval(this.matchmakingTimerId);
+          }
+          this.matchedOpponent.set(
+            this.roomPresence()[0]?.name ||
+              `GRID_${Math.floor(Math.random() * 900 + 100)}`
+          );
+          setTimeout(() => {
+            this.isMatchmaking.set(false);
+            void this.launchGame(game);
+          }, 600);
+        }
+      },
+      Math.max(120, (game.queueEstimateMinutes || 1) * 120)
+    );
   }
 
   async launchGame(game: Game) {
@@ -439,7 +463,9 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
   }
 
   getEventGame(event: LiveEvent) {
-    return this.games().find((game) => game.id === event.featuredGameId) || null;
+    return (
+      this.games().find((game) => game.id === event.featuredGameId) || null
+    );
   }
 
   getPresenceGame(entry: SocialPresence) {
@@ -447,7 +473,9 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
   }
 
   getPromotionRoute(promotion: PromotionCard) {
-    return promotion.route.startsWith('/') ? promotion.route : `/${promotion.route}`;
+    return promotion.route.startsWith('/')
+      ? promotion.route
+      : `/${promotion.route}`;
   }
 
   navigateToPath(path: string) {
@@ -481,9 +509,14 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
         typeof data.payload?.score === 'number'
           ? data.payload.score
           : Number(data.payload?.score || 0);
-      const score = Number.isFinite(rawScore) ? Math.max(0, Math.floor(rawScore)) : 0;
+      const score = Number.isFinite(rawScore)
+        ? Math.max(0, Math.floor(rawScore))
+        : 0;
 
-      void this.profileService.awardXp(Math.max(25, Math.floor(score / 100)), 'gaming_session');
+      void this.profileService.awardXp(
+        Math.max(25, Math.floor(score / 100)),
+        'gaming_session'
+      );
       void this.profileService.recordGameResult(currentGame.id, score);
       void this.unlockProgressionMilestones(currentGame, score);
     }
@@ -499,8 +532,15 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
     }
 
     try {
-      const parsed = new URL(url, typeof window !== 'undefined' ? window.location.origin : 'https://smuve.local');
-      return parsed.protocol === 'https:' && TRUSTED_GAME_HOSTS.has(parsed.hostname);
+      const parsed = new URL(
+        url,
+        typeof window !== 'undefined'
+          ? window.location.origin
+          : 'https://smuve.local'
+      );
+      return (
+        parsed.protocol === 'https:' && TRUSTED_GAME_HOSTS.has(parsed.hostname)
+      );
     } catch {
       return false;
     }
@@ -517,7 +557,10 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
 
     try {
       const parsed = new URL(game.url);
-      return event.origin === parsed.origin && TRUSTED_GAME_HOSTS.has(parsed.hostname);
+      return (
+        event.origin === parsed.origin &&
+        TRUSTED_GAME_HOSTS.has(parsed.hostname)
+      );
     } catch {
       return false;
     }
@@ -529,19 +572,34 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
     const distinctGames = Object.keys(profile.gameStats || {}).length;
 
     if (totalPlays >= 1) {
-      await this.profileService.unlockAchievement('tha-spot-first-run', 'Tha Spot First Run');
+      await this.profileService.unlockAchievement(
+        'tha-spot-first-run',
+        'Tha Spot First Run'
+      );
     }
     if (totalPlays >= 10) {
-      await this.profileService.unlockAchievement('tha-spot-regular', 'Tha Spot Regular');
+      await this.profileService.unlockAchievement(
+        'tha-spot-regular',
+        'Tha Spot Regular'
+      );
     }
     if (distinctGames >= 5) {
-      await this.profileService.unlockAchievement('tha-spot-explorer', 'Tha Spot Explorer');
+      await this.profileService.unlockAchievement(
+        'tha-spot-explorer',
+        'Tha Spot Explorer'
+      );
     }
     if (score >= 1000) {
-      await this.profileService.unlockAchievement('tha-spot-high-score', 'Tha Spot High Score');
+      await this.profileService.unlockAchievement(
+        'tha-spot-high-score',
+        'Tha Spot High Score'
+      );
     }
     if (game.badgeIds?.includes('tournament-live')) {
-      await this.profileService.unlockAchievement('tha-spot-bracket', 'Bracket Ready');
+      await this.profileService.unlockAchievement(
+        'tha-spot-bracket',
+        'Bracket Ready'
+      );
     }
   }
 
@@ -563,12 +621,17 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
 
       for (const room of this.gamingRooms()) {
         if (this.gameService.matchesRoom(game, room)) {
-          roomScores.set(room.id, (roomScores.get(room.id) || 0) + (stat.plays || 0));
+          roomScores.set(
+            room.id,
+            (roomScores.get(room.id) || 0) + (stat.plays || 0)
+          );
         }
       }
     }
 
-    const topRoomId = [...roomScores.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
+    const topRoomId = [...roomScores.entries()].sort(
+      (a, b) => b[1] - a[1]
+    )[0]?.[0];
     return this.gamingRooms().find((room) => room.id === topRoomId);
   }
 
