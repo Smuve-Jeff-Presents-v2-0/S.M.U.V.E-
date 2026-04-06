@@ -51,6 +51,9 @@ const PROFILE_AFFINITIES: Record<string, string[]> = {
   classical: ['strategy', 'classic', 'logic'],
 };
 
+const HISTORY_WEIGHT_PER_PLAY = 6;
+const MAX_HISTORY_SCORE = 24;
+
 @Component({
   selector: 'app-tha-spot',
   standalone: true,
@@ -156,7 +159,10 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
         const affinityScore = affinity.some((token) => haystack.includes(token))
           ? 18
           : 0;
-        const historyScore = Math.min((gameStats?.plays || 0) * 6, 24);
+        const historyScore = Math.min(
+          (gameStats?.plays || 0) * HISTORY_WEIGHT_PER_PLAY,
+          MAX_HISTORY_SCORE
+        );
         const badgeScore =
           (game.badgeIds?.includes('featured') ? 8 : 0) +
           (game.badgeIds?.includes('staff-pick') ? 6 : 0) +
@@ -300,7 +306,7 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
         }
       });
 
-    this.clockId = setInterval(() => this.now.set(Date.now()), 30000);
+    this.clockId = setInterval(() => this.now.set(Date.now()), 60000);
   }
 
   ngOnDestroy() {
@@ -505,13 +511,7 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
     }
 
     if (data.type === 'GAME_OVER') {
-      const rawScore =
-        typeof data.payload?.score === 'number'
-          ? data.payload.score
-          : Number(data.payload?.score || 0);
-      const score = Number.isFinite(rawScore)
-        ? Math.max(0, Math.floor(rawScore))
-        : 0;
+      const score = Math.max(0, Math.floor(Number(data.payload?.score) || 0));
 
       void this.profileService.awardXp(
         Math.max(25, Math.floor(score / 100)),
@@ -637,6 +637,9 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
 
   private formatDuration(durationMs: number) {
     const totalMinutes = Math.max(0, Math.floor(durationMs / 60000));
+    if (totalMinutes === 0) {
+      return '<1m';
+    }
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
 
