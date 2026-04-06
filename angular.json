@@ -30,9 +30,14 @@
           "configurations": {
             "production": {
               "outputHashing": "all",
-              "optimization": true,
-              "serviceWorker": true,
-              "ngswConfigPath": "ngsw-config.json",
+              "optimization": {
+                "scripts": true,
+                "styles": true,
+                "fonts": {
+                  "inline": false
+                }
+              },
+              "serviceWorker": "ngsw-config.json",
               "budgets": [
                 {
                   "type": "initial",
@@ -43,10 +48,15 @@
             },
             "ghpages": {
               "outputHashing": "all",
-              "optimization": true,
+              "optimization": {
+                "scripts": true,
+                "styles": true,
+                "fonts": {
+                  "inline": false
+                }
+              },
               "baseHref": "./",
-              "serviceWorker": true,
-              "ngswConfigPath": "ngsw-config.json",
+              "serviceWorker": "ngsw-config.json",
               "assets": ["src/assets", "src/manifest.webmanifest"]
             },
             "development": {

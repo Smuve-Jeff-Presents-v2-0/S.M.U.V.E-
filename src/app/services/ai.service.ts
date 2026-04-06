@@ -29,7 +29,6 @@ import {
   SystemStatus as AiSystemStatus,
   UpgradeRecommendation,
   StrategicRecommendation as StrategicRecommendationType,
-  ExecutiveAuditReport,
 } from '../types/ai.types';
 import { SMUVE_API_URL } from './api-config';
 
@@ -271,7 +270,7 @@ export class AiService {
     }
   }
 
-  private generateOfflineHeuristicResponse(prompt: string): string {
+  private generateOfflineHeuristicResponse(_prompt: string): string {
     const deficits = [
       'low-mid mud',
       'phase incoherence',
