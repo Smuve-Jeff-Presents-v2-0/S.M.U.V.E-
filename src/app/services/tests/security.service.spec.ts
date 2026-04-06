@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { SecurityService } from '../security.service';
 import { LoggingService } from '../logging.service';
 import { UserProfileService, initialProfile } from '../user-profile.service';
@@ -21,8 +22,9 @@ describe('SecurityService', () => {
     };
 
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
         SecurityService,
         { provide: LoggingService, useValue: loggerMock },
         { provide: UserProfileService, useValue: profileMock },
@@ -149,18 +151,21 @@ describe('SecurityService', () => {
     it('should log events locally', () => {
       // Directly test local logging without async HTTP call
       const initialLogCount = service.logs().length;
-      
+
       // Manually update logs as the async HTTP call would
-      service.logs.update((current) => [{
-        log_id: Date.now(),
-        user_id: 'test',
-        event_type: 'TEST_EVENT',
-        description: 'Test description',
-        ip_address: '127.0.0.1',
-        user_agent: 'test',
-        created_at: new Date().toISOString(),
-      }, ...current]);
-      
+      service.logs.update((current) => [
+        {
+          log_id: Date.now(),
+          user_id: 'test',
+          event_type: 'TEST_EVENT',
+          description: 'Test description',
+          ip_address: '127.0.0.1',
+          user_agent: 'test',
+          created_at: new Date().toISOString(),
+        },
+        ...current,
+      ]);
+
       const logs = service.logs();
       expect(logs.length).toBeGreaterThan(initialLogCount);
       expect(logs[0].event_type).toBe('TEST_EVENT');

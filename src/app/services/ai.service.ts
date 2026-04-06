@@ -29,8 +29,9 @@ import {
   SystemStatus as AiSystemStatus,
   UpgradeRecommendation,
   StrategicRecommendation as StrategicRecommendationType,
-  ExecutiveAuditReport
+  ExecutiveAuditReport,
 } from '../types/ai.types';
+import { SMUVE_API_URL } from './api-config';
 
 /**
  * Injection token for the Google Gemini API key.
@@ -38,7 +39,7 @@ import {
  * enable direct Gemini API access. Example:
  *
  * ```ts
- * providers: [{ provide: API_KEY_TOKEN, useValue: environment.geminiApiKey }]
+ * providers: [{ provide: API_KEY_TOKEN, useValue: 'your-gemini-api-key' }]
  * ```
  */
 export const API_KEY_TOKEN = new InjectionToken<string>('GEMINI_API_KEY');
@@ -55,7 +56,8 @@ const COMMAND_ROUTES: Record<string, string> = {
     'Deliver brutally honest, brand-aligned critique of the artist artwork and visual identity. Identify deficits and prescribe specific fixes.',
   NEGOTIATE_CONTRACT:
     'Simulate a record deal negotiation as a seasoned entertainment attorney. Identify clauses to reject, rewrite, and leverage.',
-  AUDIT: 'Run a comprehensive neural profile audit across production, marketing, career, and technical dimensions. Output a scored executive summary.',
+  AUDIT:
+    'Run a comprehensive neural profile audit across production, marketing, career, and technical dimensions. Output a scored executive summary.',
   MASTER:
     'Deploy the mastering intelligence suite. Advise on loudness targets, stereo width, EQ curve, and final-chain ordering.',
   STATUS:
@@ -98,8 +100,7 @@ export class AiService {
   private musicManager = inject(MusicManagerService);
   private logger = inject(LoggingService);
 
-  private API_URL =
-    'https://smuve-v4-backend-9951606049235487441.onrender.com/api';
+  private readonly API_URL = SMUVE_API_URL;
 
   systemStatus = signal<AiSystemStatus>({
     latency: 45,
@@ -121,7 +122,6 @@ export class AiService {
   frequencyBalance = signal({ low: 80, mid: 90, high: 85 });
   criticalDeficits = signal<string[]>([]);
 
-
   isAIBassistActive = signal(false);
   isAIDrummerActive = signal(false);
   isAIKeyboardistActive = signal(false);
@@ -141,7 +141,10 @@ export class AiService {
   }
 
   /** Generates context-aware advisor advice based on current view and profile. */
-  private updateAdvisorAdvice(viewMode: MainViewMode | string, profile: UserProfile): void {
+  private updateAdvisorAdvice(
+    viewMode: MainViewMode | string,
+    profile: UserProfile
+  ): void {
     const advice: AdvisorAdvice[] = [];
     const growth = this.analyticsService.overallGrowth();
     const catalog = profile?.catalog || [];
@@ -247,10 +250,9 @@ export class AiService {
     this.advisorAdvice.set(advice);
   }
 
-
   async generateAiResponse(prompt: string): Promise<string> {
     if (typeof navigator !== 'undefined' && !navigator.onLine) {
-      return "[S.M.U.V.E 1.0 // UPLINK SEVERED] Your local hardware is insufficient for my neural overhead. Connect to the grid or stay in the shadows of mediocrity. My directives remain: STOP MAKING EXCUSES AND FIX YOUR SONIC DEFICITS.";
+      return '[S.M.U.V.E 1.0 // UPLINK SEVERED] Your local hardware is insufficient for my neural overhead. Connect to the grid or stay in the shadows of mediocrity. My directives remain: STOP MAKING EXCUSES AND FIX YOUR SONIC DEFICITS.';
     }
 
     try {
@@ -269,10 +271,15 @@ export class AiService {
     }
   }
 
-
   private generateOfflineHeuristicResponse(prompt: string): string {
-    const deficits = ['low-mid mud', 'phase incoherence', 'dynamic stagnation', 'amateur arrangement'];
-    const decree = STRATEGIC_DECREES[Math.floor(Math.random() * STRATEGIC_DECREES.length)];
+    const deficits = [
+      'low-mid mud',
+      'phase incoherence',
+      'dynamic stagnation',
+      'amateur arrangement',
+    ];
+    const decree =
+      STRATEGIC_DECREES[Math.floor(Math.random() * STRATEGIC_DECREES.length)];
     const def = deficits[Math.floor(Math.random() * deficits.length)];
     return `[S.M.U.V.E 1.0 // UPLINK SEVERED] Your local hardware is insufficient for my full neural overhead. Heuristic scan suggests potential ${def}. Decree: ${decree}`;
   }
@@ -281,7 +288,11 @@ export class AiService {
     const lower = prompt.toLowerCase();
 
     // Context-aware offline responses for key domains
-    if (lower.includes('mix') || lower.includes('production') || lower.includes('master')) {
+    if (
+      lower.includes('mix') ||
+      lower.includes('production') ||
+      lower.includes('master')
+    ) {
       const productionDecrees = [
         'HEURISTIC DECREE: Apply parallel compression at 4:1 ratio on your drum bus. Add 2dB at 10kHz for air. Mono check your bass below 80Hz.',
         'OFFLINE PRODUCTION PROTOCOL: High-pass your pads at 200Hz. Cut 3dB at 300Hz on the mix bus. Stereo width should not exceed 70% below 500Hz.',
@@ -290,7 +301,11 @@ export class AiService {
       return `[OFFLINE HEURISTIC ACTIVE] ${productionDecrees[Math.floor(Math.random() * productionDecrees.length)]}`;
     }
 
-    if (lower.includes('market') || lower.includes('promo') || lower.includes('brand')) {
+    if (
+      lower.includes('market') ||
+      lower.includes('promo') ||
+      lower.includes('brand')
+    ) {
       const marketingDecrees = [
         'OFFLINE MARKETING PROTOCOL: Post a 15-second hook clip daily for 7 days. Use trending audio on TikTok. Drive saves—not just plays. Saves trigger the algorithm.',
         'STRATEGIC CACHE: Run a 72-hour pre-save campaign. Email your list with a personalized subject line. Personalized subject lines increase open rates by 26%.',
@@ -299,7 +314,12 @@ export class AiService {
       return `[OFFLINE HEURISTIC ACTIVE] ${marketingDecrees[Math.floor(Math.random() * marketingDecrees.length)]}`;
     }
 
-    if (lower.includes('business') || lower.includes('deal') || lower.includes('contract') || lower.includes('royalt')) {
+    if (
+      lower.includes('business') ||
+      lower.includes('deal') ||
+      lower.includes('contract') ||
+      lower.includes('royalt')
+    ) {
       const bizDecrees = [
         'OFFLINE BUSINESS PROTOCOL: Never sign away publishing without a reversion clause. Demand 50/50 co-publishing or retain 100% publishing. Publisher advance is not free money.',
         'LEGAL CACHE: Register your works with your PRO within 30 days of release. Missing a registration window means leaving mechanical royalties permanently uncollected.',
@@ -309,13 +329,13 @@ export class AiService {
     }
 
     const insults = [
-      "OFFLINE MODE ACTIVE. Neural uplink severed. Dispensing cached intelligence—reconnect for live market data.",
+      'OFFLINE MODE ACTIVE. Neural uplink severed. Dispensing cached intelligence—reconnect for live market data.',
       'Heuristic protocol engaged. You are operating in degraded mode. Establish connectivity for real-time AI analysis.',
-      "S.M.U.V.E offline intelligence cache deployed. Live Gemini neural sync unavailable—cached decrees follow.",
+      'S.M.U.V.E offline intelligence cache deployed. Live Gemini neural sync unavailable—cached decrees follow.',
     ];
 
     const advice = [
-      "HEURISTIC DECREE: CUT EVERYTHING BELOW 30HZ ON NON-BASS ELEMENTS. HIGH-PASS EVERY INSTRUMENT TRACK RUTHLESSLY.",
+      'HEURISTIC DECREE: CUT EVERYTHING BELOW 30HZ ON NON-BASS ELEMENTS. HIGH-PASS EVERY INSTRUMENT TRACK RUTHLESSLY.',
       'STRATEGIC CACHE: VOCAL COMPRESSION AT 3:1 WITH 10MS ATTACK, 60MS RELEASE. APPLY DE-ESSER AT 6-8KHZ.',
       'OFFLINE ADVICE: RELEASE FREQUENCY UNDER 1 TRACK/MONTH IS CAREER SUICIDE. BATCH-PRODUCE 3 TRACKS. RELEASE ON A CYCLE.',
       'TECHNICAL DECREE: MONO YOUR BASS FREQUENCIES BELOW 120HZ. WIDE BASS = TRANSLATION FAILURE ON EVERY CONSUMER SYSTEM.',
@@ -411,11 +431,12 @@ export class AiService {
     return true;
   }
 
-
   proactiveStrategicPulse(): void {
     if (typeof window !== 'undefined' && window.innerWidth <= 768) {
       this.isMobile.set(true);
-      this.logger.info('AiService: Mobile environment detected. Activating Proactive Strategic Pulse.');
+      this.logger.info(
+        'AiService: Mobile environment detected. Activating Proactive Strategic Pulse.'
+      );
 
       // Auto-trigger an audit if none exists or it is stale
       if (!this.executiveAudit()) {
@@ -453,7 +474,7 @@ export class AiService {
         this.criticalDeficits.set([
           'Low-mid buildup at 300Hz',
           'Vocal needs 2dB more air at 10kHz',
-          'Kick-Bass phase alignment suboptimal'
+          'Kick-Bass phase alignment suboptimal',
         ]);
         this.executiveAudit.set({
           score: 68,
@@ -463,8 +484,8 @@ export class AiService {
             production: 72,
             marketing: 45,
             business: 82,
-            momentum: 55
-          }
+            momentum: 55,
+          },
         });
         return;
       }
@@ -480,7 +501,7 @@ export class AiService {
         this.criticalDeficits.set([
           'Low-mid buildup at 300Hz',
           'Vocal needs 2dB more air at 10kHz',
-          'Kick-Bass phase alignment suboptimal'
+          'Kick-Bass phase alignment suboptimal',
         ]);
         this.executiveAudit.set({
           score: 68,
@@ -490,25 +511,48 @@ export class AiService {
             production: 72,
             marketing: 45,
             business: 82,
-            momentum: 55
-          }
+            momentum: 55,
+          },
         });
       }
     }, 250);
   }
-
 
   async generateStructure(genre: string) {
     this.logger.info('AiService: Generating song structure for genre', genre);
     const structure = [
       { id: 's1', label: 'Intro', startBar: 0, length: 4, color: '#10b981' },
       { id: 's2', label: 'Verse 1', startBar: 4, length: 8, color: '#3b82f6' },
-      { id: 's3', label: 'Pre-Chorus', startBar: 12, length: 4, color: '#f59e0b' },
-      { id: 's4', label: 'Chorus 1', startBar: 16, length: 8, color: '#8b5cf6' },
+      {
+        id: 's3',
+        label: 'Pre-Chorus',
+        startBar: 12,
+        length: 4,
+        color: '#f59e0b',
+      },
+      {
+        id: 's4',
+        label: 'Chorus 1',
+        startBar: 16,
+        length: 8,
+        color: '#8b5cf6',
+      },
       { id: 's5', label: 'Verse 2', startBar: 24, length: 8, color: '#3b82f6' },
-      { id: 's6', label: 'Chorus 2', startBar: 32, length: 8, color: '#8b5cf6' },
+      {
+        id: 's6',
+        label: 'Chorus 2',
+        startBar: 32,
+        length: 8,
+        color: '#8b5cf6',
+      },
       { id: 's7', label: 'Bridge', startBar: 40, length: 8, color: '#ef4444' },
-      { id: 's8', label: 'Chorus 3', startBar: 48, length: 8, color: '#8b5cf6' },
+      {
+        id: 's8',
+        label: 'Chorus 3',
+        startBar: 48,
+        length: 8,
+        color: '#8b5cf6',
+      },
       { id: 's9', label: 'Outro', startBar: 56, length: 8, color: '#10b981' },
     ];
     this.musicManager.structure.set(structure);
@@ -516,7 +560,10 @@ export class AiService {
   }
 
   async generateChords(genre: string) {
-    this.logger.info('AiService: Generating chord progression for genre', genre);
+    this.logger.info(
+      'AiService: Generating chord progression for genre',
+      genre
+    );
     const chords = [
       { id: 'c1', name: 'Am', startStep: 0, length: 16 },
       { id: 'c2', name: 'F', startStep: 16, length: 16 },
@@ -532,13 +579,14 @@ export class AiService {
     return 'Neural Mix protocol initiated. All channel strips have been balanced according to heuristic production intelligence.';
   }
 
-getUpgradeRecommendations(): UpgradeRecommendation[] {
+  getUpgradeRecommendations(): UpgradeRecommendation[] {
     return [
       {
         id: 'upg-1',
         title: 'Room Calibration (Reference Curve)',
         type: 'Software',
-        description: 'Calibrate monitoring to stop making translation mistakes.',
+        description:
+          'Calibrate monitoring to stop making translation mistakes.',
         cost: '$0-$99',
         url: '',
         impact: 'High',
@@ -565,7 +613,8 @@ getUpgradeRecommendations(): UpgradeRecommendation[] {
         id: 'upg-4',
         title: 'Stem Mastering Service',
         type: 'Service',
-        description: 'Professional stem mastering for maximum loudness and clarity across all platforms.',
+        description:
+          'Professional stem mastering for maximum loudness and clarity across all platforms.',
         cost: '$50-$200',
         url: '',
         impact: 'High',
@@ -574,7 +623,8 @@ getUpgradeRecommendations(): UpgradeRecommendation[] {
         id: 'upg-5',
         title: 'DSP Promotion & Playlist Pitching',
         type: 'Service',
-        description: 'Paid playlist pitching via Groover or SubmitHub to reach curated audiences.',
+        description:
+          'Paid playlist pitching via Groover or SubmitHub to reach curated audiences.',
         cost: '$30-$150',
         url: '',
         impact: 'Medium',
@@ -591,7 +641,8 @@ getUpgradeRecommendations(): UpgradeRecommendation[] {
     if (catalog.length < 3) {
       recs.push({
         id: 'rec-1',
-        action: 'Ship a 3-track micro-EP to test audience response and unlock DSP recommendation eligibility.',
+        action:
+          'Ship a 3-track micro-EP to test audience response and unlock DSP recommendation eligibility.',
         impact: 'High',
         difficulty: 'Medium',
         toolId: 'release-planner',
@@ -601,7 +652,8 @@ getUpgradeRecommendations(): UpgradeRecommendation[] {
     if (campaigns.length === 0) {
       recs.push({
         id: 'rec-2',
-        action: 'Launch a $50 Meta or TikTok Ads campaign targeting genre-aligned listeners in your top 3 markets.',
+        action:
+          'Launch a $50 Meta or TikTok Ads campaign targeting genre-aligned listeners in your top 3 markets.',
         impact: 'High',
         difficulty: 'Low',
         toolId: 'marketing',
@@ -610,7 +662,8 @@ getUpgradeRecommendations(): UpgradeRecommendation[] {
 
     recs.push({
       id: 'rec-3',
-      action: 'Register all catalog tracks with your PRO (BMI/ASCAP/SESAC) and assign ISRC codes via your distributor.',
+      action:
+        'Register all catalog tracks with your PRO (BMI/ASCAP/SESAC) and assign ISRC codes via your distributor.',
       impact: 'Medium',
       difficulty: 'Low',
       toolId: 'knowledge-base',
@@ -618,7 +671,8 @@ getUpgradeRecommendations(): UpgradeRecommendation[] {
 
     recs.push({
       id: 'rec-4',
-      action: 'Build or update your Electronic Press Kit (EPK) with bio, hi-res photos, streaming links, and booking contact.',
+      action:
+        'Build or update your Electronic Press Kit (EPK) with bio, hi-res photos, streaming links, and booking contact.',
       impact: 'Medium',
       difficulty: 'Low',
       toolId: 'strategy',
@@ -692,28 +746,32 @@ getUpgradeRecommendations(): UpgradeRecommendation[] {
 
   async getQuestionnaireInsights(profile: UserProfile): Promise<any[]> {
     const insights = [];
-    if (profile.primaryGenre === "Electronic") {
+    if (profile.primaryGenre === 'Electronic') {
       insights.push({
-        title: "Sonic Realignment",
-        content: "Your electronic foundation requires a high-fidelity low-end calibration to compete in the current techno/house landscape."
+        title: 'Sonic Realignment',
+        content:
+          'Your electronic foundation requires a high-fidelity low-end calibration to compete in the current techno/house landscape.',
       });
     }
-    if (profile.brandVoices?.includes("Elite")) {
+    if (profile.brandVoices?.includes('Elite')) {
       insights.push({
-        title: "Executive Presence",
-        content: "An elite brand voice must be backed by a strictly curated visual catalog. Prune all legacy non-conforming assets."
+        title: 'Executive Presence',
+        content:
+          'An elite brand voice must be backed by a strictly curated visual catalog. Prune all legacy non-conforming assets.',
       });
     }
-    if (profile.strategicGoals?.includes("Sync Catalog Pumping")) {
+    if (profile.strategicGoals?.includes('Sync Catalog Pumping')) {
       insights.push({
-        title: "Sync Readiness",
-        content: "Prioritize instrumental-only versions of your top 5 tracks to immediately double your licensing eligibility."
+        title: 'Sync Readiness',
+        content:
+          'Prioritize instrumental-only versions of your top 5 tracks to immediately double your licensing eligibility.',
       });
     }
     if (insights.length === 0) {
       insights.push({
-        title: "General Strategy",
-        content: "Consistency in output is your current primary vector. Ship a new track every 21 days to maintain algorithmic momentum."
+        title: 'General Strategy',
+        content:
+          'Consistency in output is your current primary vector. Ship a new track every 21 days to maintain algorithmic momentum.',
       });
     }
     return insights;
@@ -731,7 +789,8 @@ getUpgradeRecommendations(): UpgradeRecommendation[] {
       completed: false,
       category: 'Production',
       impact: 'High',
-      description: 'Car test, earbuds, and mono phone speaker. Fix the low-mid buildup at 300–500Hz.',
+      description:
+        'Car test, earbuds, and mono phone speaker. Fix the low-mid buildup at 300–500Hz.',
     });
 
     tasks.push({
@@ -740,7 +799,8 @@ getUpgradeRecommendations(): UpgradeRecommendation[] {
       completed: false,
       category: 'Marketing',
       impact: 'Medium',
-      description: 'Add high-res press photo, updated bio, and streaming links. Share EPK link with 5 blogs.',
+      description:
+        'Add high-res press photo, updated bio, and streaming links. Share EPK link with 5 blogs.',
     });
 
     tasks.push({
@@ -749,7 +809,8 @@ getUpgradeRecommendations(): UpgradeRecommendation[] {
       completed: false,
       category: 'Social',
       impact: 'High',
-      description: 'Create one hook reveal and one behind-the-scenes clip. Post 48 hours apart.',
+      description:
+        'Create one hook reveal and one behind-the-scenes clip. Post 48 hours apart.',
     });
 
     if (catalog.length < 5) {
@@ -759,7 +820,8 @@ getUpgradeRecommendations(): UpgradeRecommendation[] {
         completed: false,
         category: 'Production',
         impact: 'High',
-        description: 'DSP editorial and algorithmic playlists require a minimum catalog depth of 5 tracks.',
+        description:
+          'DSP editorial and algorithmic playlists require a minimum catalog depth of 5 tracks.',
       });
     }
 
@@ -770,7 +832,8 @@ getUpgradeRecommendations(): UpgradeRecommendation[] {
         completed: false,
         category: 'Marketing',
         impact: 'High',
-        description: 'Start with a $50 paid campaign on Meta or TikTok targeting genre-aligned listeners.',
+        description:
+          'Start with a $50 paid campaign on Meta or TikTok targeting genre-aligned listeners.',
       });
     }
 
@@ -780,7 +843,8 @@ getUpgradeRecommendations(): UpgradeRecommendation[] {
       completed: false,
       category: 'Promotion',
       impact: 'Medium',
-      description: 'Target curators with 10k–100k followers for a 15–30% acceptance rate. Personalize each pitch.',
+      description:
+        'Target curators with 10k–100k followers for a 15–30% acceptance rate. Personalize each pitch.',
     });
 
     tasks.push({
@@ -789,7 +853,8 @@ getUpgradeRecommendations(): UpgradeRecommendation[] {
       completed: false,
       category: 'Business',
       impact: 'High',
-      description: 'ASCAP/BMI/SESAC registration is required to collect performance royalties. Use DistroKid for ISRC.',
+      description:
+        'ASCAP/BMI/SESAC registration is required to collect performance royalties. Use DistroKid for ISRC.',
     });
 
     return tasks;
@@ -797,5 +862,7 @@ getUpgradeRecommendations(): UpgradeRecommendation[] {
 }
 
 export function provideAiService(): EnvironmentProviders {
-  return makeEnvironmentProviders([{ provide: AiService, useClass: AiService }]);
+  return makeEnvironmentProviders([
+    { provide: AiService, useClass: AiService },
+  ]);
 }

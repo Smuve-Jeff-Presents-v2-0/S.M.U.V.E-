@@ -1,12 +1,18 @@
 import { TestBed } from '@angular/core/testing';
-import { MusicManagerService, TrackModel, GlobalChord, SongSection } from '../music-manager.service';
+import {
+  MusicManagerService,
+  TrackModel,
+  GlobalChord,
+  SongSection,
+} from '../music-manager.service';
 import { AudioEngineService } from '../audio-engine.service';
 import { InstrumentsService } from '../instruments.service';
 import { UserProfileService } from '../user-profile.service';
 import { LoggingService } from '../logging.service';
 import { FileLoaderService } from '../file-loader.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('PianoRoll & ChannelRack Upgrades', () => {
   let service: MusicManagerService;
@@ -22,19 +28,20 @@ describe('PianoRoll & ChannelRack Upgrades', () => {
       isPlaying: () => false,
       ctx: {},
       playBuffer: jest.fn(),
-      playSynth: jest.fn()
+      playSynth: jest.fn(),
     };
 
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
         MusicManagerService,
         { provide: AudioEngineService, useValue: mockEngine },
         InstrumentsService,
         { provide: UserProfileService, useValue: { profile: () => ({}) } },
         LoggingService,
-        FileLoaderService
-      ]
+        FileLoaderService,
+      ],
     });
     service = TestBed.inject(MusicManagerService);
   });
@@ -43,7 +50,7 @@ describe('PianoRoll & ChannelRack Upgrades', () => {
     const id = service.ensureTrack('synth-lead');
     service.setTrackColor(id, '#FF0000');
 
-    const track = service.tracks().find(t => t.id === id);
+    const track = service.tracks().find((t) => t.id === id);
     expect(track?.color).toBe('#FF0000');
     expect(track?.type).toBe('midi');
   });
