@@ -51,7 +51,7 @@ const mockFeed: ThaSpotFeed = {
       title: 'Live Bracket',
       description: 'Queue into the main event.',
       roomId: 'versus-night',
-      reward: '500 XP',
+      reward: 'Clash Banner',
       status: 'live',
       windowLabel: 'Live now',
       featuredGameId: '1',
@@ -77,7 +77,7 @@ const mockFeed: ThaSpotFeed = {
         startAt: '2026-04-06T20:00:00.000Z',
         endAt: '2026-04-07T20:00:00.000Z',
         recurrence: 'daily',
-        rewardType: 'xp',
+        rewardType: 'cosmetic',
       },
     },
   ],
@@ -118,15 +118,6 @@ const mockFeed: ThaSpotFeed = {
       audienceTags: ['producer', 'returning'],
       priority: 10,
       campaignType: 'studio',
-    },
-  ],
-  leaderboards: [
-    {
-      id: 'board-1',
-      label: 'Weekly bracket',
-      score: '12,000',
-      roomId: 'versus-night',
-      trend: '+8%',
     },
   ],
   recommendationRails: [
@@ -243,27 +234,19 @@ describe('ThaSpotComponent', () => {
       equipment: [],
       daw: [],
       catalog: [],
-      xp: 320,
-      level: 3,
-      achievements: [],
       gameStats: {
         '2': {
           plays: 2,
           lastPlayedAt: Date.now() - 5000,
-          bestScore: 900,
-          currentStreak: 2,
         },
       },
       thaSpotProgression: {
-        currentStreak: 2,
         favoriteRoomId: 'producer-lounge',
         earnedCosmetics: ['Weekend skin'],
       },
     }),
     recordGameSession: jest.fn().mockResolvedValue(undefined),
     recordGameResult: jest.fn().mockResolvedValue(undefined),
-    awardXp: jest.fn().mockResolvedValue(undefined),
-    unlockAchievement: jest.fn().mockResolvedValue(undefined),
   };
 
   const uiServiceMock = {
@@ -333,10 +316,6 @@ describe('ThaSpotComponent', () => {
         ...profile.gameStats,
         '1': { plays: 5, lastPlayedAt: Date.now() },
       },
-      thaSpotProgression: {
-        ...profile.thaSpotProgression,
-        currentStreak: 4,
-      },
     }));
     fixture.detectChanges();
 
@@ -359,7 +338,7 @@ describe('ThaSpotComponent', () => {
     expect(component.activeEvents()[0]?.status).toBe('live');
   }));
 
-  it('opens a governed preview before starting a game', () => {
+  it('opens a preview before starting a game', () => {
     component.previewGame(mockFeed.games[0]!);
 
     expect(component.selectedGame()?.name).toBe('Tha Battlefield');
@@ -398,7 +377,7 @@ describe('ThaSpotComponent', () => {
     );
   });
 
-  it('blocks inline launch when a cabinet requires external governance', () => {
+  it('opens a new tab when a cabinet is external-only', () => {
     const openSpy = jest.spyOn(window, 'open').mockImplementation(() => null);
     const game = {
       ...component.games()[0]!,
@@ -415,7 +394,7 @@ describe('ThaSpotComponent', () => {
     expect(component.currentGame()).toBeNull();
   });
 
-  it('caps posted scores before persisting results', () => {
+  it('records game completion without persisting gameplay scores', () => {
     const sourceWindow = {} as Window;
     component.currentGame.set(component.games()[0]!);
     (component as any).gameIframe = {
@@ -430,7 +409,6 @@ describe('ThaSpotComponent', () => {
 
     expect(profileServiceMock.recordGameResult).toHaveBeenCalledWith(
       '1',
-      1_000_000,
       expect.objectContaining({
         roomId: 'all',
       })

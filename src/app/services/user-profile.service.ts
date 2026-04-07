@@ -39,24 +39,18 @@ export interface ThaSpotEventHistoryEntry {
   eventId: string;
   roomId?: string;
   reward?: string;
-  rewardType?: 'xp' | 'cosmetic' | 'token';
+  rewardType?: 'cosmetic' | 'token';
   participatedAt: number;
 }
 
 export interface ThaSpotRoomStat {
   plays?: number;
-  bestScore?: number;
   lastPlayedAt?: number;
-  masteryScore?: number;
 }
 
 export interface ThaSpotGameStat {
-  bestScore?: number;
-  lastScore?: number;
   plays?: number;
   lastPlayedAt?: number;
-  currentStreak?: number;
-  longestStreak?: number;
   lastRoomId?: string;
   roomPlays?: Record<string, number>;
   earnedCosmetics?: string[];
@@ -64,8 +58,6 @@ export interface ThaSpotGameStat {
 }
 
 export interface ThaSpotProgression {
-  currentStreak?: number;
-  longestStreak?: number;
   lastSessionAt?: number;
   lastRoomId?: string;
   favoriteRoomId?: string;
@@ -78,7 +70,7 @@ export interface ThaSpotSessionContext {
   roomId?: string;
   eventId?: string;
   reward?: string;
-  rewardType?: 'xp' | 'cosmetic' | 'token';
+  rewardType?: 'cosmetic' | 'token';
   cosmetics?: string[];
 }
 
@@ -101,9 +93,6 @@ export interface UserProfile {
   artistIdentity?: ArtistIdentityState;
 
   // Gameplay progression
-  xp?: number;
-  level?: number;
-  achievements?: { id: string; title: string; unlockedAt: number }[];
   gameStats?: Record<string, ThaSpotGameStat>;
   thaSpotProgression?: ThaSpotProgression;
 
@@ -137,10 +126,6 @@ export const initialProfile: UserProfile = {
   marketingCampaigns: [],
   catalog: [],
   artistIdentity: createInitialArtistIdentity('New Artist', 'Hip Hop'),
-
-  xp: 0,
-  level: 1,
-  achievements: [],
   gameStats: {},
   thaSpotProgression: {
     roomStats: {},
@@ -155,7 +140,6 @@ export const initialProfile: UserProfile = {
 export class UserProfileService {
   private logger = inject(LoggingService);
   private databaseService = inject(DatabaseService);
-  private readonly streakWindowMs = 1000 * 60 * 60 * 18;
   private readonly maxEventHistory = 20;
 
   profile = signal<UserProfile>(initialProfile);
@@ -171,6 +155,10 @@ export class UserProfileService {
             userProfile.artistName,
             userProfile.primaryGenre,
             userProfile.artistIdentity
+          ),
+          gameStats: this.sanitizeGameStats(userProfile.gameStats),
+          thaSpotProgression: this.sanitizeThaSpotProgression(
+            userProfile.thaSpotProgression
           ),
         };
         this.profile.set(normalizedProfile);
@@ -191,7 +179,16 @@ export class UserProfileService {
           newProfile.primaryGenre,
           newProfile.artistIdentity
         ),
+        gameStats: this.sanitizeGameStats(newProfile.gameStats),
+        thaSpotProgression: this.sanitizeThaSpotProgression(
+          newProfile.thaSpotProgression
+        ),
       };
+      delete normalizedProfile.xp;
+      delete normalizedProfile.level;
+      delete normalizedProfile.achievements;
+      delete normalizedProfile.lastXpReason;
+      delete normalizedProfile.lastXpAt;
       await this.databaseService.saveUserProfile(normalizedProfile, id);
       this.profile.set(normalizedProfile);
       this.profile$.set(normalizedProfile);
@@ -228,64 +225,24 @@ export class UserProfileService {
     await this.updateProfile(next);
   }
 
-  /**
-   * Adds XP and auto-levels the user.
-   * Level curve: each level requires 250 * level XP.
-   */
-  async awardXp(amount: number, reason: string = 'activity'): Promise<void> {
-    const current = this.profile();
-    const xp = (current.xp || 0) + Math.max(0, Math.floor(amount));
-
-    const requiredForNext = (lvl: number) => 250 * lvl;
-    let level = 1;
-    let remaining = xp;
-    while (remaining >= requiredForNext(level)) {
-      remaining -= requiredForNext(level);
-      level++;
-      if (level > 999) break;
-    }
-
-    await this.updateProfile({
-      ...current,
-      xp,
-      level,
-      lastXpReason: reason,
-      lastXpAt: Date.now(),
-    } as any);
-  }
-
-  async recordGameResult(
-    gameId: string,
-    score: number,
-    context: ThaSpotSessionContext = {}
-  ): Promise<void> {
+  async recordGameResult(gameId: string, context: ThaSpotSessionContext = {}) {
     const current = this.profile();
     const stats = { ...(current.gameStats || {}) };
     const prev = stats[gameId] || {};
     const now = Date.now();
-    const isNewPlaySession =
-      !prev.lastPlayedAt || now - prev.lastPlayedAt > this.streakWindowMs;
     const nextProgression = this.buildThaSpotProgression(
       current.thaSpotProgression,
       prev,
       {
         ...context,
         playedAt: now,
-        score,
       }
     );
 
     stats[gameId] = {
       ...prev,
-      bestScore: Math.max(prev.bestScore || 0, score),
-      lastScore: score,
-      plays: (prev.plays || 0) + (isNewPlaySession ? 1 : 0),
+      plays: prev.plays || 0,
       lastPlayedAt: now,
-      currentStreak: nextProgression.currentStreak,
-      longestStreak: Math.max(
-        prev.longestStreak || 0,
-        nextProgression.longestStreak || 0
-      ),
       lastRoomId: context.roomId || prev.lastRoomId,
       roomPlays: prev.roomPlays || {},
       earnedCosmetics: this.mergeUniqueStrings(
@@ -310,14 +267,6 @@ export class UserProfileService {
     const stats = { ...(current.gameStats || {}) };
     const prev = stats[gameId] || {};
     const playedAt = Date.now();
-    const previousPlayedAt =
-      prev.lastPlayedAt || current.thaSpotProgression?.lastSessionAt;
-    const currentStreak =
-      previousPlayedAt && playedAt - previousPlayedAt <= this.streakWindowMs
-        ? (prev.currentStreak ||
-            current.thaSpotProgression?.currentStreak ||
-            0) + 1
-        : 1;
     const roomId = context.roomId || prev.lastRoomId;
     const roomPlays = {
       ...(prev.roomPlays || {}),
@@ -332,7 +281,6 @@ export class UserProfileService {
         ...context,
         playedAt,
         roomId,
-        currentStreak,
         roomPlays,
       }
     );
@@ -341,8 +289,6 @@ export class UserProfileService {
       ...prev,
       plays: (prev.plays || 0) + 1,
       lastPlayedAt: playedAt,
-      currentStreak,
-      longestStreak: Math.max(prev.longestStreak || 0, currentStreak),
       lastRoomId: roomId,
       roomPlays,
       earnedCosmetics: this.mergeUniqueStrings(
@@ -359,25 +305,11 @@ export class UserProfileService {
     } as any);
   }
 
-  async unlockAchievement(id: string, title: string): Promise<void> {
-    const current = this.profile();
-    const achievements = [...(current.achievements || [])];
-    if (achievements.some((a) => a.id === id)) return;
-
-    achievements.push({ id, title, unlockedAt: Date.now() });
-    await this.updateProfile({
-      ...current,
-      achievements,
-    } as any);
-  }
-
   private buildThaSpotProgression(
     progression: ThaSpotProgression | undefined,
     previousGameStats: ThaSpotGameStat,
     context: ThaSpotSessionContext & {
       playedAt: number;
-      score?: number;
-      currentStreak?: number;
       roomPlays?: Record<string, number>;
     }
   ): ThaSpotProgression {
@@ -386,28 +318,20 @@ export class UserProfileService {
 
     if (roomId) {
       const existingRoom = roomStats[roomId] || {};
-      const sessionIncrement = context.currentStreak ? 1 : 0;
       roomStats[roomId] = {
-        plays: (existingRoom.plays || 0) + sessionIncrement,
-        bestScore: Math.max(existingRoom.bestScore || 0, context.score || 0),
+        plays: Math.max(
+          existingRoom.plays || 0,
+          (context.roomPlays || {})[roomId] || 0
+        ),
         lastPlayedAt: context.playedAt,
-        masteryScore:
-          (existingRoom.masteryScore || 0) +
-          (sessionIncrement ? 10 : 0) +
-          Math.min(40, Math.floor((context.score || 0) / 100)),
       };
     }
 
     const favoriteRoomId = Object.entries(roomStats).sort(
-      (a, b) => (b[1].masteryScore || 0) - (a[1].masteryScore || 0)
+      (a, b) => (b[1].plays || 0) - (a[1].plays || 0)
     )[0]?.[0];
 
     return {
-      currentStreak: context.currentStreak || progression?.currentStreak || 1,
-      longestStreak: Math.max(
-        progression?.longestStreak || 0,
-        context.currentStreak || 0
-      ),
       lastSessionAt: context.playedAt,
       lastRoomId: roomId,
       favoriteRoomId,
@@ -445,5 +369,44 @@ export class UserProfileService {
     incoming: string[] | undefined
   ) {
     return [...new Set([...(existing || []), ...(incoming || [])])];
+  }
+
+  private sanitizeGameStats(
+    stats: Record<string, ThaSpotGameStat> | undefined
+  ): Record<string, ThaSpotGameStat> {
+    return Object.fromEntries(
+      Object.entries(stats || {}).map(([gameId, stat]) => [
+        gameId,
+        {
+          plays: stat?.plays || 0,
+          lastPlayedAt: stat?.lastPlayedAt,
+          lastRoomId: stat?.lastRoomId,
+          roomPlays: stat?.roomPlays || {},
+          earnedCosmetics: stat?.earnedCosmetics || [],
+          eventHistory: stat?.eventHistory || [],
+        },
+      ])
+    );
+  }
+
+  private sanitizeThaSpotProgression(
+    progression: ThaSpotProgression | undefined
+  ): ThaSpotProgression {
+    return {
+      lastSessionAt: progression?.lastSessionAt,
+      lastRoomId: progression?.lastRoomId,
+      favoriteRoomId: progression?.favoriteRoomId,
+      roomStats: Object.fromEntries(
+        Object.entries(progression?.roomStats || {}).map(([roomId, stat]) => [
+          roomId,
+          {
+            plays: stat?.plays || 0,
+            lastPlayedAt: stat?.lastPlayedAt,
+          },
+        ])
+      ),
+      earnedCosmetics: progression?.earnedCosmetics || [],
+      eventHistory: progression?.eventHistory || [],
+    };
   }
 }

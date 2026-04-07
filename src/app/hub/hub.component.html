@@ -64,8 +64,10 @@
           <span class="stat-value text-primary">{{ profileService.profile().knowledgeBase.strategicHealthScore }}%</span>
         </div>
         <div class="executive-stat">
-          <span class="stat-label">Label Level</span>
-          <span class="stat-value text-accent">LVL {{ profileService.profile().level }}</span>
+          <span class="stat-label">Catalog Depth</span>
+          <span class="stat-value text-accent">{{
+            profileService.profile().catalog.length
+          }}</span>
         </div>
       </div>
     </header>
@@ -157,24 +159,37 @@
           <h2 class="card-heading glimmer-text">Career Path</h2>
           <div class="flex-1 mt-6 space-y-6">
             <div class="progress-circle-container">
-              <div class="level-badge">LVL {{ profileService.profile().level }}</div>
+              <div class="level-badge">
+                {{ profileService.profile().catalog.length }} tracks
+              </div>
               <svg viewBox="0 0 36 36" class="circular-chart">
                 <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                <path class="circle text-secondary" [attr.stroke-dasharray]="(profileService.profile().xp % 250 / 2.5) + ', 100'" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path
+                  class="circle text-secondary"
+                  [attr.stroke-dasharray]="
+                    (profileService.profile().careerGoals.length * 20 || 20) +
+                    ', 100'
+                  "
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
               </svg>
             </div>
             <div class="text-center">
-              <p class="text-xs uppercase tracking-widest opacity-60">Next Milestone</p>
-              <p class="font-bold text-sm">Regional Takeover</p>
+              <p class="text-xs uppercase tracking-widest opacity-60">
+                Active Focus
+              </p>
+              <p class="font-bold text-sm">
+                {{ profileService.profile().careerGoals[0] || 'Shape next release' }}
+              </p>
             </div>
             <div class="space-y-2">
               <div class="achievement-pill">
                 <span class="material-symbols-outlined text-xs">verified</span>
-                <span>Billboard Registered</span>
+                <span>Catalog ready</span>
               </div>
-              <div class="achievement-pill opacity-40">
-                <span class="material-symbols-outlined text-xs">lock</span>
-                <span>Sold Out Tour</span>
+              <div class="achievement-pill">
+                <span class="material-symbols-outlined text-xs">tune</span>
+                <span>{{ profileService.profile().primaryGenre }}</span>
               </div>
             </div>
           </div>

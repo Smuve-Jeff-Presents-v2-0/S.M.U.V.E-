@@ -167,11 +167,10 @@
         <p>Built from room-ready multiplayer cabinets.</p>
       </article>
       <article class="metric-card glass-v42">
-        <span class="metric-label">Progression</span>
-        <strong>LVL {{ progressionSummary().level }}</strong>
+        <span class="metric-label">Recent activity</span>
+        <strong>{{ progressionSummary().recentLabel }}</strong>
         <p>
-          {{ progressionSummary().streakLabel }} ·
-          {{ progressionSummary().achievements }} achievements ·
+          {{ progressionSummary().totalPlays }} tracked sessions ·
           {{ progressionSummary().cosmetics }} cosmetics
         </p>
       </article>
@@ -339,25 +338,6 @@
 
         <section class="insight-card glass-v42">
           <div class="section-heading">
-            <h3>Leaderboards</h3>
-            <span>{{ activeLeaderboards().length }} boards</span>
-          </div>
-          <div class="leaderboard-list">
-            <div
-              class="leaderboard-row"
-              *ngFor="let entry of activeLeaderboards()"
-            >
-              <div>
-                <strong>{{ entry.label }}</strong>
-                <p>{{ entry.score }}</p>
-              </div>
-              <span class="trend-pill">{{ entry.trend }}</span>
-            </div>
-          </div>
-        </section>
-
-        <section class="insight-card glass-v42">
-          <div class="section-heading">
             <h3>Cross-platform moves</h3>
             <span>Contextual merch</span>
           </div>
@@ -431,18 +411,18 @@
       </div>
 
       <div class="intel-section">
-        <h4 class="section-title">PROGRESSION</h4>
+        <h4 class="section-title">SESSION SUMMARY</h4>
         <div class="metric-row">
-          <span class="label">LEVEL</span>
-          <span class="value">LVL {{ progressionSummary().level }}</span>
+          <span class="label">LAST CABINET</span>
+          <span class="value">{{ progressionSummary().recentLabel }}</span>
         </div>
         <div class="metric-row">
           <span class="label">TRACKED SESSIONS</span>
           <span class="value">{{ progressionSummary().totalPlays }}</span>
         </div>
         <div class="metric-row">
-          <span class="label">ACHIEVEMENTS</span>
-          <span class="value">{{ progressionSummary().achievements }}</span>
+          <span class="label">COSMETICS</span>
+          <span class="value">{{ progressionSummary().cosmetics }}</span>
         </div>
       </div>
     </div>
@@ -541,7 +521,7 @@
             {{
               canEmbedInline(selected)
                 ? 'Start inline session'
-                : 'Governed launch'
+                : 'Open external session'
             }}
           </button>
         </div>
@@ -626,7 +606,7 @@
             allowfullscreen
             allow="fullscreen; autoplay"
             referrerpolicy="no-referrer"
-            sandbox="allow-scripts allow-forms allow-popups allow-pointer-lock"
+            sandbox="allow-scripts allow-forms allow-popups"
             class="game-frame"
             (error)="onFrameError()"
           >

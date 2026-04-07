@@ -48,7 +48,7 @@
       "id": "arcade",
       "name": "Arcade",
       "icon": "joystick",
-      "description": "Fast rotations, reflex-first play, and short-session score chasing.",
+      "description": "Fast rotations, reflex-first play, and short-session cabinet runs.",
       "rules": {
         "tags": ["Arcade", "Reflex", "Retro"]
       }
@@ -99,9 +99,9 @@
     {
       "id": "event-1",
       "title": "Tha Battlefield Friday Bracket",
-      "description": "Live matchmaking ladder with bonus XP for every completed round.",
+      "description": "Live matchmaking ladder with featured cosmetics for every completed round.",
       "roomId": "versus-night",
-      "reward": "500 XP + Clash Banner",
+      "reward": "Clash Banner",
       "status": "live",
       "windowLabel": "Live now",
       "featuredGameId": "1",
@@ -117,9 +117,9 @@
     {
       "id": "event-2",
       "title": "Producer Lounge Daily Challenge",
-      "description": "Lock a 30-note streak across rhythm picks to unlock a fresh badge.",
+      "description": "Hold a clean 30-note chain across rhythm picks to earn a fresh badge.",
       "roomId": "producer-lounge",
-      "reward": "200 XP + Studio skin",
+      "reward": "Studio skin",
       "status": "upcoming",
       "windowLabel": "Starts in 2h",
       "featuredGameId": "2",
@@ -129,7 +129,7 @@
         "endAt": "2026-04-07T20:00:00.000Z",
         "recurrence": "daily",
         "eligibilityTags": ["Rhythm", "Original"],
-        "rewardType": "xp"
+        "rewardType": "cosmetic"
       }
     },
     {
@@ -240,29 +240,6 @@
       "audienceTags": ["competitive", "returning"],
       "priority": 8,
       "campaignType": "intel"
-    }
-  ],
-  "leaderboards": [
-    {
-      "id": "board-1",
-      "label": "Tha Battlefield Weekly",
-      "score": "18,200",
-      "roomId": "versus-night",
-      "trend": "+11%"
-    },
-    {
-      "id": "board-2",
-      "label": "Tempo Lockdown Daily",
-      "score": "9,840",
-      "roomId": "producer-lounge",
-      "trend": "+7%"
-    },
-    {
-      "id": "board-3",
-      "label": "Grandmaster Chess ELO",
-      "score": "1825",
-      "roomId": "strategy",
-      "trend": "+4%"
     }
   ],
   "games": [
@@ -971,7 +948,7 @@
       "id": "19",
       "name": "Temple Run 2 Prime",
       "url": "https://poki.com/en/g/temple-run-2",
-      "description": "Cinematic chase runner with premium pacing, polished traversal, and elite score-chasing feel.",
+      "description": "Cinematic chase runner with premium pacing, polished traversal, and elite arcade feel.",
       "genre": "Runner",
       "rating": 4.7,
       "playersOnline": 39500,
