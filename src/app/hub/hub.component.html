@@ -101,6 +101,8 @@
           <span class="stat-value text-accent">{{
             profileService.profile().catalog.length
           }}</span>
+          <span class="stat-label">Workspace Access</span>
+          <span class="stat-value text-accent">OPEN</span>
         </div>
       </div>
     </header>
@@ -275,6 +277,15 @@
                     'Shape next release'
                 }}
               </p>
+              <div class="level-badge">OPEN</div>
+              <svg viewBox="0 0 36 36" class="circular-chart">
+                <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path class="circle text-secondary" stroke-dasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              </svg>
+            </div>
+            <div class="text-center">
+              <p class="text-xs uppercase tracking-widest opacity-60">Profile Complete</p>
+              <p class="font-bold text-sm">Every workspace is ready to use.</p>
             </div>
             <div class="space-y-2">
               <div class="achievement-pill">
@@ -284,10 +295,15 @@
               <div class="achievement-pill">
                 <span class="material-symbols-outlined text-xs">tune</span>
                 <span>{{ profileService.profile().primaryGenre }}</span>
+                <span>Artist profile committed</span>
+              </div>
+              <div class="achievement-pill">
+                <span class="material-symbols-outlined text-xs">apps</span>
+                <span>Studio, visuals, strategy, and release tools are open</span>
               </div>
             </div>
           </div>
-          <button class="btn-pro-outline w-full mt-4">Expand Board</button>
+          <button class="btn-pro-outline w-full mt-4">Open Workspace Board</button>
         </div>
       </div>
 

@@ -238,6 +238,7 @@ describe('ThaSpotComponent', () => {
         '2': {
           plays: 2,
           lastPlayedAt: Date.now() - 5000,
+          currentStreak: 2,
         },
       },
       thaSpotProgression: {
@@ -247,6 +248,7 @@ describe('ThaSpotComponent', () => {
     }),
     recordGameLaunch: jest.fn().mockResolvedValue(undefined),
     recordGameResult: jest.fn().mockResolvedValue(undefined),
+    recordGameSession: jest.fn().mockResolvedValue(undefined),
   };
 
   const uiServiceMock = {
@@ -256,6 +258,7 @@ describe('ThaSpotComponent', () => {
   };
 
   beforeEach(async () => {
+    jest.clearAllMocks();
     jest.restoreAllMocks();
 
     await TestBed.configureTestingModule({
@@ -305,7 +308,9 @@ describe('ThaSpotComponent', () => {
     expect(component.recommendedGames().length).toBeGreaterThan(0);
     expect(component.recentlyPlayed()[0].name).toBe('Tempo Lockdown');
     expect(component.liveMetrics().roomPlayers).toBe(1590);
-    expect(component.progressionSummary().masteryLabel).toBe('Producer Lounge');
+    expect(component.activitySummary().favoriteRoomLabel).toBe(
+      'Producer Lounge'
+    );
   });
 
   it('changes recommendation rails when the profile type changes', () => {
@@ -395,7 +400,10 @@ describe('ThaSpotComponent', () => {
   });
 
   it('records game completion without persisting gameplay scores', () => {
+  it('ignores posted scores when sessions end', () => {
     const sourceWindow = {} as Window;
+    const sessionCallCount =
+      profileServiceMock.recordGameSession.mock.calls.length;
     component.currentGame.set(component.games()[0]!);
     (component as any).gameIframe = {
       nativeElement: { contentWindow: sourceWindow },
@@ -412,6 +420,8 @@ describe('ThaSpotComponent', () => {
       expect.objectContaining({
         roomId: 'all',
       })
+    expect(profileServiceMock.recordGameSession.mock.calls).toHaveLength(
+      sessionCallCount
     );
   });
 });

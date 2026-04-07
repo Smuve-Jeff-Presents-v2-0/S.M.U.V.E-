@@ -26,7 +26,10 @@ import {
   ThaSpotFeed,
 } from '../../hub/game';
 import { THA_SPOT_FALLBACK_FEED } from '../../hub/tha-spot-feed.fallback';
-import { UserProfileService } from '../../services/user-profile.service';
+import {
+  UserProfileService,
+  ThaSpotSessionContext,
+} from '../../services/user-profile.service';
 import { UIService } from '../../services/ui.service';
 
 const DEFAULT_RECOMMENDATION_ITEMS = 4;
@@ -304,12 +307,12 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
     return directives.slice(0, 4);
   });
 
-  progressionSummary = computed(() => {
+  activitySummary = computed(() => {
     const profile = this.profileService.profile();
     const stats = profile.gameStats || {};
     const progression = profile.thaSpotProgression || {};
     const totalPlays = this.getTotalPlays();
-    const masteredRoom =
+    const favoriteRoom =
       this.gamingRooms().find(
         (room) => room.id === progression.favoriteRoomId
       ) || this.findMasteredRoom(stats);
@@ -318,6 +321,17 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
       totalPlays,
       masteryLabel: masteredRoom?.name || 'Choose a room',
       recentLabel: lastPlayedGame?.name || 'No recent cabinet',
+    const latestRoom =
+      this.gamingRooms().find((room) => room.id === progression.lastRoomId) ||
+      favoriteRoom;
+    return {
+      totalPlays,
+      favoriteRoomLabel: favoriteRoom?.name || 'Choose a room',
+      latestRoomLabel: latestRoom?.name || 'No sessions yet',
+      sessionLabel:
+        totalPlays > 0
+          ? `${totalPlays} tracked sessions`
+          : 'Start with any cabinet',
       cosmetics: (progression.earnedCosmetics || []).length,
     };
   });
@@ -376,6 +390,7 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
         ? game.launchConfig?.trustNote ||
             'Exact embed target verified from the live feed.'
         : 'Inline launch is unavailable for this cabinet. Open it in a new tab to continue.'
+        : 'Inline launch is unavailable for this cabinet, so it will open in a new tab.'
     );
     this.frameError.set(null);
   }
@@ -432,6 +447,7 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
           this.matchmakingStatus.set('MATCHING ROOM PRESENCE');
         } else {
           this.matchmakingStatus.set('FINALIZING LIVE MATCH');
+          this.matchmakingStatus.set('CONFIRMING OPPONENT PROFILE');
         }
 
         this.matchmakingProgress.update((value) => Math.min(100, value + 10));
@@ -570,6 +586,7 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
         currentGame.id,
         this.getSessionContext(currentGame)
       );
+      return;
     }
   }
 
@@ -834,6 +851,7 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
 
   private getPromotionAudienceTags(profile: {
     primaryGenre?: string;
+    thaSpotProgression?: { currentStreak?: number };
     gameStats?: Record<string, { plays?: number }>;
   }) {
     const tags = ['returning'];
@@ -850,6 +868,7 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
       tags.push('competitive');
     }
     if (totalPlays > 0) {
+    if (Object.keys(profile.gameStats || {}).length > 0) {
       tags.push('social');
     }
 
@@ -864,13 +883,24 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
       activeEvent?.schedule?.rewardType === 'cosmetic'
         ? [activeEvent.reward]
         : [];
+  private getSessionContext(game: Game): ThaSpotSessionContext {
+    const activeEvent = this.activeEvents().find(
+      (event) => event.featuredGameId === game.id
+    );
+    const rawRewardType = activeEvent?.schedule?.rewardType;
+    const rewardType: ThaSpotSessionContext['rewardType'] =
+      rawRewardType === 'xp'
+        ? 'access'
+        : rawRewardType === 'cosmetic' || rawRewardType === 'token'
+          ? rawRewardType
+          : undefined;
 
     return {
       roomId: this.activeRoom(),
       eventId: activeEvent?.id,
       reward: activeEvent?.reward,
-      rewardType: activeEvent?.schedule?.rewardType,
-      cosmetics,
+      rewardType,
+      cosmetics: [],
     };
   }
 

@@ -40,6 +40,7 @@ export interface ThaSpotEventHistoryEntry {
   roomId?: string;
   reward?: string;
   rewardType?: 'cosmetic' | 'token';
+  rewardType?: 'access' | 'cosmetic' | 'token';
   participatedAt: number;
 }
 
@@ -71,6 +72,7 @@ export interface ThaSpotSessionContext {
   eventId?: string;
   reward?: string;
   rewardType?: 'cosmetic' | 'token';
+  rewardType?: 'access' | 'cosmetic' | 'token';
   cosmetics?: string[];
 }
 
@@ -171,6 +173,9 @@ export class UserProfileService {
         };
         this.profile.set(normalizedProfile);
         this.profile$.set(normalizedProfile);
+        const sanitizedProfile = this.sanitizeProfile(userProfile);
+        this.profile.set(sanitizedProfile);
+        this.profile$.set(sanitizedProfile);
       }
     } catch (error) {
       this.logger.error('UserProfileService: Failed to load profile', error);
@@ -203,6 +208,10 @@ export class UserProfileService {
       await this.databaseService.saveUserProfile(normalizedProfile, id);
       this.profile.set(normalizedProfile);
       this.profile$.set(normalizedProfile);
+      const sanitizedProfile = this.sanitizeProfile(newProfile);
+      await this.databaseService.saveUserProfile(sanitizedProfile, id);
+      this.profile.set(sanitizedProfile);
+      this.profile$.set(sanitizedProfile);
     } catch (error) {
       this.logger.error('UserProfileService: Failed to save profile', error);
     }
@@ -271,6 +280,7 @@ export class UserProfileService {
   }
 
   async recordGameLaunch(
+  async recordGameSession(
     gameId: string,
     context: ThaSpotSessionContext = {}
   ): Promise<void> {
@@ -334,6 +344,7 @@ export class UserProfileService {
           existingRoom.plays || 0,
           (context.roomPlays || {})[roomId] || 0
         ),
+        plays: (existingRoom.plays || 0) + sessionIncrement,
         lastPlayedAt: context.playedAt,
       };
     }
@@ -369,10 +380,87 @@ export class UserProfileService {
         eventId: context.eventId,
         roomId: context.roomId,
         reward: context.reward,
-        rewardType: context.rewardType,
+        rewardType: this.normalizeRewardType(context.rewardType),
         participatedAt: Date.now(),
       },
     ].slice(-this.maxEventHistory);
+  }
+
+  private sanitizeProfile(profile: UserProfile): UserProfile {
+    return {
+      ...profile,
+      gameStats: this.sanitizeGameStats(profile.gameStats),
+      thaSpotProgression: this.sanitizeProgression(profile.thaSpotProgression),
+    };
+  }
+
+  private sanitizeGameStats(
+    stats: Record<string, ThaSpotGameStat> | undefined
+  ): Record<string, ThaSpotGameStat> {
+    return Object.fromEntries(
+      Object.entries(stats || {}).map(([gameId, stat]) => [
+        gameId,
+        {
+          plays: stat?.plays || 0,
+          lastPlayedAt: stat?.lastPlayedAt,
+          currentStreak: stat?.currentStreak || 0,
+          longestStreak: stat?.longestStreak || 0,
+          lastRoomId: stat?.lastRoomId,
+          roomPlays: { ...(stat?.roomPlays || {}) },
+          earnedCosmetics: [...(stat?.earnedCosmetics || [])],
+          eventHistory: this.sanitizeEventHistory(stat?.eventHistory),
+        },
+      ])
+    );
+  }
+
+  private sanitizeProgression(
+    progression: ThaSpotProgression | undefined
+  ): ThaSpotProgression {
+    return {
+      currentStreak: progression?.currentStreak || 0,
+      longestStreak: progression?.longestStreak || 0,
+      lastSessionAt: progression?.lastSessionAt,
+      lastRoomId: progression?.lastRoomId,
+      favoriteRoomId: progression?.favoriteRoomId,
+      roomStats: Object.fromEntries(
+        Object.entries(progression?.roomStats || {}).map(([roomId, stat]) => [
+          roomId,
+          {
+            plays: stat?.plays || 0,
+            lastPlayedAt: stat?.lastPlayedAt,
+          },
+        ])
+      ),
+      earnedCosmetics: [...(progression?.earnedCosmetics || [])],
+      eventHistory: this.sanitizeEventHistory(progression?.eventHistory),
+    };
+  }
+
+  private sanitizeEventHistory(
+    history: ThaSpotEventHistoryEntry[] | undefined
+  ): ThaSpotEventHistoryEntry[] {
+    return (history || []).map((entry) => ({
+      eventId: entry.eventId,
+      roomId: entry.roomId,
+      reward: entry.reward,
+      rewardType: this.normalizeRewardType(entry.rewardType),
+      participatedAt: entry.participatedAt,
+    }));
+  }
+
+  private normalizeRewardType(
+    rewardType: string | undefined
+  ): ThaSpotEventHistoryEntry['rewardType'] {
+    switch (rewardType) {
+      case 'cosmetic':
+      case 'token':
+        return rewardType;
+      case 'xp':
+        return 'access';
+      default:
+        return undefined;
+    }
   }
 
   private mergeUniqueStrings(
