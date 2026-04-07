@@ -298,7 +298,7 @@ export class UserProfileService {
 
     stats[gameId] = {
       ...prev,
-      plays: prev.plays || 0,
+      plays: (prev.plays || 0) + 1,
       lastPlayedAt: playedAt,
       lastRoomId: roomId,
       roomPlays,
