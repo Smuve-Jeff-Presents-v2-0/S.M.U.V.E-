@@ -147,6 +147,20 @@ describe('HubComponent', () => {
         'assets/hub/home-backdrop-cinema.png',
       ])
     );
+    expect(component.homeBackdropMedia).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: 'Production Suite',
+          title: 'Studio performance view',
+          layoutClass: 'panel-studio',
+        }),
+        expect.objectContaining({
+          label: 'Executive Layout',
+          title: 'Command surface overview',
+          layoutClass: 'panel-command',
+        }),
+      ])
+    );
   });
 
   it('navigates to spotlight routes from the landing page', async () => {

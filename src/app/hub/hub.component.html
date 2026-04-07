@@ -35,7 +35,13 @@
   <div class="hub-media-montage" aria-hidden="true">
     @for (panel of homeBackdropMedia; track panel.title) {
       <figure class="media-panel" [ngClass]="panel.layoutClass">
-        <img class="media-shot" [src]="panel.src" alt="" loading="eager" decoding="async" />
+        <img
+          class="media-shot"
+          [src]="panel.src"
+          [attr.alt]="panel.title"
+          loading="eager"
+          decoding="async"
+        />
         <div class="media-sheen"></div>
         <figcaption class="media-caption">
           <span class="media-label">{{ panel.label }}</span>

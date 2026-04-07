@@ -951,6 +951,6 @@
   .panel-command,
   .panel-intel,
   .panel-cinema {
-    transform: none !important;
+    transform: none;
   }
 }
