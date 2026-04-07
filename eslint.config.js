@@ -43,6 +43,12 @@ export default tseslint.config(
   },
   prettierConfig,
   {
-    ignores: ['dist/**', 'node_modules/**', '.angular/**'],
+    files: ['server/**/*.js'],
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+    },
+  },
+  {
+    ignores: ['Build/**', 'dist/**', 'node_modules/**', '.angular/**'],
   }
 );
