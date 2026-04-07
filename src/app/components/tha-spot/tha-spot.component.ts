@@ -26,7 +26,10 @@ import {
   ThaSpotFeed,
 } from '../../hub/game';
 import { THA_SPOT_FALLBACK_FEED } from '../../hub/tha-spot-feed.fallback';
-import { UserProfileService } from '../../services/user-profile.service';
+import {
+  UserProfileService,
+  ThaSpotSessionContext,
+} from '../../services/user-profile.service';
 import { UIService } from '../../services/ui.service';
 
 const DEFAULT_RECOMMENDATION_ITEMS = 4;
@@ -321,7 +324,9 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
       favoriteRoomLabel: favoriteRoom?.name || 'Choose a room',
       latestRoomLabel: latestRoom?.name || 'No sessions yet',
       sessionLabel:
-        totalPlays > 0 ? `${totalPlays} tracked sessions` : 'Start with any cabinet',
+        totalPlays > 0
+          ? `${totalPlays} tracked sessions`
+          : 'Start with any cabinet',
       cosmetics: (progression.earnedCosmetics || []).length,
     };
   });
@@ -710,10 +715,7 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
       return false;
     }
 
-    if (
-      audience.requiresAchievements &&
-      totalPlays === 0
-    ) {
+    if (audience.requiresAchievements && totalPlays === 0) {
       return false;
     }
 
@@ -861,16 +863,23 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
     return tags;
   }
 
-  private getSessionContext(game: Game) {
+  private getSessionContext(game: Game): ThaSpotSessionContext {
     const activeEvent = this.activeEvents().find(
       (event) => event.featuredGameId === game.id
     );
+    const rawRewardType = activeEvent?.schedule?.rewardType;
+    const rewardType: ThaSpotSessionContext['rewardType'] =
+      rawRewardType === 'xp'
+        ? 'access'
+        : rawRewardType === 'cosmetic' || rawRewardType === 'token'
+          ? rawRewardType
+          : undefined;
 
     return {
       roomId: this.activeRoom(),
       eventId: activeEvent?.id,
       reward: activeEvent?.reward,
-      rewardType: activeEvent?.schedule?.rewardType,
+      rewardType,
       cosmetics: [],
     };
   }

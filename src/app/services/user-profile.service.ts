@@ -381,10 +381,15 @@ export class UserProfileService {
   private normalizeRewardType(
     rewardType: string | undefined
   ): ThaSpotEventHistoryEntry['rewardType'] {
-    if (rewardType === 'cosmetic' || rewardType === 'token') {
-      return rewardType;
+    switch (rewardType) {
+      case 'cosmetic':
+      case 'token':
+        return rewardType;
+      case 'xp':
+        return 'access';
+      default:
+        return rewardType ? 'access' : undefined;
     }
-    return rewardType ? 'access' : undefined;
   }
 
   private mergeUniqueStrings(

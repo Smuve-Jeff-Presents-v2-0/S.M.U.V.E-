@@ -266,6 +266,7 @@ describe('ThaSpotComponent', () => {
   };
 
   beforeEach(async () => {
+    jest.clearAllMocks();
     jest.restoreAllMocks();
 
     await TestBed.configureTestingModule({
@@ -412,6 +413,8 @@ describe('ThaSpotComponent', () => {
 
   it('ignores posted scores when sessions end', () => {
     const sourceWindow = {} as Window;
+    const sessionCallCount =
+      profileServiceMock.recordGameSession.mock.calls.length;
     component.currentGame.set(component.games()[0]!);
     (component as any).gameIframe = {
       nativeElement: { contentWindow: sourceWindow },
@@ -423,12 +426,8 @@ describe('ThaSpotComponent', () => {
       source: sourceWindow,
     } as MessageEvent);
 
-    expect(profileServiceMock.recordGameSession).not.toHaveBeenCalledWith(
-      '1',
-      expect.objectContaining({
-        roomId: 'all',
-        score: expect.anything(),
-      })
+    expect(profileServiceMock.recordGameSession.mock.calls).toHaveLength(
+      sessionCallCount
     );
   });
 });

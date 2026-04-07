@@ -186,7 +186,7 @@ export const THA_SPOT_FALLBACK_FEED: ThaSpotFeed = {
       tags: ['Rhythm', 'Arcade', 'Original'],
       badgeIds: ['staff-pick'],
       queueEstimateMinutes: 0,
-       sessionObjectives: ['Hold a clean 25-note run', 'Stay above 95% timing'],
+      sessionObjectives: ['Hold a clean 25-note run', 'Stay above 95% timing'],
       controlHints: ['Use the displayed lane keys', 'Anticipate sync shifts'],
       launchConfig: {
         difficulty: 'Adaptive',
