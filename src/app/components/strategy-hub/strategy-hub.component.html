@@ -441,7 +441,7 @@
       <section>
         <h3 class="text-[9px] font-black text-silver-dim uppercase tracking-[0.3em] mb-4">Strategic Upgrade Targets</h3>
         <div class="space-y-3">
-          @for (rec of upgradeRecs; track rec.id) {
+          @for (rec of upgradeRecs(); track rec.id) {
             <div class="flex items-start gap-4 bg-brand-surface/40 rounded-2xl border border-white/10 p-5 hover:border-brand-primary/30 transition-all group">
               <div class="w-8 h-8 rounded-xl bg-brand-primary/10 flex items-center justify-center shrink-0 mt-0.5">
                 <i class="fas fa-arrow-up text-brand-primary text-[10px]"></i>
@@ -451,10 +451,44 @@
                   <h4 class="text-xs font-black text-white uppercase group-hover:text-brand-primary transition-colors">{{ rec.title }}</h4>
                   <div class="flex items-center gap-2">
                     <span class="text-[8px] font-black text-silver-dim uppercase">{{ rec.type }}</span>
+                    <span class="text-[8px] font-black uppercase px-2 py-0.5 rounded border" [ngClass]="getPriorityClass(rec.priority)">{{ rec.priority }}</span>
                     <span class="text-[8px] font-black uppercase px-2 py-0.5 rounded" [ngClass]="getImpactColor(rec.impact)">{{ rec.impact }}</span>
                   </div>
                 </div>
-                <p class="text-[10px] text-silver-dim leading-relaxed">{{ rec.description }}</p>
+                <p class="text-[10px] text-silver-dim leading-relaxed mb-2">{{ rec.description }}</p>
+                <p class="text-[10px] text-white/80 leading-relaxed mb-3">{{ rec.rationale }}</p>
+                <div class="flex flex-wrap gap-2 mb-3">
+                  <span class="text-[8px] font-black uppercase px-2 py-1 rounded-full border border-white/10 text-white/70">{{ rec.targetArea }}</span>
+                  <span class="text-[8px] font-black uppercase px-2 py-1 rounded-full border border-white/10 text-white/70">{{ getRecommendationStateLabel(rec.state) }}</span>
+                  @if (rec.outcomeMetric) {
+                    <span class="text-[8px] font-black uppercase px-2 py-1 rounded-full border border-brand-primary/20 text-brand-primary">
+                      {{ rec.outcomeMetric.label }}: {{ rec.outcomeMetric.value }}
+                    </span>
+                  }
+                </div>
+                <p class="text-[9px] text-silver-dim leading-relaxed mb-3" *ngIf="rec.prerequisites.length">
+                  Next prerequisite: {{ rec.prerequisites[0] }}
+                </p>
+                <div class="flex flex-wrap gap-2">
+                  <button class="text-[9px] font-black uppercase tracking-widest px-3 py-2 rounded-xl bg-brand-primary text-black hover:scale-[1.02] transition-all"
+                          (click)="focusRecommendation(rec)">
+                    {{ rec.actionLabel }}
+                  </button>
+                  <button class="text-[9px] font-black uppercase tracking-widest px-3 py-2 rounded-xl border border-white/10 text-white hover:border-brand-primary/40 transition-all"
+                          (click)="saveRecommendation(rec)">
+                    Save
+                  </button>
+                  <button class="text-[9px] font-black uppercase tracking-widest px-3 py-2 rounded-xl border border-white/10 text-silver-dim hover:text-white transition-all"
+                          (click)="dismissRecommendation(rec)">
+                    Not Relevant
+                  </button>
+                  @if (rec.state !== 'acquired') {
+                    <button class="text-[9px] font-black uppercase tracking-widest px-3 py-2 rounded-xl border border-brand-primary/20 text-brand-primary hover:bg-brand-primary/10 transition-all"
+                            (click)="acquireUpgrade(rec)">
+                      Mark Acquired
+                    </button>
+                  }
+                </div>
               </div>
               <span class="text-[10px] font-black text-brand-primary shrink-0 hidden sm:block">{{ rec.cost }}</span>
             </div>

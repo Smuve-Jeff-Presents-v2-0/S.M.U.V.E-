@@ -41,10 +41,19 @@ describe('UserProfileService - Acquire Upgrade', () => {
     expect(service.profile().daw).toContain('New Synth');
   });
 
-  it('should add "Service" to daw list', async () => {
-    const upgrade = { title: 'DistroKid', type: 'Service' };
+  it('should add "Service" to services list', async () => {
+    const upgrade = {
+      title: 'DistroKid',
+      type: 'Service',
+      recommendationId: 'upg-service',
+    };
     await service.acquireUpgrade(upgrade);
-    expect(service.profile().daw).toContain('DistroKid');
+    expect(service.profile().services).toContain('DistroKid');
+    expect(service.profile().recommendationPreferences?.['upg-service']).toEqual(
+      expect.objectContaining({
+        state: 'acquired',
+      })
+    );
   });
 
   it('should not add duplicate items', async () => {

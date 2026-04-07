@@ -52,6 +52,17 @@ describe('StrategyHubComponent', () => {
         cost: '$0',
         url: '',
         impact: 'High',
+        rationale: 'Because it matters.',
+        targetArea: 'Production',
+        priority: 'High',
+        prerequisites: ['Do the prep work'],
+        actionLabel: 'Open Studio',
+        toolId: 'studio',
+        state: 'suggested',
+        outcomeMetric: {
+          label: 'Expected gain',
+          value: 'Faster turnarounds',
+        },
       },
     ]),
   };
@@ -218,6 +229,6 @@ describe('StrategyHubComponent', () => {
   });
 
   it('should load upgrade recommendations from AI service', () => {
-    expect(component.upgradeRecs.length).toBe(1);
+    expect(component.upgradeRecs().length).toBe(1);
   });
 });

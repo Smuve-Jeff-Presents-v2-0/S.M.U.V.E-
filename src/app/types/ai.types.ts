@@ -38,6 +38,23 @@ export interface UpgradeRecommendation {
   url: string;
   minLevel?: number;
   impact: 'Extreme' | 'High' | 'Medium' | 'Low';
+  rationale: string;
+  targetArea: 'Production' | 'Marketing' | 'Business' | 'Practice';
+  priority: 'Critical' | 'High' | 'Medium';
+  prerequisites: string[];
+  actionLabel: string;
+  toolId?: string;
+  state?:
+    | 'suggested'
+    | 'saved'
+    | 'dismissed'
+    | 'not-relevant'
+    | 'acquired'
+    | 'completed';
+  outcomeMetric?: {
+    label: string;
+    value: string;
+  };
   genres?: string[];
 }
 

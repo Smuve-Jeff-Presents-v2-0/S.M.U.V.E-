@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { LoggingService } from './logging.service';
 import { DatabaseService } from './database.service';
+import { UpgradeRecommendation } from '../types/ai.types';
 
 export interface AppSettings {
   ui: {
@@ -82,6 +83,14 @@ export interface UserProfile {
   careerGoals: string[];
   equipment: string[];
   daw: string[];
+  services?: string[];
+  recommendationPreferences?: Record<
+    string,
+    {
+      state: NonNullable<UpgradeRecommendation['state']>;
+      updatedAt: number;
+    }
+  >;
   expertise?: any;
   team?: any[];
   marketingCampaigns?: any[];
@@ -119,6 +128,8 @@ export const initialProfile: UserProfile = {
   careerGoals: [],
   equipment: [],
   daw: [],
+  services: [],
+  recommendationPreferences: {},
   marketingCampaigns: [],
   catalog: [],
   gameStats: {},
@@ -166,13 +177,19 @@ export class UserProfileService {
     }
   }
 
-  async acquireUpgrade(upgrade: { title: string; type: string }) {
+  async acquireUpgrade(upgrade: {
+    title: string;
+    type: string;
+    recommendationId?: string;
+  }) {
     const current = this.profile();
     const title = upgrade.title?.trim() || '';
     const next: UserProfile = {
       ...current,
       equipment: [...(current.equipment || [])],
       daw: [...(current.daw || [])],
+      services: [...(current.services || [])],
+      recommendationPreferences: { ...(current.recommendationPreferences || {}) },
     };
 
     if (!title) {
@@ -184,14 +201,47 @@ export class UserProfileService {
         return;
       }
       next.equipment.push(title);
-    } else {
+    } else if (upgrade.type === 'Software') {
       if (next.daw.includes(title)) {
         return;
       }
       next.daw.push(title);
+    } else {
+      if (next.services.includes(title)) {
+        return;
+      }
+      next.services.push(title);
+    }
+
+    if (upgrade.recommendationId) {
+      next.recommendationPreferences[upgrade.recommendationId] = {
+        state: 'acquired',
+        updatedAt: Date.now(),
+      };
     }
 
     await this.updateProfile(next);
+  }
+
+  async setRecommendationState(
+    recommendationId: string,
+    state: NonNullable<UpgradeRecommendation['state']>
+  ) {
+    if (!recommendationId) {
+      return;
+    }
+
+    const current = this.profile();
+    await this.updateProfile({
+      ...current,
+      recommendationPreferences: {
+        ...(current.recommendationPreferences || {}),
+        [recommendationId]: {
+          state,
+          updatedAt: Date.now(),
+        },
+      },
+    });
   }
 
   async recordGameSession(
@@ -318,6 +368,22 @@ export class UserProfileService {
   private sanitizeProfile(profile: UserProfile): UserProfile {
     return {
       ...profile,
+      equipment: [...(profile.equipment || [])],
+      daw: [...(profile.daw || [])],
+      services: [...(profile.services || [])],
+      marketingCampaigns: [...(profile.marketingCampaigns || [])],
+      catalog: [...(profile.catalog || [])],
+      recommendationPreferences: Object.fromEntries(
+        Object.entries(profile.recommendationPreferences || {}).map(
+          ([recommendationId, preference]) => [
+            recommendationId,
+            {
+              state: preference?.state || 'suggested',
+              updatedAt: preference?.updatedAt || Date.now(),
+            },
+          ]
+        )
+      ),
       gameStats: this.sanitizeGameStats(profile.gameStats),
       thaSpotProgression: this.sanitizeProgression(profile.thaSpotProgression),
     };
