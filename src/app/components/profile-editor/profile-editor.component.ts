@@ -165,7 +165,7 @@ export class ProfileEditorComponent {
     try {
       await this.aiService.syncKnowledgeBaseWithProfile();
       this.addLog('EXTRACTION COMPLETE. NEURAL VAULT UPDATED.');
-    } catch {
+    } catch (_error) {
       this.addLog('SYNC ERROR: REVERTING TO LOCAL CACHE.');
     } finally {
       setTimeout(() => {

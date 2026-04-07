@@ -149,8 +149,16 @@ export class UserProfileService {
     try {
       const userProfile = await this.databaseService.loadUserProfile(userId);
       if (userProfile) {
+        const {
+          xp: _xp,
+          level: _level,
+          achievements: _achievements,
+          lastXpReason: _lastXpReason,
+          lastXpAt: _lastXpAt,
+          ...profileWithoutGamification
+        } = userProfile as UserProfile & Record<string, any>;
         const normalizedProfile = {
-          ...userProfile,
+          ...profileWithoutGamification,
           artistIdentity: ensureArtistIdentityState(
             userProfile.artistName,
             userProfile.primaryGenre,
@@ -172,8 +180,16 @@ export class UserProfileService {
   async updateProfile(newProfile: UserProfile, userId?: string): Promise<void> {
     try {
       const id = userId || 'anonymous';
+      const {
+        xp: _xp,
+        level: _level,
+        achievements: _achievements,
+        lastXpReason: _lastXpReason,
+        lastXpAt: _lastXpAt,
+        ...profileWithoutGamification
+      } = newProfile as UserProfile & Record<string, any>;
       const normalizedProfile = {
-        ...newProfile,
+        ...profileWithoutGamification,
         artistIdentity: ensureArtistIdentityState(
           newProfile.artistName,
           newProfile.primaryGenre,
@@ -184,11 +200,6 @@ export class UserProfileService {
           newProfile.thaSpotProgression
         ),
       };
-      delete normalizedProfile.xp;
-      delete normalizedProfile.level;
-      delete normalizedProfile.achievements;
-      delete normalizedProfile.lastXpReason;
-      delete normalizedProfile.lastXpAt;
       await this.databaseService.saveUserProfile(normalizedProfile, id);
       this.profile.set(normalizedProfile);
       this.profile$.set(normalizedProfile);
@@ -241,7 +252,7 @@ export class UserProfileService {
 
     stats[gameId] = {
       ...prev,
-      plays: prev.plays || 0,
+      plays: (prev.plays || 0) + 1,
       lastPlayedAt: now,
       lastRoomId: context.roomId || prev.lastRoomId,
       roomPlays: prev.roomPlays || {},
@@ -259,7 +270,7 @@ export class UserProfileService {
     } as any);
   }
 
-  async recordGameSession(
+  async recordGameLaunch(
     gameId: string,
     context: ThaSpotSessionContext = {}
   ): Promise<void> {
@@ -287,7 +298,7 @@ export class UserProfileService {
 
     stats[gameId] = {
       ...prev,
-      plays: (prev.plays || 0) + 1,
+      plays: prev.plays || 0,
       lastPlayedAt: playedAt,
       lastRoomId: roomId,
       roomPlays,

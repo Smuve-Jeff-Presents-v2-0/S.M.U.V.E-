@@ -458,7 +458,7 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
     this.currentGame.set(game);
     this.sessionStartedAt.set(Date.now());
     this.frameError.set(null);
-    await this.profileService.recordGameSession(
+    await this.profileService.recordGameLaunch(
       game.id,
       this.getSessionContext(game)
     );

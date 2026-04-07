@@ -245,7 +245,7 @@ describe('ThaSpotComponent', () => {
         earnedCosmetics: ['Weekend skin'],
       },
     }),
-    recordGameSession: jest.fn().mockResolvedValue(undefined),
+    recordGameLaunch: jest.fn().mockResolvedValue(undefined),
     recordGameResult: jest.fn().mockResolvedValue(undefined),
   };
 
@@ -355,7 +355,7 @@ describe('ThaSpotComponent', () => {
 
     expect(component.isMatchmaking()).toBe(false);
     expect(component.currentGame()?.id).toBe('1');
-    expect(profileServiceMock.recordGameSession).toHaveBeenCalledWith(
+    expect(profileServiceMock.recordGameLaunch).toHaveBeenCalledWith(
       '1',
       expect.objectContaining({
         roomId: 'all',
@@ -369,7 +369,7 @@ describe('ThaSpotComponent', () => {
     component.confirmLaunch();
 
     expect(component.currentGame()?.id).toBe('2');
-    expect(profileServiceMock.recordGameSession).toHaveBeenCalledWith(
+    expect(profileServiceMock.recordGameLaunch).toHaveBeenCalledWith(
       '2',
       expect.objectContaining({
         roomId: 'all',
