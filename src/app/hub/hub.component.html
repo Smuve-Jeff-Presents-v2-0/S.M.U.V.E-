@@ -1,12 +1,12 @@
 <div class="hub-wrapper" [class.playing]="playerService.isPlaying()">
-  <!-- S.M.U.V.E 1.0 Mobile Executive HUD -->
+  <!-- S.M.U.V.E 2.0 Mobile Executive HUD -->
   @if (aiService.isMobile() && aiService.isScanning()) {
     <div class="mobile-executive-hud animate-pulse">
       <div class="hud-glow"></div>
       <div class="flex items-center gap-4 px-4 py-3">
         <span class="material-symbols-outlined text-primary spin">security_update_good</span>
         <div class="flex-1">
-          <p class="text-[10px] font-black uppercase tracking-tighter text-primary">S.M.U.V.E 1.0 // EXECUTIVE SCANNING</p>
+          <p class="text-[10px] font-black uppercase tracking-tighter text-primary">S.M.U.V.E 2.0 // EXECUTIVE SCANNING</p>
           <p class="text-xs font-bold">{{ aiService.currentProcessStep() }} ({{ aiService.scanningProgress() }}%)</p>
         </div>
       </div>
@@ -55,7 +55,7 @@
     <!-- Header: Business Intelligence Overview -->
     <header class="hub-header">
       <div class="header-left">
-        <p class="brand-eyebrow glimmer-text">S.M.U.V.E 1.0 // EXECUTIVE COMMAND</p>
+        <p class="brand-eyebrow glimmer-text">S.M.U.V.E 2.0 // EXECUTIVE COMMAND</p>
         <h1 class="header-title glimmer-text">Welcome Back, {{ profileService.profile().artistName }}</h1>
       </div>
       <div class="header-right">
@@ -233,7 +233,7 @@
         Shell Config
       </button>
       <div class="flex-1"></div>
-      <p class="elegant-footer-text text-[10px] uppercase">S.M.U.V.E Intelligence Network v1.0.42</p>
+      <p class="elegant-footer-text text-[10px] uppercase">S.M.U.V.E Intelligence Network v2.0</p>
     </div>
   </div>
 </div>

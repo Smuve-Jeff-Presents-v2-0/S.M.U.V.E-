@@ -1,6 +1,6 @@
-# S.M.U.V.E. 4.0
+# S.M.U.V.E 2.0
 
-S.M.U.V.E. 4.0 is an Angular-based browser application for independent artists who need production tools, AI-assisted strategy, release planning, and creative support in one place.
+S.M.U.V.E 2.0 is an Angular-based browser application for independent artists who need production tools, AI-assisted strategy, release planning, and creative support in one place.
 
 The app ships with a command-hub landing page and a set of routed workspaces covering music production, vocal capture, visual creation, artist profile management, strategy, business planning, analytics, and community/gaming experiences.
 

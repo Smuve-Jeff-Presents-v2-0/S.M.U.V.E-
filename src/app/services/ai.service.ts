@@ -186,7 +186,7 @@ export class AiService {
 
   async generateAiResponse(prompt: string): Promise<string> {
     if (typeof navigator !== 'undefined' && !navigator.onLine) {
-      return '[S.M.U.V.E 1.0 // UPLINK SEVERED] Connect to the grid. FIX YOUR SONIC DEFICITS.';
+      return '[S.M.U.V.E 2.0 // UPLINK SEVERED] Connect to the grid. FIX YOUR SONIC DEFICITS.';
     }
 
     try {

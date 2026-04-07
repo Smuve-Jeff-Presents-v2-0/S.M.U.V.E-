@@ -207,7 +207,7 @@ export class BusinessPipelineService {
                 description: 'Form an LLC or Corp.',
                 status: 'Pending',
                 aiGuidance:
-                  'Protect your assets. An LLC is the bare minimum for a S.M.U.V.E 1.0.',
+                  'Protect your assets. An LLC is the bare minimum for a S.M.U.V.E 2.0.',
                 actionType: 'External',
               },
               {

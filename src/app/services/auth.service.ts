@@ -4,7 +4,7 @@ import { LoggingService } from './logging.service';
 import { UserProfileService, initialProfile } from './user-profile.service';
 
 const APP_SECURITY_CONFIG = {
-  auth_salt: 'smuve_v4_executive_secure_link',
+  auth_salt: 'smuve_v2_executive_secure_link',
   pbkdf2_iterations: 100000,
   key_length: 256,
 };
@@ -184,7 +184,7 @@ export class AuthService {
         return {
           success: false,
           message:
-            'An artist with this email already exists in the S.M.U.V.E 4.2 system.',
+            'An artist with this email already exists in the S.M.U.V.E 2.0 system.',
         };
       }
 
@@ -234,7 +234,7 @@ export class AuthService {
       return {
         success: true,
         message:
-          'Welcome to S.M.U.V.E 4.2. Your journey to greatness begins now.',
+          'Welcome to S.M.U.V.E 2.0. Your journey to greatness begins now.',
       };
     } catch {
       return {
@@ -367,7 +367,7 @@ export class AuthService {
 
       return {
         success: true,
-        message: `Welcome back, ${user.artistName}. S.M.U.V.E 4.2 has been waiting.`,
+        message: `Welcome back, ${user.artistName}. S.M.U.V.E 2.0 has been waiting.`,
       };
     } catch {
       return {

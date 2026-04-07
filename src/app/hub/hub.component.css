@@ -818,7 +818,7 @@
   50% { transform: translateY(-2px) scale(1.008); }
 }
 
-/* S.M.U.V.E 1.0 Mobile Executive HUD */
+/* S.M.U.V.E 2.0 Mobile Executive HUD */
 .mobile-executive-hud, .mobile-directive-hud {
   position: fixed;
   top: 70px;

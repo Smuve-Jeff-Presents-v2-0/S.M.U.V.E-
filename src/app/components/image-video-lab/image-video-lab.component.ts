@@ -89,7 +89,7 @@ export class ImageVideoLabComponent implements OnDestroy, AfterViewInit {
   ];
 
   aiFeedback = signal(
-    'S.M.U.V.E 4.2 Cinema Engine Offline. Initialize for executive visual capture.'
+    'S.M.U.V.E 2.0 Cinema Engine Offline. Initialize for executive visual capture.'
   );
 
   private canvasCtx: CanvasRenderingContext2D | null = null;

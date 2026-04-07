@@ -1,5 +1,5 @@
 {
-  "name": "S.M.U.V.E 4.2",
-  "description": "S.M.U.V.E 4.2: The ultimate self-hosted, sophisticated ecosystem for independent artists. Featuring a professional music production suite (DAW) and an authoritative AI commander. Maintain total control of your data and career growth within an elite strategic framework.",
+  "name": "S.M.U.V.E 2.0",
+  "description": "S.M.U.V.E 2.0 — Strategic Music Utility Virtual Enterprise. A self-hosted ecosystem for independent artists featuring professional production tools, strategic intelligence, and career control in one platform.",
   "requestFramePermissions": ["microphone", "camera"]
 }

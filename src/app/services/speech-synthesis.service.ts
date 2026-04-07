@@ -78,7 +78,7 @@ export class SpeechSynthesisService {
 
     // Pronunciation rule: S.M.U.V.E -> Smooth
     const processedText = text
-      .replace(/S\.M\.U\.V\.E(?:\s+4\.\d+)?/gi, 'Smooth')
+      .replace(/S\.M\.U\.V\.E(?:\s+\d+\.\d+)?/gi, 'Smooth')
       .replace(/SMUVE/gi, 'Smooth');
 
     this.cancel();

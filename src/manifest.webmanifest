@@ -1,6 +1,6 @@
 {
-  "name": "S.M.U.V.E 1.0 Executive Command",
-  "short_name": "S.M.U.V.E 1.0",
+  "name": "S.M.U.V.E 2.0 Strategic Music Utility Virtual Enterprise",
+  "short_name": "S.M.U.V.E 2.0",
   "description": "Elite Strategic Music Intelligence & Production Suite",
   "theme_color": "#020617",
   "background_color": "#020617",
@@ -8,7 +8,7 @@
   "orientation": "portrait",
   "scope": "./",
   "start_url": "./",
-  "id": "smuve-4.2",
+  "id": "smuve-2.0",
   "categories": [
     "music",
     "productivity",

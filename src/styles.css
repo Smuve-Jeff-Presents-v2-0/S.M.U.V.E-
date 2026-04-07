@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /* ======================================================
-   S.M.U.V.E 4.2: EXECUTIVE PROFESSIONAL THEME
+   S.M.U.V.E 2.0: EXECUTIVE PROFESSIONAL THEME
    ====================================================== */
 
 :root {
@@ -18,7 +18,7 @@
   --safe-area-inset-top: env(safe-area-inset-top, 0px);
   --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
 
-  /* Default: S.M.U.V.E 4.2 Light Palette */
+  /* Default: S.M.U.V.E 2.0 Light Palette */
   --color-bg: #f8fafc;
   --color-bg-alt: #f1f5f9;
   --color-surface: #ffffff;
@@ -105,7 +105,7 @@ html, body {
   flex-shrink: 0;
 }
 
-/* --- v4.2 Professional Utilities --- */
+/* --- v2.0 Professional Utilities --- */
 
 /* 1. Frosted Glass (Glassmorphism) */
 .glass-v42 {
@@ -364,7 +364,7 @@ body {
   overscroll-behavior-y: none;
 }
 
-/* S.M.U.V.E 1.0 Mobile Command Ticker Animation */
+/* S.M.U.V.E 2.0 Mobile Command Ticker Animation */
 .animate-ticker {
   animation: ticker 25s linear infinite;
 }
