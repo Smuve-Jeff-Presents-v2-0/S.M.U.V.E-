@@ -715,10 +715,6 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
       return false;
     }
 
-    if (audience.requiresAchievements && totalPlays === 0) {
-      return false;
-    }
-
     return true;
   }
 

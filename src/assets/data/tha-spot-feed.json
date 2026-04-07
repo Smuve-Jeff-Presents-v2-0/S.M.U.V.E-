@@ -443,7 +443,7 @@
       "queueEstimateMinutes": 0,
       "sessionObjectives": [
         "Survive 90 seconds",
-        "Finish a clean lane chain"
+        "Complete a 12-lane chain"
       ],
       "controlHints": [
         "Feather turns early",
@@ -507,7 +507,7 @@
         ],
         "objectives": [
           "Land a clean memory cycle",
-          "Finish a smooth archive pass"
+          "Complete the memory board cleanly"
         ],
         "modes": [
           "Solo"

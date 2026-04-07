@@ -388,7 +388,7 @@ export class UserProfileService {
       case 'xp':
         return 'access';
       default:
-        return rewardType ? 'access' : undefined;
+        return undefined;
     }
   }
 
