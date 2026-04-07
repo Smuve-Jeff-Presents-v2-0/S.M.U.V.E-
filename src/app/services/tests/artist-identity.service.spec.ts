@@ -89,7 +89,8 @@ describe('ArtistIdentityService', () => {
     expect(offlineSyncMock.queueConnectorSync).toHaveBeenCalledWith(
       'Spotify',
       'https://smuve.example/api/identity/artist-7/connectors/Spotify/sync',
-      expect.any(Object)
+      expect.any(Object),
+      'artist-7'
     );
     expect(updated.artistIdentity?.sync.pendingTasks[0].connectorId).toBe(
       'Spotify'
