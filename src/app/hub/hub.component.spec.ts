@@ -138,6 +138,15 @@ describe('HubComponent', () => {
       'image-video-lab',
       'release-pipeline',
     ]);
+    expect(component.homeBackdropMedia).toHaveLength(4);
+    expect(component.homeBackdropMedia.map((panel) => panel.src)).toEqual(
+      expect.arrayContaining([
+        'assets/hub/home-backdrop-studio.png',
+        'assets/hub/home-backdrop-command.png',
+        'assets/hub/home-backdrop-intel.png',
+        'assets/hub/home-backdrop-cinema.png',
+      ])
+    );
   });
 
   it('navigates to spotlight routes from the landing page', async () => {
@@ -171,5 +180,8 @@ describe('HubComponent', () => {
     expect(
       nativeElement.querySelector('.pill-action')
     ).not.toBeNull();
+    expect(nativeElement.querySelectorAll('.media-panel').length).toBe(
+      component.homeBackdropMedia.length
+    );
   });
 });
