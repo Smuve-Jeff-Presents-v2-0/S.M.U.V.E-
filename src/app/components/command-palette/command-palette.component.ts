@@ -34,7 +34,7 @@ import {
             <div
               class="text-xs text-text-main font-semibold tracking-wide mt-1"
             >
-              Rapid interactive control across S.M.U.V.E 4.2
+              Rapid interactive control across S.M.U.V.E 2.0
             </div>
           </div>
           <button

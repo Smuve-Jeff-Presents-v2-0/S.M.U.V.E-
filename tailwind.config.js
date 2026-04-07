@@ -5,7 +5,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        // S.M.U.V.E 4.2 Professional Palette (Explicit for JIT)
+        // S.M.U.V.E 2.0 Professional Palette (Explicit for JIT)
         primary: '#10b981',
         secondary: '#6366f1',
         accent: '#f59e0b',

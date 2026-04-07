@@ -1,18 +1,18 @@
 import { test, expect } from '@playwright/test';
 
-test('S.M.U.V.E 4.0 Branding and Navigation Check', async ({ page }) => {
+test('S.M.U.V.E 2.0 branding and navigation check', async ({ page }) => {
   await page.goto('/hub');
 
-  // Verify Title
-  const title = await page.textContent('h1');
-  expect(title).toContain('S.M.U.V.E 4.0');
-
-  // Verify Navigation items exist
-  await expect(page.locator('.nav-item[title="Artist Profile"]')).toBeVisible();
-  await expect(page.locator('.nav-item[title="Hub"]')).toBeVisible();
-  await expect(page.locator('.nav-item[title="The Studio"]')).toBeVisible();
-
-  // Check footer branding
-  const footer = page.locator('.app-footer');
-  await expect(footer).toContainText('Smuve Jeff Presents');
+  await expect(page).toHaveTitle(/S\.M\.U\.V\.E 2\.0/i);
+  await expect(
+    page.getByText('S.M.U.V.E 2.0 // EXECUTIVE COMMAND')
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: /Welcome Back, New Artist/i })
+  ).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Open Studio' })).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Open Gaming Hub' })
+  ).toBeVisible();
+  await expect(page.getByText('©️ Smuve Jeff Presents')).toBeVisible();
 });

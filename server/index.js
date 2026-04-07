@@ -222,5 +222,5 @@ app.post('/api/ai/analyze', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`S.M.U.V.E 4.2 Backend running on port ${PORT}`);
+  console.log(`S.M.U.V.E 2.0 Backend running on port ${PORT}`);
 });

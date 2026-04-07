@@ -62,8 +62,8 @@ describe('SpeechSynthesisService', () => {
     expect(mockUtterances[0].rate).toBe(0.82);
   });
 
-  it('should replace S.M.U.V.E 4.2 with Smooth', () => {
-    service.speak('Welcome to S.M.U.V.E 4.2');
+  it('should replace S.M.U.V.E 2.0 with Smooth', () => {
+    service.speak('Welcome to S.M.U.V.E 2.0');
 
     expect(global.SpeechSynthesisUtterance).toHaveBeenCalledWith(
       'Welcome to Smooth'

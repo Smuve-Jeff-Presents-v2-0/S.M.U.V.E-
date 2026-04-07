@@ -1,12 +1,12 @@
-# ©️ Smuve Jeff Presents: S.M.U.V.E 4.0 - Application Capabilities
+# ©️ Smuve Jeff Presents: S.M.U.V.E 2.0 - Application Capabilities
 
-**S.M.U.V.E 4.0 (Strategic Music Utility Virtual Enhancer)** is an omniscient, professional-grade digital ecosystem designed for the modern independent artist. It seamlessly integrates elite production tools with assertive AI-driven strategic intelligence to dominate the musical journey.
+**S.M.U.V.E 2.0 (Strategic Music Utility Virtual Enterprise)** is an omniscient, professional-grade digital ecosystem designed for the modern independent artist. It seamlessly integrates elite production tools with assertive AI-driven strategic intelligence to dominate the musical journey.
 
 ---
 
 ## 💎 Elite Branding & User Identity
 
-- **Consolidated Identity**: The platform is branded as **S.M.U.V.E 4.0**, an authoritative environment presented by **Smuve Jeff**, ensuring a unified and professional aesthetic.
+- **Consolidated Identity**: The platform is branded as **S.M.U.V.E 2.0**, an authoritative environment presented by **Smuve Jeff**, ensuring a unified and professional aesthetic.
 - **Deep Profile Integration**: The system adapts to your unique artist DNA, tracking years of experience, expertise levels (1-10 across 11 disciplines), and marketing budgets to tailor its strategic logic.
 - **Artist Reputation**: A dynamic reputation system where your progress unlocks advanced studio capabilities and shifts the AI's persona from mentor to peer.
 
@@ -25,7 +25,7 @@
 - **Mastering Suite**: An elite bus processing chain featuring real-time canvas spectrum analysis, soft-clip toggles, and professional-grade limiting.
 - **Live Performance Lab**: A dedicated practice space with executive visual metronomes and categorized rehearsal protocols.
 
-## 🤖 The 'S.M.U.V.E 1.0' AI Persona
+## 🤖 The 'S.M.U.V.E 2.0' AI Persona
 
 - **Omniscient Intelligence**: Powered by **Google Gemini 1.5 Pro** and a specialized **RAG-based knowledge base** for pinpoint accuracy.
 - **Assertive Persona**: An elite, sophisticated, and authoritative AI partner that issues "Strategic Decrees"—actionable orders designed to eliminate career deficits.
