@@ -147,7 +147,7 @@ export class PerformanceMonitorService {
     try {
       let maxDuration = 0;
       const inpObserver = new PerformanceObserver((list) => {
-        const entries = list.getEntries() as any[];
+        const entries = list.getEntries() as PerformanceEventTiming[];
         for (const entry of entries) {
           const duration = entry.duration;
           if (duration > maxDuration) {
