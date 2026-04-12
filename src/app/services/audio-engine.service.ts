@@ -930,6 +930,16 @@ export class AudioEngineService {
     const pos = this.getDeck(id).hotCues[slot];
     if (pos !== null) this.seekDeck(id, pos);
   }
+  setDeckLoop(id: DeckId, enabled: boolean) {
+    const deck = this.getDeck(id);
+    deck.loopEnabled = enabled;
+    if (deck.isPlaying) {
+      Object.values(deck.sources).forEach(src => {
+        if (src) src.loop = enabled;
+      });
+    }
+  }
+
   seekDeck(id: DeckId, seconds: number) {
     const deck = this.getDeck(id);
     const wasPlaying = deck.isPlaying;

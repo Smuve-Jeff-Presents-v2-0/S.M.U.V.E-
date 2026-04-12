@@ -48,6 +48,8 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
   phantomPowerEnabled = signal(false);
   showSampleLibrary = signal(false);
   isMobile = signal(false);
+  rotationA = signal(0);
+  rotationB = signal(0);
   masterVolume = signal(0.85);
   currentBeat = this.engine.currentBeat;
 
@@ -504,6 +506,10 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
       });
   }
 
+  toggleLoop(deck: 'A' | 'B') {
+    this.deckService.toggleLoop(deck);
+  }
+
   sync(deck: 'A' | 'B') {
     this.deckService.sync(deck);
   }
@@ -575,7 +581,7 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  private processScratch(deck: 'A' | 'B', event: MouseEvent | TouchEvent) {
+    private processScratch(deck: 'A' | 'B', event: MouseEvent | TouchEvent) {
     event.preventDefault();
     const angle = this.getAngle(event, deck);
     const lastAngle = deck === 'A' ? this.lastAngleA : this.lastAngleB;
@@ -584,19 +590,31 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
     if (delta > Math.PI) delta -= 2 * Math.PI;
     if (delta < -Math.PI) delta += 2 * Math.PI;
 
-    const velocity = delta * 15.0; // Scale rotation to playback rate
-    this.engine.setDeckRate(deck, velocity, false);
+    // Physical Wind-back: delta rotation maps to audio scrub
+    // One full rotation (2PI) should move approx 1.8 seconds (typical 33 RPM feel)
+    const scrubSecondsPerRadian = 1.8 / (2 * Math.PI);
+    const scrub = delta * scrubSecondsPerRadian;
 
     const progress = this.engine.getDeckProgress(deck).position;
     const duration = this.engine.getDeckProgress(deck).duration;
-    const scrub = delta * 0.5;
     let newPos = progress + scrub;
     if (newPos < 0) newPos = 0;
     if (duration) newPos = Math.min(duration, newPos);
+
     this.engine.seekDeck(deck, newPos);
 
-    if (deck === 'A') this.lastAngleA = angle;
-    else this.lastAngleB = angle;
+    // Velocity-based playback rate for authentic scratch sound
+    // velocity = radians per update. Let's scale it.
+    const velocity = (delta / 0.016) * scrubSecondsPerRadian; // approx rate
+    this.engine.setDeckRate(deck, velocity, false);
+
+    if (deck === 'A') {
+      this.rotationA.update(r => r + delta * (180/Math.PI));
+      this.lastAngleA = angle;
+    } else {
+      this.rotationB.update(r => r + delta * (180/Math.PI));
+      this.lastAngleB = angle;
+    }
   }
 
   private getAngle(event: MouseEvent | TouchEvent, deck?: 'A' | 'B'): number {
