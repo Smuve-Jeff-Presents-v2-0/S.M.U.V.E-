@@ -784,6 +784,16 @@ export class DrumMachineComponent implements AfterViewInit, OnDestroy {
       : pad.color;
   }
 
+  getStepLabel(step: number): string {
+    if (step % this.stepsPerBar === 0) {
+      return `B${step / this.stepsPerBar + 1}`;
+    }
+    if (step % 4 === 0) {
+      return `${(step % this.stepsPerBar) / 4 + 1}`;
+    }
+    return '·';
+  }
+
   private hexWithAlpha(hex: string, alpha: number): string {
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);

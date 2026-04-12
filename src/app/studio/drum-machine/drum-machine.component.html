@@ -109,7 +109,7 @@
                    [class.text-brand-primary]="step % stepsPerBar === 0"
                    [class.text-slate-500]="step % 4 === 0 && step % stepsPerBar !== 0"
                    [class.text-slate-700]="step % 4 !== 0">
-                {{ step % stepsPerBar === 0 ? 'B' + (step / stepsPerBar + 1) : (step % 4 === 0 ? (step % stepsPerBar) / 4 + 1 : '·') }}
+                {{ getStepLabel(step) }}
               </div>
             }
           </div>
