@@ -354,7 +354,9 @@ export class AudioEngineService {
       if ((deck.sources as any)[k]) {
         try {
           (deck.sources as any)[k]!.stop();
-        } catch (e) {}
+        } catch (_e) {
+          /* ignore */
+        }
         (deck.sources as any)[k] = null;
       }
     });
@@ -574,8 +576,8 @@ export class AudioEngineService {
     velocity = 1,
     pan = 0,
     outGain = 0.6,
-    sendA = 0.1,
-    sendB = 0.05,
+    _sendA = 0.1,
+    _sendB = 0.05,
     params?: any,
     velocityScale = 1
   ) {

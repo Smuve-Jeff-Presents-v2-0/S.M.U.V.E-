@@ -2,7 +2,7 @@ import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { BusinessPipelineService } from '../../services/business-pipeline.service';
-import { BusinessPipeline, BusinessStep } from '../../types/business.types';
+import { BusinessStep } from '../../types/business.types';
 import { MerchDesignLabComponent } from '../business-modules/merch-design-lab.component';
 import { LegalTemplateComponent } from '../business-modules/legal-template.component';
 import { UserContextService } from '../../services/user-context.service';

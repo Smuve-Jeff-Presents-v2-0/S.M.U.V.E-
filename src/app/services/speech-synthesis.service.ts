@@ -147,10 +147,10 @@ export class SpeechSynthesisService {
   }
 
   private pickConversationVoice(
-    voices: SpeechSynthesisVoice[],
+    voices: any[],
     profile: VoiceStyleProfile,
     forceChange: boolean
-  ): SpeechSynthesisVoice | null {
+  ): any | null {
     const englishVoices = voices.filter((voice) =>
       voice.lang?.toLowerCase().startsWith('en')
     );

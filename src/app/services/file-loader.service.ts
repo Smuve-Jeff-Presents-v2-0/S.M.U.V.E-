@@ -76,7 +76,7 @@ export class FileLoaderService {
 
     try {
       return await ctx.decodeAudioData(arrayBuffer.slice(0));
-    } catch (error) {
+    } catch (_error) {
       throw new Error('Failed to decode audio file');
     }
   }
