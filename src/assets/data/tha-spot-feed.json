@@ -979,10 +979,10 @@
         "trustNote": "Allowlisted retro combat partner.",
         "embedMode": "inline",
         "approvedExternalUrl": "https://www.retrogames.cc/embed/23550-super-street-fighter-ii-the-new-challengers-usa.html",
-        "approvedEmbedUrl": "https://www.gamepix.com/play/street-fight",
+        "approvedEmbedUrl": "https://www.retrogames.cc/embed/23550-super-street-fighter-ii-the-new-challengers-usa.html",
         "telemetryMode": "origin",
         "telemetryOrigins": [
-          "https://www.gamepix.com"
+          "https://www.retrogames.cc"
         ]
       },
       "art": {
