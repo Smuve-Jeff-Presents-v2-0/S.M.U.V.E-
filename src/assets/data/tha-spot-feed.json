@@ -1630,10 +1630,6 @@
         "embedMode": "inline",
         "approvedEmbedUrl": "https://www.gamepix.com/play/soccer-random",
         "approvedExternalUrl": "https://www.gamepix.com/play/soccer-random",
-        "approvedEmbedUrl": "https://www.gamepix.com/play/soccer-random",
-        "approvedExternalUrl": "https://www.gamepix.com/play/soccer-random",
-        "approvedEmbedUrl": "https://www.gamepix.com/play/soccer-random",
-        "approvedExternalUrl": "https://www.gamepix.com/play/soccer-random",
         "telemetryMode": "origin",
         "telemetryOrigins": [
           "https://www.gamepix.com"
@@ -1679,6 +1675,7 @@
         "inlinePolicy": "trusted",
         "embedMode": "inline",
         "approvedEmbedUrl": "https://www.gamepix.com/play/tower-build",
+        "telemetryMode": "origin",
         "telemetryOrigins": [
           "https://www.gamepix.com"
         ]
@@ -1692,6 +1689,7 @@
         "inlinePolicy": "trusted",
         "embedMode": "inline",
         "approvedEmbedUrl": "https://www.gamepix.com/play/tower-build",
+        "telemetryMode": "origin",
         "telemetryOrigins": [
           "https://www.gamepix.com"
         ]
@@ -1700,6 +1698,118 @@
     {
       "id": "22",
       "name": "Game 22",
+      "url": "https://www.gamepix.com/play/tower-build",
+      "launchConfig": {
+        "inlinePolicy": "trusted",
+        "embedMode": "inline",
+        "approvedEmbedUrl": "https://www.gamepix.com/play/tower-build",
+        "telemetryMode": "origin",
+        "telemetryOrigins": [
+          "https://www.gamepix.com"
+        ]
+      }
+    },
+    {
+      "id": "23",
+      "name": "Game 23",
+      "url": "https://www.gamepix.com/play/tower-build",
+      "launchConfig": {
+        "inlinePolicy": "trusted",
+        "embedMode": "inline",
+        "approvedEmbedUrl": "https://www.gamepix.com/play/tower-build",
+        "telemetryMode": "origin",
+        "telemetryOrigins": [
+          "https://www.gamepix.com"
+        ]
+      }
+    },
+    {
+      "id": "24",
+      "name": "Game 24",
+      "url": "https://www.gamepix.com/play/tower-build",
+      "launchConfig": {
+        "inlinePolicy": "trusted",
+        "embedMode": "inline",
+        "approvedEmbedUrl": "https://www.gamepix.com/play/tower-build",
+        "telemetryMode": "origin",
+        "telemetryOrigins": [
+          "https://www.gamepix.com"
+        ]
+      }
+    },
+    {
+      "id": "25",
+      "name": "Game 25",
+      "url": "https://www.gamepix.com/play/tower-build",
+      "launchConfig": {
+        "inlinePolicy": "trusted",
+        "embedMode": "inline",
+        "approvedEmbedUrl": "https://www.gamepix.com/play/tower-build",
+        "telemetryMode": "origin",
+        "telemetryOrigins": [
+          "https://www.gamepix.com"
+        ]
+      }
+    },
+    {
+      "id": "26",
+      "name": "Game 26",
+      "url": "https://www.gamepix.com/play/tower-build",
+      "launchConfig": {
+        "inlinePolicy": "trusted",
+        "embedMode": "inline",
+        "approvedEmbedUrl": "https://www.gamepix.com/play/tower-build",
+        "telemetryMode": "origin",
+        "telemetryOrigins": [
+          "https://www.gamepix.com"
+        ]
+      }
+    },
+    {
+      "id": "27",
+      "name": "Game 27",
+      "url": "https://www.gamepix.com/play/tower-build",
+      "launchConfig": {
+        "inlinePolicy": "trusted",
+        "embedMode": "inline",
+        "approvedEmbedUrl": "https://www.gamepix.com/play/tower-build",
+        "telemetryMode": "origin",
+        "telemetryOrigins": [
+          "https://www.gamepix.com"
+        ]
+      }
+    },
+    {
+      "id": "28",
+      "name": "Game 28",
+      "url": "https://www.gamepix.com/play/tower-build",
+      "launchConfig": {
+        "inlinePolicy": "trusted",
+        "embedMode": "inline",
+        "approvedEmbedUrl": "https://www.gamepix.com/play/tower-build",
+        "telemetryMode": "origin",
+        "telemetryOrigins": [
+          "https://www.gamepix.com"
+        ]
+      }
+    },
+    {
+      "id": "29",
+      "name": "Game 29",
+      "url": "https://www.gamepix.com/play/tower-build",
+      "launchConfig": {
+        "inlinePolicy": "trusted",
+        "embedMode": "inline",
+        "approvedEmbedUrl": "https://www.gamepix.com/play/tower-build",
+        "telemetryMode": "origin",
+        "telemetryOrigins": [
+          "https://www.gamepix.com"
+        ]
+      }
+    },
+    {
+      "id": "30",
+      "name": "Game 30",
       "url": "https://www.gamepix.com/play/tower-build",
       "launchConfig": {
         "inlinePolicy": "trusted",
