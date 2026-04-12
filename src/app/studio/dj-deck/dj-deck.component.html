@@ -4,10 +4,11 @@
     <button (click)="deckService.toggleViewMode()" class="mode-chip" [class.active]="deckService.viewMode() === 'flat'">
       <i class="fas fa-layer-group mr-1"></i> FLAT VIEW
     </button>
-    <div class="deck-info glass-v42 px-4 py-2 rounded-xl border-brand-primary/20">
-      <span class="text-[10px] font-black text-brand-primary uppercase tracking-widest">DECK A</span>
-      <div class="flex items-baseline gap-2">
-        <span class="text-2xl font-black text-white font-mono">{{ deckService.deckA().bpm }}</span>
+    <div class="deck-info glass-v42 px-6 py-3 rounded-2xl border-brand-primary/30 shadow-v42-lg relative overflow-hidden group">
+      <div class="absolute inset-0 bg-brand-primary/5 group-hover:bg-brand-primary/10 transition-colors"></div>
+      <span class="text-[10px] font-black text-brand-primary uppercase tracking-[0.3em] relative z-10">DECK A</span>
+      <div class="flex items-baseline gap-2 relative z-10">
+        <span class="text-3xl font-black text-white font-mono tracking-tighter">{{ deckService.deckA().bpm | number:'1.0-1' }}</span>
         <span class="text-[10px] font-bold text-slate-500 uppercase">BPM</span>
       </div>
     </div>
@@ -16,17 +17,26 @@
       <button (click)="sync('A'); sync('B')" class="btn-pro btn-pro-primary px-8 py-2 text-xs font-black tracking-[0.3em] uppercase animate-pulse">
         MASTER SYNC
       </button>
-      <div class="mt-2 flex gap-1">
-        @for (i of [1,2,3,4,5,6,7,8]; track i) {
-          <div class="w-2 h-1 rounded-full bg-slate-800" [class.bg-brand-primary]="(currentBeat() % 8) + 1 >= i"></div>
-        }
+      <div class="mt-2 flex flex-col items-center gap-1">
+        <div class="flex gap-1">
+          @for (i of [1,2,3,4,5,6,7,8]; track i) {
+            <div class="w-2 h-1 rounded-full bg-slate-800" [class.bg-brand-primary]="(currentBeat() % 8) + 1 >= i"></div>
+          }
+        </div>
+        <!-- Phase Meter -->
+        <div class="phase-meter w-32 h-1.5 bg-black/40 rounded-full mt-1 relative overflow-hidden border border-white/5">
+          <div class="phase-indicator absolute top-0 w-1 h-full bg-brand-primary shadow-[0_0_8px_var(--brand-primary)]"
+               [style.left.%]="phasePosition()"></div>
+          <div class="absolute left-1/2 top-0 w-0.5 h-full bg-white/20 -translate-x-1/2"></div>
+        </div>
       </div>
     </div>
 
-    <div class="deck-info glass-v42 px-4 py-2 rounded-xl border-brand-secondary/20 text-right">
-      <span class="text-[10px] font-black text-brand-secondary uppercase tracking-widest">DECK B</span>
-      <div class="flex items-baseline gap-2 justify-end">
-        <span class="text-2xl font-black text-white font-mono">{{ deckService.deckB().bpm }}</span>
+    <div class="deck-info glass-v42 px-6 py-3 rounded-2xl border-brand-secondary/30 text-right shadow-v42-lg relative overflow-hidden group">
+      <div class="absolute inset-0 bg-brand-secondary/5 group-hover:bg-brand-secondary/10 transition-colors"></div>
+      <span class="text-[10px] font-black text-brand-secondary uppercase tracking-[0.3em] relative z-10">DECK B</span>
+      <div class="flex items-baseline gap-2 justify-end relative z-10">
+        <span class="text-3xl font-black text-white font-mono tracking-tighter">{{ deckService.deckB().bpm | number:'1.0-1' }}</span>
         <span class="text-[10px] font-bold text-slate-500 uppercase">BPM</span>
       </div>
     </div>
@@ -65,7 +75,7 @@
           <div class="strobe-ring"></div>
           <div class="platter-reflection"></div>
           <div
-            class="vinyl-platter absolute inset-0 rounded-full shadow-[0_30px_60px_rgba(0,0,0,0.8)] border-[10px] border-[#0f1116]"
+            class="vinyl-platter absolute inset-0 rounded-full shadow-[0_30px_60px_rgba(0,0,0,0.8)] border-[10px] border-[#0f1116] touch-none"
             [class.animate-spin-vinyl]="deckService.deckA().isPlaying && !isScratchingA()"
             [class.scratch-active]="isScratchingA()"
             (mousedown)="onPlatterDown('A', $event)"
@@ -81,11 +91,31 @@
               </span>
               <span class="text-[9px] font-black text-brand-primary/80 mt-1">BPM {{ deckService.deckA().bpm }}</span>
             </div>
+
+            <!-- Hot Cue Markers on Vinyl -->
+            <div class="hot-cue-markers absolute inset-0 pointer-events-none">
+              @for (cue of hotCueMarkersA(); track cue.i) {
+                <div class="hot-cue-marker-wrap absolute inset-0" [ngStyle]="getHotCueMarkerStyle('A', cue.pos)">
+                  <div class="hot-cue-line"></div>
+                </div>
+              }
+            </div>
+
             <div class="platter-center-pin"></div>
           </div>
           <div class="status-pill left-4 bottom-4 bg-brand-primary/10 text-brand-primary border-brand-primary/30">
             {{ isScratchingA() ? 'Scratch Hold' : 'Live Play' }}
           </div>
+          <!-- Slip Mode Ghost Playhead -->
+          @if (deckService.deckA().slip) {
+            <div class="absolute inset-0 rounded-full border-2 border-brand-primary/20 pointer-events-none animate-pulse"></div>
+          }
+
+          <!-- Slip Mode Ghost Playhead -->
+          @if (deckService.deckB().slip) {
+            <div class="absolute inset-0 rounded-full border-2 border-brand-secondary/20 pointer-events-none animate-pulse"></div>
+          }
+
           <div class="tone-arm absolute top-0 right-0 w-8 h-48 origin-top pointer-events-none transition-transform duration-1000"
                [style.transform]="deckService.deckA().isPlaying ? 'rotate(12deg)' : 'rotate(-15deg)'">
             <div class="w-1.5 h-full bg-gradient-to-r from-slate-400 to-slate-600 rounded-full shadow-lg"></div>
@@ -147,6 +177,58 @@
             {{ getPadLabel(pad) }}
           </button>
         }
+      </div>
+
+      <!-- Stem Separation Controls -->
+      <div class="mt-4 p-3 glass-v42 rounded-xl border border-white/5 space-y-3">
+        <div class="flex justify-between items-center">
+          <span class="text-[8px] font-black text-brand-primary uppercase tracking-[0.2em]">Stem Deconstruction</span>
+          <span class="text-[7px] font-bold text-slate-500 uppercase">AI Isolated</span>
+        </div>
+        <div class="grid grid-cols-4 gap-2">
+          <div class="flex flex-col items-center gap-1">
+            <input type="range" min="0" max="1.5" step="0.01" value="1" (input)="setStemGain('A', 'vocals', $any($event.target).value)" class="w-1.5 h-12 accent-brand-primary appearance-none bg-white/10 rounded-full vertical-range">
+            <span class="text-[7px] font-black text-slate-400 uppercase">VOX</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <input type="range" min="0" max="1.5" step="0.01" value="1" (input)="setStemGain('A', 'drums', $any($event.target).value)" class="w-1.5 h-12 accent-brand-primary appearance-none bg-white/10 rounded-full vertical-range">
+            <span class="text-[7px] font-black text-slate-400 uppercase">DRM</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <input type="range" min="0" max="1.5" step="0.01" value="1" (input)="setStemGain('A', 'bass', $any($event.target).value)" class="w-1.5 h-12 accent-brand-primary appearance-none bg-white/10 rounded-full vertical-range">
+            <span class="text-[7px] font-black text-slate-400 uppercase">BAS</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <input type="range" min="0" max="1.5" step="0.01" value="1" (input)="setStemGain('A', 'melody', $any($event.target).value)" class="w-1.5 h-12 accent-brand-primary appearance-none bg-white/10 rounded-full vertical-range">
+            <span class="text-[7px] font-black text-slate-400 uppercase">MLD</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stem Separation Controls -->
+      <div class="mt-4 p-3 glass-v42 rounded-xl border border-white/5 space-y-3">
+        <div class="flex justify-between items-center">
+          <span class="text-[8px] font-black text-brand-secondary uppercase tracking-[0.2em]">Stem Deconstruction</span>
+          <span class="text-[7px] font-bold text-slate-500 uppercase">AI Isolated</span>
+        </div>
+        <div class="grid grid-cols-4 gap-2">
+          <div class="flex flex-col items-center gap-1">
+            <input type="range" min="0" max="1.5" step="0.01" value="1" (input)="setStemGain('B', 'vocals', $any($event.target).value)" class="w-1.5 h-12 accent-brand-secondary appearance-none bg-white/10 rounded-full vertical-range">
+            <span class="text-[7px] font-black text-slate-400 uppercase">VOX</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <input type="range" min="0" max="1.5" step="0.01" value="1" (input)="setStemGain('B', 'drums', $any($event.target).value)" class="w-1.5 h-12 accent-brand-secondary appearance-none bg-white/10 rounded-full vertical-range">
+            <span class="text-[7px] font-black text-slate-400 uppercase">DRM</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <input type="range" min="0" max="1.5" step="0.01" value="1" (input)="setStemGain('B', 'bass', $any($event.target).value)" class="w-1.5 h-12 accent-brand-secondary appearance-none bg-white/10 rounded-full vertical-range">
+            <span class="text-[7px] font-black text-slate-400 uppercase">BAS</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <input type="range" min="0" max="1.5" step="0.01" value="1" (input)="setStemGain('B', 'melody', $any($event.target).value)" class="w-1.5 h-12 accent-brand-secondary appearance-none bg-white/10 rounded-full vertical-range">
+            <span class="text-[7px] font-black text-slate-400 uppercase">MLD</span>
+          </div>
+        </div>
       </div>
 
       <div class="mt-4 grid grid-cols-2 gap-3">
@@ -248,9 +330,10 @@
 
 
       <!-- FX & CUSTOMIZATION CONSOLE -->
-      <div class="fx-custom-console bg-black/40 rounded-2xl border border-white/5 p-4 mt-2">
-        <div class="flex justify-between items-center mb-3">
-          <span class="text-[9px] font-black text-brand-primary uppercase tracking-[0.2em]">Neural FX Rack</span>
+      <div class="fx-custom-console glass-v42 rounded-2xl border border-white/10 p-4 mt-2 shadow-2xl relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-brand-primary/5 to-transparent pointer-events-none"></div>
+        <div class="flex justify-between items-center mb-3 relative z-10">
+          <span class="text-[9px] font-black text-brand-primary uppercase tracking-[0.4em] glimmer-text">Neural FX Rack</span>
           <div class="flex gap-2">
             <button (click)="toggleLoop('A')"
                     [class.bg-brand-primary]="deckService.deckA().loop"
@@ -290,9 +373,13 @@
         </div>
 
         <!-- Custom FX Row -->
-        <div class="flex gap-2 mt-4">
-          <button (click)="applyScratchFx('A', 'transform')" class="flex-1 py-1.5 bg-white/5 border border-white/10 rounded text-[7px] font-black uppercase hover:bg-brand-primary/20 transition-all">Chop A</button>
-          <button (click)="applyScratchFx('B', 'transform')" class="flex-1 py-1.5 bg-white/5 border border-white/10 rounded text-[7px] font-black uppercase hover:bg-brand-secondary/20 transition-all">Chop B</button>
+        <div class="flex gap-2 mt-4 relative z-10">
+          <button (click)="applyScratchFx('A', 'transform')" class="btn-pro flex-1 py-2 bg-white/5 border border-white/10 rounded-lg text-[8px] font-black uppercase hover:bg-brand-primary/20 hover:border-brand-primary/40 transition-all">
+            <i class="fas fa-scissors mr-1"></i> Chop A
+          </button>
+          <button (click)="applyScratchFx('B', 'transform')" class="btn-pro flex-1 py-2 bg-white/5 border border-white/10 rounded-lg text-[8px] font-black uppercase hover:bg-brand-secondary/20 hover:border-brand-secondary/40 transition-all">
+            <i class="fas fa-scissors mr-1"></i> Chop B
+          </button>
         </div>
       </div>
 
@@ -357,7 +444,7 @@
           <div class="strobe-ring"></div>
           <div class="platter-reflection"></div>
           <div
-            class="vinyl-platter absolute inset-0 rounded-full shadow-[0_30px_60px_rgba(0,0,0,0.8)] border-[10px] border-[#0f1116]"
+            class="vinyl-platter absolute inset-0 rounded-full shadow-[0_30px_60px_rgba(0,0,0,0.8)] border-[10px] border-[#0f1116] touch-none"
             [class.animate-spin-vinyl]="deckService.deckB().isPlaying && !isScratchingB()"
             [class.scratch-active]="isScratchingB()"
             (mousedown)="onPlatterDown('B', $event)"
@@ -373,6 +460,16 @@
               </span>
               <span class="text-[9px] font-black text-brand-secondary/80 mt-1">BPM {{ deckService.deckB().bpm }}</span>
             </div>
+
+            <!-- Hot Cue Markers on Vinyl -->
+            <div class="hot-cue-markers absolute inset-0 pointer-events-none">
+              @for (cue of hotCueMarkersB(); track cue.i) {
+                <div class="hot-cue-marker-wrap absolute inset-0" [ngStyle]="getHotCueMarkerStyle('B', cue.pos)">
+                  <div class="hot-cue-line secondary"></div>
+                </div>
+              }
+            </div>
+
             <div class="platter-center-pin"></div>
           </div>
           <div class="status-pill right-4 bottom-4 bg-brand-secondary/10 text-brand-secondary border-brand-secondary/30">
@@ -444,6 +541,58 @@
             {{ getPadLabel(pad) }}
           </button>
         }
+      </div>
+
+      <!-- Stem Separation Controls -->
+      <div class="mt-4 p-3 glass-v42 rounded-xl border border-white/5 space-y-3">
+        <div class="flex justify-between items-center">
+          <span class="text-[8px] font-black text-brand-primary uppercase tracking-[0.2em]">Stem Deconstruction</span>
+          <span class="text-[7px] font-bold text-slate-500 uppercase">AI Isolated</span>
+        </div>
+        <div class="grid grid-cols-4 gap-2">
+          <div class="flex flex-col items-center gap-1">
+            <input type="range" min="0" max="1.5" step="0.01" value="1" (input)="setStemGain('A', 'vocals', $any($event.target).value)" class="w-1.5 h-12 accent-brand-primary appearance-none bg-white/10 rounded-full vertical-range">
+            <span class="text-[7px] font-black text-slate-400 uppercase">VOX</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <input type="range" min="0" max="1.5" step="0.01" value="1" (input)="setStemGain('A', 'drums', $any($event.target).value)" class="w-1.5 h-12 accent-brand-primary appearance-none bg-white/10 rounded-full vertical-range">
+            <span class="text-[7px] font-black text-slate-400 uppercase">DRM</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <input type="range" min="0" max="1.5" step="0.01" value="1" (input)="setStemGain('A', 'bass', $any($event.target).value)" class="w-1.5 h-12 accent-brand-primary appearance-none bg-white/10 rounded-full vertical-range">
+            <span class="text-[7px] font-black text-slate-400 uppercase">BAS</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <input type="range" min="0" max="1.5" step="0.01" value="1" (input)="setStemGain('A', 'melody', $any($event.target).value)" class="w-1.5 h-12 accent-brand-primary appearance-none bg-white/10 rounded-full vertical-range">
+            <span class="text-[7px] font-black text-slate-400 uppercase">MLD</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stem Separation Controls -->
+      <div class="mt-4 p-3 glass-v42 rounded-xl border border-white/5 space-y-3">
+        <div class="flex justify-between items-center">
+          <span class="text-[8px] font-black text-brand-secondary uppercase tracking-[0.2em]">Stem Deconstruction</span>
+          <span class="text-[7px] font-bold text-slate-500 uppercase">AI Isolated</span>
+        </div>
+        <div class="grid grid-cols-4 gap-2">
+          <div class="flex flex-col items-center gap-1">
+            <input type="range" min="0" max="1.5" step="0.01" value="1" (input)="setStemGain('B', 'vocals', $any($event.target).value)" class="w-1.5 h-12 accent-brand-secondary appearance-none bg-white/10 rounded-full vertical-range">
+            <span class="text-[7px] font-black text-slate-400 uppercase">VOX</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <input type="range" min="0" max="1.5" step="0.01" value="1" (input)="setStemGain('B', 'drums', $any($event.target).value)" class="w-1.5 h-12 accent-brand-secondary appearance-none bg-white/10 rounded-full vertical-range">
+            <span class="text-[7px] font-black text-slate-400 uppercase">DRM</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <input type="range" min="0" max="1.5" step="0.01" value="1" (input)="setStemGain('B', 'bass', $any($event.target).value)" class="w-1.5 h-12 accent-brand-secondary appearance-none bg-white/10 rounded-full vertical-range">
+            <span class="text-[7px] font-black text-slate-400 uppercase">BAS</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <input type="range" min="0" max="1.5" step="0.01" value="1" (input)="setStemGain('B', 'melody', $any($event.target).value)" class="w-1.5 h-12 accent-brand-secondary appearance-none bg-white/10 rounded-full vertical-range">
+            <span class="text-[7px] font-black text-slate-400 uppercase">MLD</span>
+          </div>
+        </div>
       </div>
 
       <div class="mt-4 grid grid-cols-2 gap-3">
@@ -686,11 +835,22 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    padding: 10px 12px;
-    border-radius: 14px;
-    background: linear-gradient(180deg, rgba(2,6,23,0.92), rgba(15,23,42,0.88));
-    border: 1px solid rgba(255,255,255,0.07);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+    padding: 12px 14px;
+    border-radius: 18px;
+    background: linear-gradient(180deg, #1e293b, #0f172a);
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.1),
+      0 4px 12px rgba(0,0,0,0.5);
+    position: relative;
+    overflow: hidden;
+  }
+  .console-module::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.03), transparent);
+    pointer-events: none;
   }
   .console-caption {
     font-size: 9px;
@@ -726,7 +886,7 @@
     font-size: 14px;
     font-weight: 900;
     letter-spacing: 0.18em;
-    font-family: ui-monospace, SFMono-Regular, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    font-family: 'Space Grotesk', ui-monospace, monospace;
   }
   .session-status-bar {
     display: grid;
@@ -881,19 +1041,31 @@
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    border-radius: 18px;
-    padding: 12px 16px;
-    background: linear-gradient(180deg, rgba(2,6,23,0.92), rgba(15,23,42,0.88));
-    border: 1px solid rgba(148,163,184,0.22);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 18px 36px rgba(0,0,0,0.25);
+    border-radius: 20px;
+    padding: 14px 20px;
+    background: #020617;
+    border: 1px solid #1e293b;
+    box-shadow:
+      inset 0 2px 4px rgba(0,0,0,0.8),
+      0 1px 0 rgba(255,255,255,0.05);
+    position: relative;
+  }
+  .mixer-display-panel::before {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    border-radius: 19px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), transparent);
+    pointer-events: none;
   }
   .mixer-display-caption {
     font-size: 9px;
     font-weight: 900;
-    letter-spacing: 0.26em;
+    letter-spacing: 0.3em;
     text-transform: uppercase;
     color: #94a3b8;
     margin-bottom: 4px;
+    font-family: 'Space Grotesk', sans-serif;
   }
   .mixer-display-value {
     font-size: 16px;
@@ -948,6 +1120,28 @@
   }
   .vinyl-platter:active { cursor: grabbing; }
 
+  .hot-cue-markers {
+    z-index: 5;
+  }
+  .hot-cue-marker-wrap {
+    transition: transform 0.1s linear;
+  }
+  .hot-cue-line {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 3px;
+    height: 32%;
+    background: var(--color-primary);
+    transform: translateX(-50%);
+    box-shadow: 0 0 10px var(--color-primary);
+    border-radius: 0 0 4px 4px;
+  }
+  .hot-cue-line.secondary {
+    background: var(--brand-secondary);
+    box-shadow: 0 0 10px var(--brand-secondary);
+  }
+
   @keyframes spin-vinyl {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
@@ -983,11 +1177,13 @@
   }
   .vertical-range::-webkit-slider-thumb {
     appearance: none;
-    width: 20px;
-    height: 12px;
-    background: #e2e8f0;
-    border-radius: 2px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    width: 48px;
+    height: 24px;
+    background: linear-gradient(180deg, #e2e8f0, #94a3b8);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+    cursor: ns-resize;
   }
 
   @media (max-width: 1024px) {
