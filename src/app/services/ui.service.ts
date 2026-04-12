@@ -31,6 +31,9 @@ const THEMES: AppTheme[] = [
   },
 ];
 
+const MAX_RECENT_WORKSPACES = 6;
+const MAX_PINNED_WORKSPACES = 6;
+
 @Injectable({
   providedIn: 'root',
 })
@@ -220,7 +223,7 @@ export class UIService {
       const next = [
         workspace.mode,
         ...current.filter((item) => item !== workspace.mode),
-      ].slice(0, 6);
+      ].slice(0, MAX_RECENT_WORKSPACES);
       this.writeModes(this.recentKey, next);
       return next;
     });
@@ -235,7 +238,7 @@ export class UIService {
     this.pinnedViewModes.update((current) => {
       const next = current.includes(workspace.mode)
         ? current.filter((item) => item !== workspace.mode)
-        : [...current, workspace.mode].slice(0, 6);
+        : [...current, workspace.mode].slice(0, MAX_PINNED_WORKSPACES);
       this.writeModes(this.pinnedKey, next);
       return next;
     });

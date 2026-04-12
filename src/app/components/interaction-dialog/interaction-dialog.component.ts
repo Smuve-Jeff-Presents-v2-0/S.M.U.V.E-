@@ -127,7 +127,7 @@ export class InteractionDialogComponent {
         active?.type === 'prompt' ? active.initialValue || '' : '';
 
       if (active?.type === 'prompt') {
-        queueMicrotask(() => this.promptInput?.nativeElement?.focus());
+        setTimeout(() => this.promptInput?.nativeElement?.focus());
       }
     });
   }
