@@ -936,7 +936,7 @@
     },
     {
       "id": "10",
-      "name": "Street Brawler V",
+      "name": "Street Fight",
       "url": "https://www.gamepix.com/play/street-fight",
       "description": "Master classic combat in the world warrior tournament cabinet.",
       "genre": "Fighting",
@@ -978,7 +978,7 @@
         "inlinePolicy": "trusted",
         "trustNote": "Allowlisted retro combat partner.",
         "embedMode": "inline",
-        "approvedExternalUrl": "https://www.retrogames.cc/embed/10042-street-fighter-ii-the-world-warrior-world-910522.html",
+        "approvedExternalUrl": "https://www.gamepix.com/play/street-fight",
         "approvedEmbedUrl": "https://www.gamepix.com/play/street-fight",
         "telemetryMode": "origin",
         "telemetryOrigins": [
