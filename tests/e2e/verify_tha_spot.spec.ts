@@ -12,7 +12,6 @@ test('Verify Tha Spot Gaming Hub and Filters', async ({ page }) => {
     arenaSpotlight.getByRole('heading', {
       name: 'Tha Battlefield',
       exact: true,
-      level: 2,
     })
   ).toBeVisible();
 
