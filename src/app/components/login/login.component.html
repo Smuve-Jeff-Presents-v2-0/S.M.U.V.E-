@@ -2,7 +2,7 @@
   class="min-h-screen flex items-center justify-center bg-brand-dark p-6 relative overflow-hidden animate-enter"
 >
   <div
-    class="absolute inset-0 bg-gradient-to-br from-brand-brand-primary/10 via-transparent to-brand-brand-accent/10 pointer-events-none"
+    class="absolute inset-0 bg-gradient-to-br from-brand-primary/10 via-transparent to-brand-accent/10 pointer-events-none"
   ></div>
 
   <div
@@ -10,7 +10,7 @@
   >
     <div class="text-center mb-10">
       <div
-        class="w-16 h-16 rounded-2xl bg-brand-brand-primary/10 border border-brand-brand-primary/20 flex items-center justify-center text-brand-primary mx-auto mb-6 shadow-lg"
+        class="w-16 h-16 rounded-2xl bg-brand-primary/10 border border-brand-primary/20 flex items-center justify-center text-brand-primary mx-auto mb-6 shadow-lg"
       >
         <i class="fas fa-feather-pointed text-3xl"></i>
       </div>
@@ -28,7 +28,7 @@
 
     <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="space-y-6">
       <div
-        class="rounded-2xl border border-brand-primary/15 bg-brand-brand-primary/5 px-4 py-4"
+        class="rounded-2xl border border-brand-primary/15 bg-brand-primary/5 px-4 py-4"
       >
         <p
           class="text-[9px] font-black uppercase tracking-[0.3em] text-brand-primary"
@@ -106,7 +106,7 @@
       [class.bg-brand-danger/5]="isError()"
       [class.border-brand-primary]="!isError()"
       [class.text-brand-primary]="!isError()"
-      [class.bg-brand-brand-primary/5]="!isError()"
+      [class.bg-brand-primary/5]="!isError()"
     >
       {{ message() }}
     </div>
