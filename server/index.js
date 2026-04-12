@@ -340,7 +340,6 @@ app.post('/api/auth/login-email', loginEmailLimiter, async (req, res) => {
     // Use server-derived metadata instead of client-supplied values.
     const serverUserAgent = req.get('User-Agent') || 'unknown';
     const serverIpAddress = req.ip || 'unknown';
-
     const safeArtistName = escapeHtml(artistName || 'Artist');
     const timestamp = formatLoginTimestamp(loginAt);
     const subjectPrefix = process.env.SMTP_SUBJECT_PREFIX || 'S.M.U.V.E 2.0';
@@ -367,6 +366,8 @@ app.post('/api/auth/login-email', loginEmailLimiter, async (req, res) => {
           <p>We detected a successful login to your S.M.U.V.E 2.0 account.</p>
           <ul>
             <li><strong>Login time:</strong> ${escapeHtml(timestamp)}</li>
+            <li><strong>Device:</strong> ${escapeHtml(serverUserAgent)}</li>
+            <li><strong>IP address:</strong> ${escapeHtml(serverIpAddress)}</li>
             <li><strong>Device:</strong> ${escapeHtml(serverUserAgent)}</li>
             <li><strong>IP address:</strong> ${escapeHtml(serverIpAddress)}</li>
           </ul>
