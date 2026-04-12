@@ -615,7 +615,7 @@ export class AiService {
         })
       );
       return response.text;
-    } catch (error) {
+    } catch (_error) {
       return `[OFFLINE HEURISTIC ACTIVE] Neural cache hit. Decree: ${STRATEGIC_DECREES[0]}`;
     }
   }

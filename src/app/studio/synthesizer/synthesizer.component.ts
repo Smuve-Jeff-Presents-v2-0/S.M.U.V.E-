@@ -1,5 +1,5 @@
 import { LoggingService } from '../../services/logging.service';
-import { Component, Input, OnInit, inject, signal } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Clip } from '../instrument.service';

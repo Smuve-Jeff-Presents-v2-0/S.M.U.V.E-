@@ -354,7 +354,9 @@ export class AudioEngineService {
       if ((deck.sources as any)[k]) {
         try {
           (deck.sources as any)[k]!.stop();
-        } catch (e) {}
+        } catch (_e) {
+          /* ignore */
+        }
         (deck.sources as any)[k] = null;
       }
     });
@@ -438,7 +440,7 @@ export class AudioEngineService {
     deck.eqLow.gain.setTargetAtTime(low, this.ctx.currentTime, 0.01);
   }
 
-  setDeckFilter(id: DeckId, freq: number, type: BiquadFilterType = 'lowpass') {
+  setDeckFilter(id: DeckId, freq: number, type: any = 'lowpass') {
     const deck = this.getDeck(id);
     deck.filter.type = type;
     deck.filter.frequency.setTargetAtTime(freq, this.ctx.currentTime, 0.02);
@@ -574,8 +576,8 @@ export class AudioEngineService {
     velocity = 1,
     pan = 0,
     outGain = 0.6,
-    sendA = 0.1,
-    sendB = 0.05,
+    _sendA = 0.1,
+    _sendB = 0.05,
     params?: any,
     velocityScale = 1
   ) {
@@ -930,6 +932,16 @@ export class AudioEngineService {
     const pos = this.getDeck(id).hotCues[slot];
     if (pos !== null) this.seekDeck(id, pos);
   }
+  setDeckLoop(id: DeckId, enabled: boolean) {
+    const deck = this.getDeck(id);
+    deck.loopEnabled = enabled;
+    if (deck.isPlaying) {
+      Object.values(deck.sources).forEach((src) => {
+        if (src) src.loop = enabled;
+      });
+    }
+  }
+
   seekDeck(id: DeckId, seconds: number) {
     const deck = this.getDeck(id);
     const wasPlaying = deck.isPlaying;
