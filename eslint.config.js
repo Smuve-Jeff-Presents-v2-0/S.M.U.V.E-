@@ -19,6 +19,8 @@ export default tseslint.config(
         SpeechRecognitionResultList: 'readonly',
         BlobPart: 'readonly',
         MediaRecorderOptions: 'readonly',
+        PerformanceEventTiming: 'readonly',
+        BiquadFilterType: 'readonly',
       },
     },
     plugins: {
