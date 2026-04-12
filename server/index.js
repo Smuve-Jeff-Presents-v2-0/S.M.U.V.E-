@@ -368,8 +368,6 @@ app.post('/api/auth/login-email', loginEmailLimiter, async (req, res) => {
             <li><strong>Login time:</strong> ${escapeHtml(timestamp)}</li>
             <li><strong>Device:</strong> ${escapeHtml(serverUserAgent)}</li>
             <li><strong>IP address:</strong> ${escapeHtml(serverIpAddress)}</li>
-            <li><strong>Device:</strong> ${escapeHtml(serverUserAgent)}</li>
-            <li><strong>IP address:</strong> ${escapeHtml(serverIpAddress)}</li>
           </ul>
           <p>If this was you, no action is required.</p>
           <p>If this was not you, please secure your account immediately.</p>
