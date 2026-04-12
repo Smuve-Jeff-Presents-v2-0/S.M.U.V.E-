@@ -399,9 +399,15 @@
               {{ uiService.activeTheme().name }} Mode
             </strong>
             <span class="shell-appearance-detail">
-              {{ uiService.showScanlines() ? 'HUD overlay active' : 'Clean HUD' }}
+              {{
+                uiService.showScanlines() ? 'HUD overlay active' : 'Clean HUD'
+              }}
               ·
-              {{ uiService.performanceMode() ? 'performance priority' : 'full motion' }}
+              {{
+                uiService.performanceMode()
+                  ? 'performance priority'
+                  : 'full motion'
+              }}
             </span>
           </div>
           <button
