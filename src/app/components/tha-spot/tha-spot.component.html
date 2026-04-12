@@ -367,7 +367,7 @@
             <div
               *ngFor="let game of filteredGames(); let i = index"
               class="game-card-wrapper"
-              [style.animation-delay]="i * cardAnimationDelayIncrement + 's'"
+              [style.animation-delay]="getCardAnimationDelay(i)"
             >
               <div
                 class="game-card glass-v42"

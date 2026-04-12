@@ -38,13 +38,14 @@ const MAX_HISTORY_SCORE = 24;
 const HISTORY_SCORE_DIVISOR = 6;
 const FEED_REFRESH_INTERVAL_MS = 300000;
 const EVENT_ENDING_SOON_MS = 1000 * 60 * 60 * 6;
-export const CARD_ANIMATION_DELAY_INCREMENT = 0.03;
+const CARD_ANIMATION_DELAY_INCREMENT = 0.03;
 const FEATURED_BADGE_IDS = [
   'featured',
   'staff-pick',
   'trending',
   'tournament-live',
 ];
+const FEATURED_BADGE_ID_SET = new Set(FEATURED_BADGE_IDS);
 const MULTIPLAYER_TAG_KEYWORDS = ['multiplayer', 'co-op', 'versus', 'pvp'];
 type LibraryViewMode = 'grid' | 'compact';
 type QuickFilter = 'featured' | 'multiplayer' | 'instant' | 'online';
@@ -736,6 +737,10 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
     return this.canEmbedInline(game) ? 'Inline ready' : 'External launch';
   }
 
+  getCardAnimationDelay(index: number) {
+    return `${index * this.cardAnimationDelayIncrement}s`;
+  }
+
   private isTrustedTelemetryEvent(event: MessageEvent, game: Game): boolean {
     const telemetryMode = game.launchConfig?.telemetryMode || 'none';
     if (typeof window === 'undefined' || telemetryMode === 'none') {
@@ -808,7 +813,7 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
     switch (filter) {
       case 'featured':
         return !!game.badgeIds?.some((badge) =>
-          FEATURED_BADGE_IDS.includes(badge)
+          FEATURED_BADGE_ID_SET.has(badge)
         );
       case 'multiplayer':
         return (
