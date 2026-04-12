@@ -48,10 +48,45 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
   phantomPowerEnabled = signal(false);
   showSampleLibrary = signal(false);
   isMobile = signal(false);
+
+  hotCueMarkersA = computed(() => {
+    const deck = this.deckService.deckA();
+    if (!deck.duration) return [];
+    return deck.hotCues
+      .map((pos, i) => (pos !== null ? { pos, i } : null))
+      .filter((c): c is { pos: number; i: number } => c !== null);
+  });
+
+  hotCueMarkersB = computed(() => {
+    const deck = this.deckService.deckB();
+    if (!deck.duration) return [];
+    return deck.hotCues
+      .map((pos, i) => (pos !== null ? { pos, i } : null))
+      .filter((c): c is { pos: number; i: number } => c !== null);
+  });
+
+  getHotCueMarkerStyle(deckId: 'A' | 'B', pos: number) {
+    const deck =
+      deckId === 'A' ? this.deckService.deckA() : this.deckService.deckB();
+    if (!deck.duration) return {};
+
+    // Calculate angle based on position in track
+    // One full rotation (360deg) = 1.8 seconds
+    const angle = (pos / 1.8) * 360;
+    return {
+      transform: `rotate(${angle}deg)`,
+      '--cue-color': `var(--color-hotcue-${pos % 8})`,
+    };
+  }
+
   rotationA = signal(0);
   rotationB = signal(0);
   masterVolume = signal(0.85);
   currentBeat = this.engine.currentBeat;
+  phasePosition = computed(() => {
+    const beat = this.currentBeat();
+    return (beat % 1) * 100;
+  });
 
   private recorder: MediaRecorder | null = null;
   recording = signal(false);
@@ -64,6 +99,8 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
   private animFrame: number | null = null;
   private syncInterval: any = null;
   private recordingInterval: any = null;
+  private activeTouchA: number | null = null;
+  private activeTouchB: number | null = null;
   private recordingStartedAt: number | null = null;
   private lastRenderTimestamp = 0;
   performanceMode = signal<'cue' | 'roll' | 'sampler'>('cue');
@@ -74,6 +111,20 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
 
   isScratchingA = signal(false);
   isScratchingB = signal(false);
+
+  slipProgressA = computed(() => {
+    const deck = this.deckService.deckA();
+    if (!deck.slip) return 0;
+    // We need to know where the playback would be if not scratching/looping
+    // For now we'll just use the rotation signal plus an offset
+    return this.rotationA() % 360;
+  });
+
+  slipProgressB = computed(() => {
+    const deck = this.deckService.deckB();
+    if (!deck.slip) return 0;
+    return this.rotationB() % 360;
+  });
   activeRollPadA = signal<number | null>(null);
   activeRollPadB = signal<number | null>(null);
   activeSamplerPadA = signal<number | null>(null);
@@ -514,6 +565,11 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
     this.deckService.sync(deck);
   }
 
+  setStemGain(deck: 'A' | 'B', stem: string, val: any) {
+    const gain = parseFloat(val);
+    this.deckService.onStemGainChange(deck, { stem, gain });
+  }
+
   setCrossfade(val: any) {
     this.deckService.crossfade.set(parseFloat(val));
   }
@@ -521,8 +577,22 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
   onPlatterDown(deck: 'A' | 'B', event: MouseEvent | TouchEvent) {
     event.preventDefault();
     const isA = deck === 'A';
-    if (isA) this.isScratchingA.set(true);
-    else this.isScratchingB.set(true);
+
+    let touchId: number | null = null;
+    if ('touches' in event && (event as TouchEvent).touches.length) {
+      const touch =
+        (event as TouchEvent).changedTouches[0] ||
+        (event as TouchEvent).touches[0];
+      touchId = touch.identifier;
+    }
+
+    if (isA) {
+      this.isScratchingA.set(true);
+      this.activeTouchA = touchId;
+    } else {
+      this.isScratchingB.set(true);
+      this.activeTouchB = touchId;
+    }
 
     const angle = this.getAngle(event, deck);
     if (isA) this.lastAngleA = angle;
@@ -619,7 +689,7 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private getAngle(event: MouseEvent | TouchEvent, deck?: 'A' | 'B'): number {
-    const { x, y } = this.getPointerPosition(event);
+    const { x, y } = this.getPointerPosition(event, deck);
     const fallbackCenter = {
       x: window.innerWidth / 2,
       y: window.innerHeight / 2,
@@ -630,9 +700,13 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
     return Math.atan2(y - center.y, x - center.x);
   }
 
-  private getPointerPosition(event: MouseEvent | TouchEvent) {
-    if ('touches' in event && event.touches.length) {
-      const touch = event.touches[0];
+  private getPointerPosition(event: MouseEvent | TouchEvent, deck?: 'A' | 'B') {
+    if ('touches' in event && (event as TouchEvent).touches.length) {
+      const targetId = deck === 'A' ? this.activeTouchA : this.activeTouchB;
+      let touch = Array.from((event as TouchEvent).touches).find(
+        (t) => t.identifier === targetId
+      );
+      if (!touch) touch = (event as TouchEvent).touches[0];
       return { x: touch.clientX, y: touch.clientY };
     }
     return {

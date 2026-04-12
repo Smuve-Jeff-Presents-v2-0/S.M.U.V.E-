@@ -18,7 +18,6 @@
     </div>
   </div>
 
-
   <nav class="tactical-dock">
     <div class="dock-inner glass-v42">
       <div class="dock-segment section-label">
@@ -111,7 +110,9 @@
           </p>
         </div>
         <div class="discovery-status">
-          <span class="signal-pill">{{ discoverySummary().highlightLabel }}</span>
+          <span class="signal-pill">{{
+            discoverySummary().highlightLabel
+          }}</span>
           <button
             class="secondary-btn discovery-clear"
             *ngIf="discoverySummary().hasRefinements"
@@ -308,8 +309,8 @@
               <div>
                 <p>{{ game.name }}</p>
                 <span
-                  >{{ game.genre }} · {{ game.playersOnline | number }}
-                  live</span
+                  >{{ game.genre }} ·
+                  {{ game.playersOnline | number }} live</span
                 >
               </div>
             </button>
@@ -350,7 +351,9 @@
           </div>
           <div class="library-meta">
             <div class="library-count">{{ filteredGames().length }} titles</div>
-            <span class="library-subcount">{{ getLibrarySubcountLabel() }}</span>
+            <span class="library-subcount">{{
+              getLibrarySubcountLabel()
+            }}</span>
           </div>
         </div>
 
@@ -446,10 +449,16 @@
                     </div>
                   </div>
 
-                  <div class="game-room-row" *ngIf="getGameRoomLabels(game).length">
+                  <div
+                    class="game-room-row"
+                    *ngIf="getGameRoomLabels(game).length"
+                  >
                     <span class="meta-label">Rooms</span>
                     <div class="game-room-tags">
-                      <span class="tag room-tag" *ngFor="let room of getGameRoomLabels(game)">
+                      <span
+                        class="tag room-tag"
+                        *ngFor="let room of getGameRoomLabels(game)"
+                      >
                         {{ room }}
                       </span>
                     </div>
@@ -504,7 +513,10 @@
             <span>{{ featuredEvents().length }} highlighted</span>
           </div>
           <div class="mini-rail">
-            <article class="event-card glass-v42" *ngFor="let event of featuredEvents()">
+            <article
+              class="event-card glass-v42"
+              *ngFor="let event of featuredEvents()"
+            >
               <div class="event-topline">
                 <span class="event-status" [attr.data-status]="event.status">{{
                   event.windowLabel
@@ -594,9 +606,7 @@
       <article class="metric-card glass-v42">
         <span class="metric-label">Return lane</span>
         <strong>{{ activitySummary().latestRoomLabel }}</strong>
-        <p>
-          {{ activeEvents().length }} live moments currently in view.
-        </p>
+        <p>{{ activeEvents().length }} live moments currently in view.</p>
       </article>
       <article class="metric-card glass-v42">
         <span class="metric-label">Neural sync</span>
@@ -606,7 +616,9 @@
       <article class="metric-card glass-v42">
         <span class="metric-label">Tactical edge</span>
         <strong>+{{ tacticalAdvantage() }}%</strong>
-        <p>Recommendation boost generated from live rails and session signals.</p>
+        <p>
+          Recommendation boost generated from live rails and session signals.
+        </p>
       </article>
     </section>
   </main>

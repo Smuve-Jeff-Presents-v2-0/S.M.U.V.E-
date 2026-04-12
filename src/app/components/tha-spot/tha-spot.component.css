@@ -55,7 +55,6 @@
   }
 }
 
-
 .energy-grid {
   position: absolute;
   inset: -100% 0;
@@ -66,22 +65,38 @@
   transform: perspective(500px) rotateX(65deg) scale(3);
   transform-origin: center top;
   animation: gridDrift 15s linear infinite;
-  mask-image: linear-gradient(to bottom, transparent, black 40%, black 80%, transparent);
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black 40%,
+    black 80%,
+    transparent
+  );
 }
 
 .energy-grid::after {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.2), transparent 70%);
+  background-image: radial-gradient(
+    circle at 50% 50%,
+    rgba(16, 185, 129, 0.2),
+    transparent 70%
+  );
   animation: gridPulse 4s ease-in-out infinite;
 }
 
 @keyframes gridPulse {
-  0%, 100% { opacity: 0.3; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(1.1); }
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
 }
-
 
 @keyframes gridDrift {
   from {
@@ -499,7 +514,11 @@
   inset: 0;
   background:
     linear-gradient(180deg, rgba(2, 6, 23, 0.08), rgba(2, 6, 23, 0.6)),
-    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.22), transparent 35%);
+    radial-gradient(
+      circle at 20% 20%,
+      rgba(255, 255, 255, 0.22),
+      transparent 35%
+    );
 }
 
 .spotlight-badges {
@@ -522,7 +541,11 @@
   padding: 28px;
   background:
     linear-gradient(180deg, rgba(15, 23, 42, 0.7), rgba(2, 6, 23, 0.92)),
-    radial-gradient(circle at top right, rgba(59, 130, 246, 0.08), transparent 35%);
+    radial-gradient(
+      circle at top right,
+      rgba(59, 130, 246, 0.08),
+      transparent 35%
+    );
 }
 
 .spotlight-copy h2 {
@@ -699,7 +722,11 @@
   padding: 18px 20px;
   background:
     linear-gradient(180deg, rgba(15, 23, 42, 0.82), rgba(2, 6, 23, 0.92)),
-    radial-gradient(circle at top left, rgba(16, 185, 129, 0.08), transparent 45%);
+    radial-gradient(
+      circle at top left,
+      rgba(16, 185, 129, 0.08),
+      transparent 45%
+    );
 }
 
 .event-topline {
@@ -1698,8 +1725,8 @@
 
 @media (max-width: 768px) {
   .hub-main {
-  overflow-y: auto;
-  scrollbar-gutter: stable;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
     padding: 24px 18px calc(120px + env(safe-area-inset-bottom));
     padding-left: calc(18px + env(safe-area-inset-left));
     padding-right: calc(18px + env(safe-area-inset-right));
@@ -1784,20 +1811,53 @@
   opacity: 0.6;
 }
 
-.hud-corner.top-left { top: 20px; left: 20px; border-right: none; border-bottom: none; }
-.hud-corner.top-right { top: 20px; right: 20px; border-left: none; border-bottom: none; }
-.hud-corner.bottom-left { bottom: 20px; left: 20px; border-right: none; border-top: none; }
-.hud-corner.bottom-right { bottom: 20px; right: 20px; border-left: none; border-top: none; }
+.hud-corner.top-left {
+  top: 20px;
+  left: 20px;
+  border-right: none;
+  border-bottom: none;
+}
+.hud-corner.top-right {
+  top: 20px;
+  right: 20px;
+  border-left: none;
+  border-bottom: none;
+}
+.hud-corner.bottom-left {
+  bottom: 20px;
+  left: 20px;
+  border-right: none;
+  border-top: none;
+}
+.hud-corner.bottom-right {
+  bottom: 20px;
+  right: 20px;
+  border-left: none;
+  border-top: none;
+}
 
 .hud-side-line {
   position: absolute;
   width: 1px;
-  background: linear-gradient(to bottom, transparent, var(--hub-accent), transparent);
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--hub-accent),
+    transparent
+  );
   opacity: 0.3;
 }
 
-.hud-side-line.left { left: 10px; top: 10%; bottom: 10%; }
-.hud-side-line.right { right: 10px; top: 10%; bottom: 10%; }
+.hud-side-line.left {
+  left: 10px;
+  top: 10%;
+  bottom: 10%;
+}
+.hud-side-line.right {
+  right: 10px;
+  top: 10%;
+  bottom: 10%;
+}
 
 .hud-system-status {
   position: absolute;
@@ -1830,16 +1890,37 @@
 }
 
 @keyframes bitPulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.5); opacity: 0.4; }
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.4;
+  }
 }
 
 @media (max-width: 768px) {
-  .hud-corner { width: 20px; height: 20px; top: 10px; left: 10px; }
-  .hud-corner.top-right { right: 10px; }
-  .hud-corner.bottom-left { bottom: 10px; }
-  .hud-corner.bottom-right { bottom: 10px; }
-  .hud-system-status { top: 10px; font-size: 8px; }
+  .hud-corner {
+    width: 20px;
+    height: 20px;
+    top: 10px;
+    left: 10px;
+  }
+  .hud-corner.top-right {
+    right: 10px;
+  }
+  .hud-corner.bottom-left {
+    bottom: 10px;
+  }
+  .hud-corner.bottom-right {
+    bottom: 10px;
+  }
+  .hud-system-status {
+    top: 10px;
+    font-size: 8px;
+  }
 }
 
 /* HOLOGRAPHIC CABIN EFFECTS */
@@ -1850,10 +1931,15 @@
 }
 
 .game-card::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: -2px;
-  background: linear-gradient(45deg, var(--hub-accent), transparent, var(--hub-secondary));
+  background: linear-gradient(
+    45deg,
+    var(--hub-accent),
+    transparent,
+    var(--hub-secondary)
+  );
   z-index: -1;
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -1862,7 +1948,9 @@
 
 .game-card:hover {
   transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(16, 185, 129, 0.2);
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(16, 185, 129, 0.2);
 }
 
 .game-card:hover::before {
@@ -1874,7 +1962,7 @@
 }
 
 .card-media::after {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   background: linear-gradient(to top, rgba(2, 6, 23, 0.8), transparent);
@@ -1884,7 +1972,6 @@
 .game-card:hover .card-media::after {
   opacity: 0.3;
 }
-
 
 /* HUD FRAME UPGRADE */
 .hud-frame-overlay {
@@ -1903,20 +1990,53 @@
   opacity: 0.6;
 }
 
-.hud-corner.top-left { top: 20px; left: 20px; border-right: none; border-bottom: none; }
-.hud-corner.top-right { top: 20px; right: 20px; border-left: none; border-bottom: none; }
-.hud-corner.bottom-left { bottom: 20px; left: 20px; border-right: none; border-top: none; }
-.hud-corner.bottom-right { bottom: 20px; right: 20px; border-left: none; border-top: none; }
+.hud-corner.top-left {
+  top: 20px;
+  left: 20px;
+  border-right: none;
+  border-bottom: none;
+}
+.hud-corner.top-right {
+  top: 20px;
+  right: 20px;
+  border-left: none;
+  border-bottom: none;
+}
+.hud-corner.bottom-left {
+  bottom: 20px;
+  left: 20px;
+  border-right: none;
+  border-top: none;
+}
+.hud-corner.bottom-right {
+  bottom: 20px;
+  right: 20px;
+  border-left: none;
+  border-top: none;
+}
 
 .hud-side-line {
   position: absolute;
   width: 1px;
-  background: linear-gradient(to bottom, transparent, var(--hub-accent), transparent);
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--hub-accent),
+    transparent
+  );
   opacity: 0.3;
 }
 
-.hud-side-line.left { left: 10px; top: 10%; bottom: 10%; }
-.hud-side-line.right { right: 10px; top: 10%; bottom: 10%; }
+.hud-side-line.left {
+  left: 10px;
+  top: 10%;
+  bottom: 10%;
+}
+.hud-side-line.right {
+  right: 10px;
+  top: 10%;
+  bottom: 10%;
+}
 
 .hud-system-status {
   position: absolute;
@@ -1949,16 +2069,37 @@
 }
 
 @keyframes bitPulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.5); opacity: 0.4; }
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.4;
+  }
 }
 
 @media (max-width: 768px) {
-  .hud-corner { width: 20px; height: 20px; top: 10px; left: 10px; }
-  .hud-corner.top-right { right: 10px; }
-  .hud-corner.bottom-left { bottom: 10px; }
-  .hud-corner.bottom-right { bottom: 10px; }
-  .hud-system-status { top: 10px; font-size: 8px; }
+  .hud-corner {
+    width: 20px;
+    height: 20px;
+    top: 10px;
+    left: 10px;
+  }
+  .hud-corner.top-right {
+    right: 10px;
+  }
+  .hud-corner.bottom-left {
+    bottom: 10px;
+  }
+  .hud-corner.bottom-right {
+    bottom: 10px;
+  }
+  .hud-system-status {
+    top: 10px;
+    font-size: 8px;
+  }
 }
 
 /* HOLOGRAPHIC CABIN EFFECTS */
@@ -1969,10 +2110,15 @@
 }
 
 .game-card::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: -2px;
-  background: linear-gradient(45deg, var(--hub-accent), transparent, var(--hub-secondary));
+  background: linear-gradient(
+    45deg,
+    var(--hub-accent),
+    transparent,
+    var(--hub-secondary)
+  );
   z-index: -1;
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -1981,7 +2127,9 @@
 
 .game-card:hover {
   transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(16, 185, 129, 0.2);
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(16, 185, 129, 0.2);
 }
 
 .game-card:hover::before {
@@ -1993,7 +2141,7 @@
 }
 
 .card-media::after {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   background: linear-gradient(to top, rgba(2, 6, 23, 0.8), transparent);
@@ -2003,8 +2151,6 @@
 .game-card:hover .card-media::after {
   opacity: 0.3;
 }
-
-
 
 /* HUD FRAME UPGRADE */
 .hud-frame-overlay {
@@ -2023,20 +2169,53 @@
   opacity: 0.6;
 }
 
-.hud-corner.top-left { top: 20px; left: 20px; border-right: none; border-bottom: none; }
-.hud-corner.top-right { top: 20px; right: 20px; border-left: none; border-bottom: none; }
-.hud-corner.bottom-left { bottom: 20px; left: 20px; border-right: none; border-top: none; }
-.hud-corner.bottom-right { bottom: 20px; right: 20px; border-left: none; border-top: none; }
+.hud-corner.top-left {
+  top: 20px;
+  left: 20px;
+  border-right: none;
+  border-bottom: none;
+}
+.hud-corner.top-right {
+  top: 20px;
+  right: 20px;
+  border-left: none;
+  border-bottom: none;
+}
+.hud-corner.bottom-left {
+  bottom: 20px;
+  left: 20px;
+  border-right: none;
+  border-top: none;
+}
+.hud-corner.bottom-right {
+  bottom: 20px;
+  right: 20px;
+  border-left: none;
+  border-top: none;
+}
 
 .hud-side-line {
   position: absolute;
   width: 1px;
-  background: linear-gradient(to bottom, transparent, var(--hub-accent), transparent);
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--hub-accent),
+    transparent
+  );
   opacity: 0.3;
 }
 
-.hud-side-line.left { left: 10px; top: 10%; bottom: 10%; }
-.hud-side-line.right { right: 10px; top: 10%; bottom: 10%; }
+.hud-side-line.left {
+  left: 10px;
+  top: 10%;
+  bottom: 10%;
+}
+.hud-side-line.right {
+  right: 10px;
+  top: 10%;
+  bottom: 10%;
+}
 
 .hud-system-status {
   position: absolute;
@@ -2069,16 +2248,37 @@
 }
 
 @keyframes bitPulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.5); opacity: 0.4; }
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.4;
+  }
 }
 
 @media (max-width: 768px) {
-  .hud-corner { width: 20px; height: 20px; top: 10px; left: 10px; }
-  .hud-corner.top-right { right: 10px; }
-  .hud-corner.bottom-left { bottom: 10px; }
-  .hud-corner.bottom-right { bottom: 10px; }
-  .hud-system-status { top: 10px; font-size: 8px; }
+  .hud-corner {
+    width: 20px;
+    height: 20px;
+    top: 10px;
+    left: 10px;
+  }
+  .hud-corner.top-right {
+    right: 10px;
+  }
+  .hud-corner.bottom-left {
+    bottom: 10px;
+  }
+  .hud-corner.bottom-right {
+    bottom: 10px;
+  }
+  .hud-system-status {
+    top: 10px;
+    font-size: 8px;
+  }
 }
 
 /* HOLOGRAPHIC CABIN EFFECTS */
@@ -2089,10 +2289,15 @@
 }
 
 .game-card::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: -2px;
-  background: linear-gradient(45deg, var(--hub-accent), transparent, var(--hub-secondary));
+  background: linear-gradient(
+    45deg,
+    var(--hub-accent),
+    transparent,
+    var(--hub-secondary)
+  );
   z-index: -1;
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -2101,7 +2306,9 @@
 
 .game-card:hover {
   transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(16, 185, 129, 0.2);
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(16, 185, 129, 0.2);
 }
 
 .game-card:hover::before {
@@ -2113,7 +2320,7 @@
 }
 
 .card-media::after {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   background: linear-gradient(to top, rgba(2, 6, 23, 0.8), transparent);
@@ -2155,10 +2362,9 @@
   }
 }
 
-
 /* TACTICAL HUD REFINEMENTS */
 .hud-side-line::after {
-  content: "";
+  content: '';
   position: absolute;
   width: 10px;
   height: 2px;
@@ -2169,11 +2375,11 @@
 }
 
 .hud-system-status::before {
-  content: "[ ";
+  content: '[ ';
   opacity: 0.5;
 }
 .hud-system-status::after {
-  content: " ]";
+  content: ' ]';
   opacity: 0.5;
 }
 
@@ -2204,7 +2410,11 @@
 /* TACTICAL TEXTURES */
 .discovery-shell {
   border: 1px solid rgba(16, 185, 129, 0.2);
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(2, 6, 23, 0.95));
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.9),
+    rgba(2, 6, 23, 0.95)
+  );
   box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.4);
 }
 
