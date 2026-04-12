@@ -28,6 +28,13 @@ const mockFeed: ThaSpotFeed = {
       description: 'Featured event room.',
       rules: { badgeIds: ['featured', 'tournament-live'] },
     },
+    {
+      id: 'rpg-vault',
+      name: 'RPG',
+      icon: 'shield',
+      description: 'Progression-first cabinets.',
+      rules: { tags: ['RPG'] },
+    },
   ],
   liveEvents: [],
   socialPresence: [],
@@ -100,6 +107,28 @@ const mockFeed: ThaSpotFeed = {
         approvedExternalUrl: '/assets/games/tempo-lockdown/tempo-lockdown.html',
       },
     },
+    {
+      id: '15',
+      name: 'Quest Relay',
+      url: 'https://www.gamepix.com/play/quest-relay',
+      genre: 'Adventure',
+      availability: 'Hybrid',
+      rating: 4.8,
+      playersOnline: 2400,
+      tags: ['RPG', 'Co-op', 'Multiplayer'],
+      badgeIds: ['new-drop'],
+      art: {
+        eyebrow: 'Raid RPG',
+        accentStart: '#8b5cf6',
+        accentEnd: '#4c1d95',
+      },
+      launchConfig: {
+        approvedEmbedUrl: 'https://www.gamepix.com/play/quest-relay',
+        approvedExternalUrl: 'https://www.gamepix.com/play/quest-relay',
+        telemetryMode: 'origin',
+        telemetryOrigins: ['https://www.gamepix.com'],
+      },
+    },
   ],
 };
 
@@ -125,7 +154,7 @@ describe('GameService', () => {
     httpMock.expectOne('/assets/data/tha-spot-feed.json').flush(mockFeed);
     const games = await pending;
 
-    expect(games.length).toBe(3);
+    expect(games.length).toBe(4);
     expect(games.some((game) => game.availability === 'Offline')).toBe(true);
     expect(games.some((game) => game.availability === 'Online')).toBe(true);
     expect(games.some((game) => game.name === 'Hextris')).toBe(true);
@@ -139,6 +168,14 @@ describe('GameService', () => {
     const games = await pending;
 
     expect(games.map((game) => game.name)).toEqual(['Hextris', 'Bracket Hero']);
+  });
+
+  it('supports tag-driven room discovery for RPG cabinets', async () => {
+    const pending = firstValueFrom(service.getGamesForRoom('rpg-vault'));
+    httpMock.expectOne('/assets/data/tha-spot-feed.json').flush(mockFeed);
+    const games = await pending;
+
+    expect(games.map((game) => game.name)).toEqual(['Quest Relay']);
   });
 
   it('returns the newest games first when requested', async () => {
@@ -160,11 +197,11 @@ describe('GameService', () => {
       ...mockFeed,
       games: [
         ...mockFeed.games,
-        { ...mockFeed.games[0], id: '15', name: 'Reloaded' },
+        { ...mockFeed.games[0], id: '16', name: 'Reloaded' },
       ],
     });
     const refreshed = await secondPending;
 
-    expect(refreshed.games.some((game) => game.id === '15')).toBe(true);
+    expect(refreshed.games.some((game) => game.id === '16')).toBe(true);
   });
 });

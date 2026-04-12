@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const MINIMUM_EXPECTED_GAMES = 37;
+const MINIMUM_EXPECTED_GAMES = 45;
 
 describe('Tha Spot feed integrity', () => {
   const feedPath = join(
@@ -12,6 +12,10 @@ describe('Tha Spot feed integrity', () => {
     'tha-spot-feed.json'
   );
   const feed = JSON.parse(readFileSync(feedPath, 'utf8')) as {
+    rooms?: Array<{
+      id?: string;
+      name?: string;
+    }>;
     games?: Array<{
       id?: string;
       name?: string;
@@ -25,6 +29,7 @@ describe('Tha Spot feed integrity', () => {
       };
     }>;
   };
+  const rooms = feed.rooms ?? [];
   const games = feed.games ?? [];
 
   it('keeps every library entry uniquely identifiable', () => {
@@ -47,5 +52,31 @@ describe('Tha Spot feed integrity', () => {
           game.launchConfig?.approvedExternalUrl
       ).toBeTruthy();
     }
+  });
+
+  it('keeps category rooms available for the expanded library', () => {
+    const roomIds = new Set(rooms.map((room) => room.id));
+
+    expect(roomIds.has('sports')).toBe(true);
+    expect(roomIds.has('fighting-pit')).toBe(true);
+    expect(roomIds.has('shooting-range')).toBe(true);
+    expect(roomIds.has('rpg-vault')).toBe(true);
+    expect(roomIds.has('co-op-link')).toBe(true);
+  });
+
+  it('maintains multiple choices for the featured expansion categories', () => {
+    const fightingGames = games.filter((game) => game.genre === 'Fighting');
+    const sportsGames = games.filter((game) => game.genre === 'Sports');
+    const shootingGames = games.filter((game) => game.genre === 'Shooting');
+    const rpgGames = games.filter(
+      (game) => game.genre === 'RPG' || game.tags?.includes('RPG')
+    );
+    const coopGames = games.filter((game) => game.tags?.includes('Co-op'));
+
+    expect(fightingGames.length).toBeGreaterThanOrEqual(3);
+    expect(sportsGames.length).toBeGreaterThanOrEqual(8);
+    expect(shootingGames.length).toBeGreaterThanOrEqual(6);
+    expect(rpgGames.length).toBeGreaterThanOrEqual(8);
+    expect(coopGames.length).toBeGreaterThanOrEqual(8);
   });
 });
