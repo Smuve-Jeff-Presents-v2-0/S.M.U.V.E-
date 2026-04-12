@@ -605,7 +605,8 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
 
     // Velocity-based playback rate for authentic scratch sound
     // velocity = radians per update. Let's scale it.
-    const velocity = (delta / 0.016) * scrubSecondsPerRadian; // approx rate
+    const SECONDS_PER_FRAME = 0.016; // Approx 60fps
+    const velocity = (delta / SECONDS_PER_FRAME) * scrubSecondsPerRadian; // approx rate
     this.engine.setDeckRate(deck, velocity, false);
 
     if (deck === 'A') {
