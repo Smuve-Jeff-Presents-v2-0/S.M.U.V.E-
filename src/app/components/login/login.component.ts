@@ -61,7 +61,7 @@ export class LoginComponent implements OnInit {
       }
     } catch {
       this.isError.set(true);
-      this.message.set('A executive error occurred. System offline.');
+      this.message.set('An unexpected error occurred. System offline.');
     } finally {
       this.isLoading.set(false);
     }
