@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { UserProfileService } from './user-profile.service';
 import {
   ReleaseProject,

@@ -57,7 +57,7 @@ export class InstrumentService {
     );
   }
 
-  connect(destination: AudioNode) {
+  connect(_destination: AudioNode) {
     // Compatibility method
     this.logger.info('InstrumentService: connect requested');
   }

@@ -403,10 +403,17 @@
         <router-outlet></router-outlet>
       </div>
 
+
+      <!-- AI BACKDROP (Mobile) -->
+      <div
+        *ngIf="uiService.isChatbotOpen()"
+        (click)="toggleChatbot()"
+        class="fixed inset-0 bg-black/40 backdrop-blur-sm z-30 md:hidden animate-in fade-in duration-300"
+      ></div>
       <!-- AI SIDEBAR -->
       <aside
         *ngIf="uiService.isChatbotOpen()"
-        class="ai-drawer glass-v42 border-l border-border transition-all duration-500 z-40 fixed top-0 right-0 h-full w-full md:w-96"
+        class="ai-drawer glass-v42 border-l border-border transition-all duration-500 z-40 fixed top-0 right-0 h-full w-full md:w-96 shadow-2xl"
       >
         <app-chatbot (close)="uiService.toggleChatbot()"></app-chatbot>
       </aside>

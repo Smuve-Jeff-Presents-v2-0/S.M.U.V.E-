@@ -9,14 +9,14 @@ export class CollaborationService {
   private dataChannels: { [key: string]: RTCDataChannel } = {};
   currentSession = signal<any>(null);
 
-  async startSession(user: AuthUser, projectState: any): Promise<string> {
+  async startSession(_user: AuthUser, projectState: any): Promise<string> {
     const sessionId = this.generateSecureId();
     this.logger.system(`INITIALIZING WEBRTC P2P SESSION: ${sessionId}`);
-    this.currentSession.set({ sessionId, participants: [user], projectState });
+    this.currentSession.set({ sessionId, participants: [_user], projectState });
     return sessionId;
   }
 
-  async joinSession(sessionId: string, user: AuthUser): Promise<void> {
+  async joinSession(sessionId: string, _user: AuthUser): Promise<void> {
     this.logger.system(`JOINING P2P COLLABORATION SESSION: ${sessionId}`);
     const peerConnection = new RTCPeerConnection({
       iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],

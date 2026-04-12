@@ -265,7 +265,7 @@ export class ChatbotComponent implements OnInit, AfterViewChecked {
     try {
       this.scrollContainer.nativeElement.scrollTop =
         this.scrollContainer.nativeElement.scrollHeight;
-    } catch (err) {}
+    } catch (_err) {}
   }
 
   private handleError(e: unknown, context: string) {

@@ -50,7 +50,7 @@ export class LoginComponent {
       } else {
         this.isError.set(true);
       }
-    } catch (err) {
+    } catch (_err) {
       this.isError.set(true);
       this.message.set('A executive error occurred. System offline.');
     } finally {

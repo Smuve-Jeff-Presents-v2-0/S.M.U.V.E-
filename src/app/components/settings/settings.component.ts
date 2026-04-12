@@ -88,7 +88,7 @@ export class SettingsComponent implements OnInit {
           `Updated ${key} to ${value}`
         );
       }
-    } catch (err) {
+    } catch (_err) {
       this.notificationService.show(
         'Sync failed. Local cache maintained.',
         'error',

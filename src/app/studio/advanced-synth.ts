@@ -16,7 +16,7 @@ export interface SynthParams {
   lfoAmount: number;
   lfoTarget: 'cutoff' | 'pitch' | 'volume';
 
-  filterType: BiquadFilterType;
+  filterType: any;
   filterCutoff: number;
   filterResonance: number;
 

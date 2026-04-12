@@ -1,4 +1,4 @@
-import { Component, Input, inject, signal, computed } from '@angular/core';
+import { Component, Input, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AudioSessionService } from '../audio-session.service';
 import { ChannelStripComponent } from '../channel-strip/channel-strip.component';
