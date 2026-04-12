@@ -4,6 +4,20 @@
     <div class="energy-grid"></div>
     <div class="ambient-glow"></div>
   </div>
+  <div class="hud-frame-overlay">
+    <div class="hud-corner top-left"></div>
+    <div class="hud-corner top-right"></div>
+    <div class="hud-corner bottom-left"></div>
+    <div class="hud-corner bottom-right"></div>
+    <div class="hud-side-line left"></div>
+    <div class="hud-side-line right"></div>
+
+    <div class="hud-system-status">
+      <div class="status-bit pulse"></div>
+      <span class="status-text">SYSTEM ACTIVE // UPLINK SECURE</span>
+    </div>
+  </div>
+
 
   <nav class="tactical-dock">
     <div class="dock-inner glass-v42">
@@ -42,7 +56,7 @@
   </nav>
 
   <main
-    class="hub-main"
+    class="hub-main custom-scrollbar"
     [class.room-transitioning]="isTransitioning()"
     [class.with-intel]="showIntelPanel()"
   >
