@@ -120,7 +120,7 @@ export class PianoRollComponent implements AfterViewInit, OnDestroy {
 
   constructor() {
     effect(() => {
-      this.uiService.performanceMode();
+      void this.uiService.performanceMode();
       this.isCompactMobile.set(window.innerWidth < 768);
     });
   }

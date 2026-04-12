@@ -28,30 +28,11 @@ export class StemSeparationService {
   }
 
   private async simulateSeparation(buffer: AudioBuffer): Promise<Stems> {
-    const offlineCtx = new OfflineAudioContext(
-      buffer.numberOfChannels,
-      buffer.length,
-      buffer.sampleRate
-    );
-
     // Create 4 distinct "stems" using filters
-    const vocals = await this.applyFilter(
-      offlineCtx,
-      buffer,
-      'peaking',
-      2500,
-      1.5,
-      6
-    ); // Boost vocal range
-    const drums = await this.applyFilter(offlineCtx, buffer, 'highpass', 5000); // Emphasize transients
-    const bass = await this.applyFilter(offlineCtx, buffer, 'lowpass', 250); // Low-end only
-    const melody = await this.applyFilter(
-      offlineCtx,
-      buffer,
-      'bandpass',
-      1000,
-      1.0
-    ); // Mid-range focus
+    const vocals = await this.applyFilter(buffer, 'peaking', 2500, 1.5, 6); // Boost vocal range
+    const drums = await this.applyFilter(buffer, 'highpass', 5000); // Emphasize transients
+    const bass = await this.applyFilter(buffer, 'lowpass', 250); // Low-end only
+    const melody = await this.applyFilter(buffer, 'bandpass', 1000, 1.0); // Mid-range focus
 
     this.logger.info(
       'StemSeparationService: Neural frequency reconstruction complete.'
@@ -61,7 +42,6 @@ export class StemSeparationService {
   }
 
   private async applyFilter(
-    ctx: OfflineAudioContext,
     buffer: AudioBuffer,
     type: any,
     freq: number,
