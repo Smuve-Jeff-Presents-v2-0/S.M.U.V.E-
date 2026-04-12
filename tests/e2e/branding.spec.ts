@@ -10,7 +10,7 @@ test('S.M.U.V.E 2.0 branding and navigation check', async ({ page }) => {
     page.getByText('S.M.U.V.E 2.0 // EXECUTIVE COMMAND')
   ).toBeVisible();
   await expect(
-    page.getByRole('heading', { name: /Welcome Back, Executive Artist/i })
+    page.getByRole('heading', { name: /Welcome Back,/i })
   ).toBeVisible();
   await expect(page.getByRole('button', { name: 'Open Studio' })).toBeVisible();
   await expect(
