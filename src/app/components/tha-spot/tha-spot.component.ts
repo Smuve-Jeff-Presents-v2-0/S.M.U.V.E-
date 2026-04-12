@@ -38,6 +38,14 @@ const MAX_HISTORY_SCORE = 24;
 const HISTORY_SCORE_DIVISOR = 6;
 const FEED_REFRESH_INTERVAL_MS = 300000;
 const EVENT_ENDING_SOON_MS = 1000 * 60 * 60 * 6;
+export const CARD_ANIMATION_DELAY_INCREMENT = 0.03;
+const FEATURED_BADGE_IDS = [
+  'featured',
+  'staff-pick',
+  'trending',
+  'tournament-live',
+];
+const MULTIPLAYER_TAG_KEYWORDS = ['multiplayer', 'co-op', 'versus', 'pvp'];
 type LibraryViewMode = 'grid' | 'compact';
 type QuickFilter = 'featured' | 'multiplayer' | 'instant' | 'online';
 const QUICK_FILTERS: QuickFilter[] = [
@@ -56,6 +64,7 @@ const QUICK_FILTERS: QuickFilter[] = [
 })
 export class ThaSpotComponent implements OnInit, OnDestroy {
   @ViewChild('gameIframe') gameIframe?: ElementRef<HTMLIFrameElement>;
+  readonly cardAnimationDelayIncrement = CARD_ANIMATION_DELAY_INCREMENT;
   readonly quickFilterOptions = QUICK_FILTERS;
 
   private gameService = inject(GameService);
@@ -475,6 +484,10 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
     return this.activeRoomConfig()?.description || '';
   }
 
+  getLibrarySubcountLabel() {
+    return this.activeRoom() === 'all' ? 'All Games' : this.getActiveRoomName();
+  }
+
   toggleIntel() {
     this.showIntelPanel.update((value) => !value);
   }
@@ -795,18 +808,14 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
     switch (filter) {
       case 'featured':
         return !!game.badgeIds?.some((badge) =>
-          ['featured', 'staff-pick', 'trending', 'tournament-live'].includes(
-            badge
-          )
+          FEATURED_BADGE_IDS.includes(badge)
         );
       case 'multiplayer':
         return (
           game.multiplayerType === 'Server' ||
           game.multiplayerType === 'P2P' ||
           !!game.tags?.some((tag) =>
-            ['multiplayer', 'co-op', 'versus', 'pvp'].includes(
-              tag.toLowerCase()
-            )
+            MULTIPLAYER_TAG_KEYWORDS.includes(tag.toLowerCase())
           )
         );
       case 'instant':

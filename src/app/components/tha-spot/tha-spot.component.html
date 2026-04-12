@@ -336,11 +336,7 @@
           </div>
           <div class="library-meta">
             <div class="library-count">{{ filteredGames().length }} titles</div>
-            <span class="library-subcount">{{
-              activeRoom() === 'all'
-                ? 'All Games'
-                : getActiveRoomName()
-            }}</span>
+            <span class="library-subcount">{{ getLibrarySubcountLabel() }}</span>
           </div>
         </div>
 
@@ -371,7 +367,7 @@
             <div
               *ngFor="let game of filteredGames(); let i = index"
               class="game-card-wrapper"
-              [style.animation-delay]="i * 0.03 + 's'"
+              [style.animation-delay]="i * cardAnimationDelayIncrement + 's'"
             >
               <div
                 class="game-card glass-v42"
