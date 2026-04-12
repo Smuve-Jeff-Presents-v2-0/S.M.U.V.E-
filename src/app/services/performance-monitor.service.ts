@@ -101,7 +101,7 @@ export class PerformanceMonitorService {
     // FID Observer
     try {
       const fidObserver = new PerformanceObserver((list) => {
-        const entries = list.getEntries() as any[];
+        const entries = list.getEntries() as PerformanceEventTiming[];
         if (entries.length > 0) {
           const fid = entries[0].processingStart - entries[0].startTime;
           this.updateMetric('fid', fid);
