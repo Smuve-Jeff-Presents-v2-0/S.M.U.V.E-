@@ -4,6 +4,8 @@ import { UserProfileService } from './user-profile.service';
 import { MainViewMode } from './user-context.service';
 import { UIService } from './ui.service';
 
+const DEFAULT_ARTIST_NAME = 'New Artist';
+
 export interface OnboardingStep {
   id: string;
   title: string;
@@ -34,7 +36,7 @@ export class OnboardingService {
 
     const hasIdentity =
       profile.artistName.trim() !== '' &&
-      profile.artistName !== 'New Artist' &&
+      profile.artistName !== DEFAULT_ARTIST_NAME &&
       Boolean(profile.primaryGenre);
     const hasProfileDepth = Boolean(
       profile.website ||
