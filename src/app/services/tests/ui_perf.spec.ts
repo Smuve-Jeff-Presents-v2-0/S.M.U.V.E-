@@ -77,7 +77,10 @@ describe('UIService Performance Mode', () => {
 
     TestBed.resetTestingModule();
 
-    expect(removeEventListenerSpy).toHaveBeenCalledWith('online', onlineHandler);
+    expect(removeEventListenerSpy).toHaveBeenCalledWith(
+      'online',
+      onlineHandler
+    );
     expect(removeEventListenerSpy).toHaveBeenCalledWith(
       'offline',
       offlineHandler
