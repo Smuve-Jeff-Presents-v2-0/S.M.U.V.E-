@@ -1,31 +1,64 @@
-<div class="studio-container flex h-full bg-[#050505] overflow-hidden" [class.performance-mode]="uiService.performanceMode()">
+<div
+  class="studio-container flex h-full bg-[#050505] overflow-hidden"
+  [class.performance-mode]="uiService.performanceMode()"
+>
   <!-- Side Navigation Rail -->
-  <aside class="studio-sidebar w-16 md:w-20 border-r border-white/5 flex flex-col items-center py-8 gap-10 bg-black/40 backdrop-blur-xl z-50">
-    <div class="sidebar-icon" [class.active]="activeView() === 'dj'" (click)="setActiveView('dj')">
+  <aside
+    class="studio-sidebar w-16 md:w-20 border-r border-white/5 flex flex-col items-center py-8 gap-10 bg-black/40 backdrop-blur-xl z-50"
+  >
+    <div
+      class="sidebar-icon"
+      [class.active]="activeView() === 'dj'"
+      (click)="setActiveView('dj')"
+    >
       <span class="material-symbols-outlined">queue_music</span>
       <span class="sidebar-label">Arrangement</span>
     </div>
-    <div class="sidebar-icon" [class.active]="activeView() === 'drum-machine'" (click)="setActiveView('drum-machine')">
+    <div
+      class="sidebar-icon"
+      [class.active]="activeView() === 'drum-machine'"
+      (click)="setActiveView('drum-machine')"
+    >
       <span class="material-symbols-outlined">music_note</span>
       <span class="sidebar-label">Drums</span>
     </div>
-    <div class="sidebar-icon" [class.active]="showPianoRoll()" (click)="showPianoRoll.set(!showPianoRoll())">
+    <div
+      class="sidebar-icon"
+      [class.active]="showPianoRoll()"
+      (click)="showPianoRoll.set(!showPianoRoll())"
+    >
       <span class="material-symbols-outlined">piano</span>
       <span class="sidebar-label">Piano</span>
     </div>
-    <div class="sidebar-icon" [class.active]="activeView() === 'mixer'" (click)="setActiveView('mixer')">
+    <div
+      class="sidebar-icon"
+      [class.active]="activeView() === 'mixer'"
+      (click)="setActiveView('mixer')"
+    >
       <span class="material-symbols-outlined">equalizer</span>
       <span class="sidebar-label">Mixer</span>
     </div>
-    <div class="sidebar-icon" [class.active]="activeView() === 'vocal-suite'" (click)="setActiveView('vocal-suite')">
+    <div
+      class="sidebar-icon"
+      [class.active]="activeView() === 'vocal-suite'"
+      (click)="setActiveView('vocal-suite')"
+    >
       <span class="material-symbols-outlined">mic</span>
       <span class="sidebar-label">Vocals</span>
     </div>
-    <div class="sidebar-icon" [class.active]="activeView() === 'mastering'" (click)="setActiveView('mastering')">
+    <div
+      class="sidebar-icon"
+      [class.active]="activeView() === 'mastering'"
+      (click)="setActiveView('mastering')"
+    >
       <span class="material-symbols-outlined">compress</span>
       <span class="sidebar-label">Master</span>
     </div>
-    <div class="sidebar-icon" [class.active]="activeView() === 'performance'" (click)="setActiveView('performance')">
+    <div
+      class="sidebar-icon"
+      [class.active]="activeView() === 'performance'"
+      (click)="setActiveView('performance')"
+    >
       <span class="material-symbols-outlined">sensors</span>
       <span class="sidebar-label">Live</span>
     </div>
@@ -33,11 +66,15 @@
 
   <div class="main-content">
     <!-- Top Bar -->
-    <header class="fl-top-bar px-4 flex items-center justify-between shrink-0 relative z-50">
+    <header
+      class="fl-top-bar px-4 flex items-center justify-between shrink-0 relative z-50"
+    >
       <div class="flex items-center gap-4">
         <div class="flex items-center gap-2 text-brand-primary">
           <span class="material-symbols-outlined text-xl">token</span>
-          <h2 class="text-slate-100 text-xs font-black tracking-tight uppercase italic leading-none">
+          <h2
+            class="text-slate-100 text-xs font-black tracking-tight uppercase italic leading-none"
+          >
             <span class="studio-title-desktop">STUDIO PRO </span>
             <span class="studio-title-desktop studio-title-accent">v2.0</span>
             <span class="studio-title-mobile">STUDIO </span>
@@ -45,15 +82,25 @@
           </h2>
         </div>
         <div class="h-6 w-px bg-white/10"></div>
-        <div class="flex items-center gap-3 bg-black/40 px-3 py-1 rounded border border-brand-primary/20">
-          <span class="material-symbols-outlined text-brand-primary text-xs">schedule</span>
-          <span class="text-brand-primary font-mono text-lg font-bold tracking-[0.1em]">{{ currentBeat().toFixed(0) }}</span>
+        <div
+          class="flex items-center gap-3 bg-black/40 px-3 py-1 rounded border border-brand-primary/20"
+        >
+          <span class="material-symbols-outlined text-brand-primary text-xs"
+            >schedule</span
+          >
+          <span
+            class="text-brand-primary font-mono text-lg font-bold tracking-[0.1em]"
+            >{{ currentBeat().toFixed(0) }}</span
+          >
         </div>
       </div>
 
       <div class="flex items-center gap-4">
         <div class="hidden lg:flex items-center gap-4 studio-mode-pills">
-          <div class="mode-pill" [class.mode-pill-active]="activeView() === 'dj'">
+          <div
+            class="mode-pill"
+            [class.mode-pill-active]="activeView() === 'dj'"
+          >
             <span class="material-symbols-outlined text-[10px]">album</span>
             <span>Arrangement</span>
           </div>
@@ -61,14 +108,25 @@
             <span class="material-symbols-outlined text-[10px]">piano</span>
             <span>Piano Roll</span>
           </div>
-          <div class="mode-pill" [class.mode-pill-active]="activeView() === 'mastering'">
-            <span class="material-symbols-outlined text-[10px]">graphic_eq</span>
+          <div
+            class="mode-pill"
+            [class.mode-pill-active]="activeView() === 'mastering'"
+          >
+            <span class="material-symbols-outlined text-[10px]"
+              >graphic_eq</span
+            >
             <span>Master Chain</span>
           </div>
         </div>
         <div class="hidden md:flex flex-col items-end opacity-60 mr-4">
-          <span class="text-[6px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Neural Hub Status</span>
-          <span class="text-[9px] font-bold text-white uppercase tracking-tight italic">{{ aiService.strategicDecrees()[0] }}</span>
+          <span
+            class="text-[6px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1"
+            >Neural Hub Status</span
+          >
+          <span
+            class="text-[9px] font-bold text-white uppercase tracking-tight italic"
+            >{{ aiService.strategicDecrees()[0] }}</span
+          >
         </div>
         <button
           (click)="aiService.performExecutiveAudit()"
@@ -84,10 +142,23 @@
     </div>
 
     <!-- View Navigation -->
-    <div class="studio-view-nav flex items-center justify-between px-4 md:px-6 py-2 md:py-3 bg-[#1a110b] border-b border-white/5 shrink-0 shadow-inner overflow-hidden">
+    <div
+      class="studio-view-nav flex items-center justify-between px-4 md:px-6 py-2 md:py-3 bg-[#1a110b] border-b border-white/5 shrink-0 shadow-inner overflow-hidden"
+    >
       <div class="view-nav-container flex-grow">
         <div class="flex items-center gap-1 min-w-max">
-          @for (view of ['dj', 'drum-machine', 'piano-roll', 'mixer', 'vocal-suite', 'performance', 'mastering']; track view) {
+          @for (
+            view of [
+              'dj',
+              'drum-machine',
+              'piano-roll',
+              'mixer',
+              'vocal-suite',
+              'performance',
+              'mastering',
+            ];
+            track view
+          ) {
             <button
               (click)="setActiveView($any(view))"
               class="px-3 md:px-5 py-1.5 rounded text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all duration-300 border border-transparent whitespace-nowrap"
@@ -103,6 +174,18 @@
         </div>
       </div>
       <div class="hidden sm:flex gap-4 ml-4">
+        <button
+          (click)="uiService.toggleAutoPianoRoll()"
+          class="text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2"
+          [class.text-brand-primary]="uiService.autoPianoRoll()"
+          [class.text-slate-500]="!uiService.autoPianoRoll()"
+          title="Toggle Auto-Open Piano Roll on Track Selection"
+        >
+          <span class="material-symbols-outlined text-[14px]">
+            {{ uiService.autoPianoRoll() ? 'auto_mode' : 'auto_mode' }}
+          </span>
+          Auto-Open
+        </button>
         <button
           (click)="showMixer.set(!showMixer())"
           class="text-[10px] font-black uppercase tracking-widest transition-all"
@@ -136,49 +219,113 @@
         *ngIf="aiService.isScanning()"
         class="absolute inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-center justify-center animate-enter"
       >
-        <div class="w-full max-w-md p-8 glass-card border border-brand-primary/30 text-center">
+        <div
+          class="w-full max-w-md p-8 glass-card border border-brand-primary/30 text-center"
+        >
           <div class="mb-6 relative">
-            <div class="text-[60px] font-black text-brand-primary/20 absolute inset-0 flex items-center justify-center">{{ aiService.scanningProgress() }}%</div>
-            <span class="material-symbols-outlined !text-6xl text-brand-primary animate-spin-slow">offline_bolt</span>
+            <div
+              class="text-[60px] font-black text-brand-primary/20 absolute inset-0 flex items-center justify-center"
+            >
+              {{ aiService.scanningProgress() }}%
+            </div>
+            <span
+              class="material-symbols-outlined !text-6xl text-brand-primary animate-spin-slow"
+              >offline_bolt</span
+            >
           </div>
-          <h3 class="text-lg font-black text-white uppercase tracking-[0.3em] mb-2">{{ aiService.currentProcessStep() }}</h3>
-          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6">S.M.U.V.E. Neural Intelligence Scanning Session Architecture...</p>
+          <h3
+            class="text-lg font-black text-white uppercase tracking-[0.3em] mb-2"
+          >
+            {{ aiService.currentProcessStep() }}
+          </h3>
+          <p
+            class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6"
+          >
+            S.M.U.V.E. Neural Intelligence Scanning Session Architecture...
+          </p>
           <div class="w-full h-1 bg-white/5 rounded-full overflow-hidden">
-            <div class="h-full bg-brand-primary transition-all duration-300" [style.width.%]="aiService.scanningProgress()"></div>
+            <div
+              class="h-full bg-brand-primary transition-all duration-300"
+              [style.width.%]="aiService.scanningProgress()"
+            ></div>
           </div>
         </div>
       </div>
 
       <!-- Strategic Audit Report Overlay -->
       <div
-        *ngIf="!aiService.isScanning() && aiService.criticalDeficits().length > 0"
+        *ngIf="
+          !aiService.isScanning() && aiService.criticalDeficits().length > 0
+        "
         class="absolute top-20 right-8 z-[100] w-80 glass-card p-6 border border-brand-primary/20 shadow-2xl animate-enter"
       >
         <div class="flex items-center justify-between mb-4">
-           <span class="text-[10px] font-black text-brand-primary uppercase tracking-widest">Executive Audit Report</span>
-           <button (click)="aiService.criticalDeficits.set([])" class="text-slate-500 hover:text-white"><span class="material-symbols-outlined text-sm">close</span></button>
+          <span
+            class="text-[10px] font-black text-brand-primary uppercase tracking-widest"
+            >Executive Audit Report</span
+          >
+          <button
+            (click)="aiService.criticalDeficits.set([])"
+            class="text-slate-500 hover:text-white"
+          >
+            <span class="material-symbols-outlined text-sm">close</span>
+          </button>
         </div>
         <div class="flex items-end justify-between mb-6">
-           <div class="flex flex-col">
-              <span class="text-[8px] font-black text-slate-500 uppercase">Overall Cohesion</span>
-              <span class="text-3xl font-black text-white font-mono">{{ aiService.sonicCohesion() }}%</span>
-           </div>
-           <div class="w-24 h-12 bg-black/40 rounded-lg border border-white/5 overflow-hidden">
-              <div class="h-full bg-brand-primary/40 flex items-end justify-around px-2">
-                 <div class="w-1 bg-brand-primary" [style.height.%]="aiService.frequencyBalance().low"></div>
-                 <div class="w-1 bg-brand-primary" [style.height.%]="aiService.frequencyBalance().mid"></div>
-                 <div class="w-1 bg-brand-primary" [style.height.%]="aiService.frequencyBalance().high"></div>
-              </div>
-           </div>
+          <div class="flex flex-col">
+            <span class="text-[8px] font-black text-slate-500 uppercase"
+              >Overall Cohesion</span
+            >
+            <span class="text-3xl font-black text-white font-mono"
+              >{{ aiService.sonicCohesion() }}%</span
+            >
+          </div>
+          <div
+            class="w-24 h-12 bg-black/40 rounded-lg border border-white/5 overflow-hidden"
+          >
+            <div
+              class="h-full bg-brand-primary/40 flex items-end justify-around px-2"
+            >
+              <div
+                class="w-1 bg-brand-primary"
+                [style.height.%]="aiService.frequencyBalance().low"
+              ></div>
+              <div
+                class="w-1 bg-brand-primary"
+                [style.height.%]="aiService.frequencyBalance().mid"
+              ></div>
+              <div
+                class="w-1 bg-brand-primary"
+                [style.height.%]="aiService.frequencyBalance().high"
+              ></div>
+            </div>
+          </div>
         </div>
         <div class="space-y-3">
-           <div class="text-[8px] font-black text-slate-500 uppercase tracking-widest border-b border-white/5 pb-1">Critical Deficits</div>
-           <div *ngFor="let deficit of aiService.criticalDeficits()" class="flex items-start gap-3">
-              <span class="material-symbols-outlined text-[10px] text-red-500 mt-0.5">warning</span>
-              <span class="text-[10px] font-bold text-white/80 leading-tight uppercase">{{ deficit }}</span>
-           </div>
+          <div
+            class="text-[8px] font-black text-slate-500 uppercase tracking-widest border-b border-white/5 pb-1"
+          >
+            Critical Deficits
+          </div>
+          <div
+            *ngFor="let deficit of aiService.criticalDeficits()"
+            class="flex items-start gap-3"
+          >
+            <span
+              class="material-symbols-outlined text-[10px] text-red-500 mt-0.5"
+              >warning</span
+            >
+            <span
+              class="text-[10px] font-bold text-white/80 leading-tight uppercase"
+              >{{ deficit }}</span
+            >
+          </div>
         </div>
-        <button class="w-full mt-6 py-2 bg-brand-primary/10 border border-brand-primary/20 rounded-lg text-brand-primary text-[9px] font-black uppercase tracking-widest hover:bg-brand-primary/20 transition-all">Resolve with Neural Mix</button>
+        <button
+          class="w-full mt-6 py-2 bg-brand-primary/10 border border-brand-primary/20 rounded-lg text-brand-primary text-[9px] font-black uppercase tracking-widest hover:bg-brand-primary/20 transition-all"
+        >
+          Resolve with Neural Mix
+        </button>
       </div>
 
       <div
@@ -232,11 +379,25 @@
         [class.pointer-events-none]="activeView() !== 'performance'"
         [class.opacity-0]="activeView() !== 'performance'"
       >
-        <div class="absolute inset-0 flex items-center justify-center bg-black/80">
-          <div class="text-center p-8 glass-card rounded-3xl border border-brand-primary/20 max-w-sm animate-enter mx-4">
-            <span class="material-symbols-outlined !text-4xl text-brand-primary mb-6 animate-pulse">sensors</span>
-            <h2 class="text-lg font-black text-white uppercase tracking-widest mb-4">Performance Rehearsal</h2>
-            <button (click)="uiService.navigateToView('practice')" class="btn-pro btn-pro-primary text-[10px] font-black uppercase w-full py-3">
+        <div
+          class="absolute inset-0 flex items-center justify-center bg-black/80"
+        >
+          <div
+            class="text-center p-8 glass-card rounded-3xl border border-brand-primary/20 max-w-sm animate-enter mx-4"
+          >
+            <span
+              class="material-symbols-outlined !text-4xl text-brand-primary mb-6 animate-pulse"
+              >sensors</span
+            >
+            <h2
+              class="text-lg font-black text-white uppercase tracking-widest mb-4"
+            >
+              Performance Rehearsal
+            </h2>
+            <button
+              (click)="uiService.navigateToView('practice')"
+              class="btn-pro btn-pro-primary text-[10px] font-black uppercase w-full py-3"
+            >
               Open Practice Space
             </button>
           </div>
@@ -246,10 +407,27 @@
       <div class="fl-editor-overlay" [class.visible]="showPianoRoll()">
         <div class="editor-header">
           <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-emerald-400 text-sm">grid_on</span>
-            <span class="text-[10px] font-black text-white uppercase tracking-widest">Piano Roll</span>
+            <span class="material-symbols-outlined text-emerald-400 text-sm"
+              >grid_on</span
+            >
+            <span
+              class="text-[10px] font-black text-white uppercase tracking-widest"
+              >Piano Roll</span
+            >
+            <button
+              (click)="uiService.toggleAutoPianoRoll()"
+              class="ml-4 px-2 py-0.5 rounded border border-white/5 text-[8px] font-black uppercase tracking-widest transition-all"
+              [class.bg-brand-primary/20]="uiService.autoPianoRoll()"
+              [class.text-brand-primary]="uiService.autoPianoRoll()"
+              [class.text-slate-500]="!uiService.autoPianoRoll()"
+            >
+              Auto-Open: {{ uiService.autoPianoRoll() ? 'ON' : 'OFF' }}
+            </button>
           </div>
-          <button (click)="showPianoRoll.set(false)" class="text-slate-500 hover:text-white transition-colors">
+          <button
+            (click)="showPianoRoll.set(false)"
+            class="text-slate-500 hover:text-white transition-colors"
+          >
             <span class="material-symbols-outlined text-sm">close</span>
           </button>
         </div>
@@ -260,17 +438,22 @@
     </main>
 
     <div class="studio-bottom-dock">
-      <app-transport-bar class="studio-transport desktop-transport shrink-0 border-t border-white/5"></app-transport-bar>
+      <app-transport-bar
+        class="studio-transport desktop-transport shrink-0 border-t border-white/5"
+      ></app-transport-bar>
       <nav class="fl-mobile-nav">
-        @for (item of [
-          { view: 'dj', label: 'Song', icon: 'queue_music' },
-          { view: 'drum-machine', label: 'Drums', icon: 'music_note' },
-          { view: 'piano-roll', label: 'Piano', icon: 'piano' },
-          { view: 'mixer', label: 'Mixer', icon: 'equalizer' },
-          { view: 'vocal-suite', label: 'Vocals', icon: 'mic' },
-          { view: 'mastering', label: 'Master', icon: 'graphic_eq' },
-          { view: 'performance', label: 'Live', icon: 'sensors' }
-        ]; track item.view) {
+        @for (
+          item of [
+            { view: 'dj', label: 'Song', icon: 'queue_music' },
+            { view: 'drum-machine', label: 'Drums', icon: 'music_note' },
+            { view: 'piano-roll', label: 'Piano', icon: 'piano' },
+            { view: 'mixer', label: 'Mixer', icon: 'equalizer' },
+            { view: 'vocal-suite', label: 'Vocals', icon: 'mic' },
+            { view: 'mastering', label: 'Master', icon: 'graphic_eq' },
+            { view: 'performance', label: 'Live', icon: 'sensors' },
+          ];
+          track item.view
+        ) {
           <button
             (click)="setActiveView($any(item.view))"
             class="fl-mobile-nav-button"

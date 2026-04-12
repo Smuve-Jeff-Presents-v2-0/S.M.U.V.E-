@@ -3,7 +3,9 @@ import { test, expect } from '@playwright/test';
 test('Strategy Hub Dynamic Features', async ({ page }) => {
   await page.goto('/strategy');
 
-  await expect(page.getByRole('heading', { name: 'STRATEGYHUB' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'STRATEGYHUB' })
+  ).toBeVisible();
   await expect(
     page.getByRole('heading', { name: /Real-Time Market Intelligence/i })
   ).toBeVisible();

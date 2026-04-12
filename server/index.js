@@ -87,7 +87,9 @@ const initDb = async () => {
         FOREIGN KEY (user_id) REFERENCES user_profiles(user_id) ON DELETE CASCADE
       );
     `);
-    console.log('Database initialized with security, project, and identity support');
+    console.log(
+      'Database initialized with security, project, and identity support'
+    );
   } catch (err) {
     console.error('Error initializing database', err);
   }
@@ -275,29 +277,25 @@ app.get('/api/identity/:userId/connectors', async (req, res) => {
   }
 });
 
-app.post('/api/identity/:userId/connectors/:connectorId/sync', async (req, res) => {
-  try {
-    const { userId, connectorId } = req.params;
-    const { trigger = 'manual', payload = {} } = req.body || {};
-    const jobId = `job_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+app.post(
+  '/api/identity/:userId/connectors/:connectorId/sync',
+  async (req, res) => {
+    try {
+      const { userId, connectorId } = req.params;
+      const { trigger = 'manual', payload = {} } = req.body || {};
+      const jobId = `job_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
-    await pool.query(
-      'INSERT INTO connector_jobs (job_id, user_id, connector_id, status, trigger_type, payload, updated_at) VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP)',
-      [
-        jobId,
-        userId,
-        connectorId,
-        'queued',
-        trigger,
-        JSON.stringify(payload),
-      ]
-    );
+      await pool.query(
+        'INSERT INTO connector_jobs (job_id, user_id, connector_id, status, trigger_type, payload, updated_at) VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP)',
+        [jobId, userId, connectorId, 'queued', trigger, JSON.stringify(payload)]
+      );
 
-    res.json({ success: true, jobId, status: 'queued' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+      res.json({ success: true, jobId, status: 'queued' });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
   }
-});
+);
 
 // AI Analyze Proxy
 app.post('/api/ai/analyze', async (req, res) => {

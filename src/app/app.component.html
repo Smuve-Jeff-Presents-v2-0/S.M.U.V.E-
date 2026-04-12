@@ -190,8 +190,12 @@
           type="button"
           (click)="toggleSidebar()"
           class="shell-icon-button w-10 h-10 rounded-lg hover:bg-background-alt text-text-dim hover:text-text-main transition-all flex items-center justify-center group shrink-0"
-          [attr.aria-label]="isSidebarOpen() ? 'Close navigation menu' : 'Open navigation menu'"
-          [title]="isSidebarOpen() ? 'Close navigation menu' : 'Open navigation menu'"
+          [attr.aria-label]="
+            isSidebarOpen() ? 'Close navigation menu' : 'Open navigation menu'
+          "
+          [title]="
+            isSidebarOpen() ? 'Close navigation menu' : 'Open navigation menu'
+          "
         >
           <span class="material-symbols-outlined text-2xl">{{
             isSidebarOpen() ? 'menu_open' : 'menu'
@@ -286,7 +290,9 @@
           [title]="'Open Command Palette (Ctrl + K)'"
           aria-label="Open command palette"
         >
-          <span class="material-symbols-outlined text-xl md:text-2xl">search</span>
+          <span class="material-symbols-outlined text-xl md:text-2xl"
+            >search</span
+          >
         </button>
 
         <button
@@ -317,7 +323,9 @@
           <div
             class="w-10 h-10 rounded-lg bg-brand-primary/10 border border-brand-primary/20 flex items-center justify-center text-brand-primary group-hover:bg-brand-primary group-hover:text-white transition-all"
           >
-            <span class="material-symbols-outlined text-xl md:text-2xl">neurology</span>
+            <span class="material-symbols-outlined text-xl md:text-2xl"
+              >neurology</span
+            >
           </div>
           <div
             *ngIf="uiService.isChatbotOpen()"
@@ -437,16 +445,29 @@
 
     <!-- Mobile Navigation Bar -->
 
-      <!-- S.M.U.V.E 2.0 Mobile Command Ticker -->
-      <div class="mobile-command-ticker bg-black/60 border-b border-border py-1 overflow-hidden h-6">
-        <div class="flex items-center gap-6 whitespace-nowrap animate-ticker">
-          <span class="text-[8px] font-black tracking-tighter text-primary">[UPLINK: ACTIVE]</span>
-          <span class="text-[8px] font-black tracking-tighter text-text-dim">STRATEGIC HEALTH: {{ profileService.profile().knowledgeBase.strategicHealthScore }}%</span>
-          <span class="text-[8px] font-black tracking-tighter text-accent">DECREE: {{ aiService.strategicDecrees()[0] }}</span>
-          <span class="text-[8px] font-black tracking-tighter text-primary">[S.M.U.V.E 2.0 EXECUTIVE COMMAND]</span>
-        </div>
+    <!-- S.M.U.V.E 2.0 Mobile Command Ticker -->
+    <div
+      class="mobile-command-ticker bg-black/60 border-b border-border py-1 overflow-hidden h-6"
+    >
+      <div class="flex items-center gap-6 whitespace-nowrap animate-ticker">
+        <span class="text-[8px] font-black tracking-tighter text-primary"
+          >[UPLINK: ACTIVE]</span
+        >
+        <span class="text-[8px] font-black tracking-tighter text-text-dim"
+          >STRATEGIC HEALTH:
+          {{
+            profileService.profile().knowledgeBase.strategicHealthScore
+          }}%</span
+        >
+        <span class="text-[8px] font-black tracking-tighter text-accent"
+          >DECREE: {{ aiService.strategicDecrees()[0] }}</span
+        >
+        <span class="text-[8px] font-black tracking-tighter text-primary"
+          >[S.M.U.V.E 2.0 EXECUTIVE COMMAND]</span
+        >
       </div>
-<nav class="mobile-nav-bar border-t border-border glass-v42">
+    </div>
+    <nav class="mobile-nav-bar border-t border-border glass-v42">
       <button
         type="button"
         (click)="navigateToView('hub')"

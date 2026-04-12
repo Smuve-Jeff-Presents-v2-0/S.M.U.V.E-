@@ -4,7 +4,9 @@ test('Verify Tha Spot Gaming Hub and Filters', async ({ page }) => {
   await page.goto('/tha-spot');
 
   await expect(page.getByRole('heading', { name: 'All Games' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Game library' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Game library' })
+  ).toBeVisible();
   await expect(
     page.getByRole('heading', { name: 'Tha Battlefield', exact: true })
   ).toBeVisible();
