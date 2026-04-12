@@ -32,6 +32,7 @@
           class="dock-btn intel-toggle"
           (click)="toggleIntel()"
           [class.active]="showIntelPanel()"
+          data-testid="intel-toggle"
         >
           <span class="material-symbols-outlined">analytics</span>
           <span class="btn-label">INTEL</span>
@@ -89,6 +90,7 @@
       <article
         class="spotlight-stage glass-v42"
         *ngIf="featuredGame() as spotlight"
+        data-testid="arena-spotlight"
       >
         <div
           class="spotlight-media"

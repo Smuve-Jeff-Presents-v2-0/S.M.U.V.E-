@@ -8,6 +8,8 @@ test('Tha Spot Visual Verification', async ({ page }) => {
   await expect(page.getByText('Arena spotlight')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Game library' })).toBeVisible();
   await expect(
-    page.getByRole('heading', { name: 'Tha Battlefield', level: 2 })
+    page
+      .getByTestId('arena-spotlight')
+      .getByRole('heading', { name: 'Tha Battlefield' })
   ).toBeVisible();
 });
