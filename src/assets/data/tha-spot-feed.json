@@ -90,6 +90,11 @@
       "rules": {
         "genres": [
           "Sports"
+        ],
+        "tags": [
+          "Basketball",
+          "Soccer",
+          "Football"
         ]
       }
     },
@@ -454,8 +459,7 @@
         "Multiplayer",
         "Original",
         "PvP",
-        "Combat",
-        "station-pod"
+        "Combat"
       ],
       "multiplayerType": "Server",
       "aiSupportLevel": "Advanced",
@@ -514,8 +518,7 @@
         "Multiplayer",
         "Original",
         "Co-op",
-        "Rhythm",
-        "station-pod"
+        "Rhythm"
       ],
       "multiplayerType": "Server",
       "aiSupportLevel": "Neural",
@@ -571,8 +574,7 @@
       "tags": [
         "Arcade",
         "Offline",
-        "Reflex",
-        "station-pod"
+        "Reflex"
       ],
       "badgeIds": [
         "featured"
@@ -623,8 +625,7 @@
       "tags": [
         "Puzzle",
         "Offline",
-        "Memory",
-        "station-pod"
+        "Memory"
       ],
       "badgeIds": [
         "staff-pick"
@@ -675,8 +676,7 @@
       "tags": [
         "Rhythm",
         "Arcade",
-        "Original",
-        "station-pod"
+        "Original"
       ],
       "badgeIds": [
         "new-drop"
@@ -727,8 +727,7 @@
       "tags": [
         "Classic",
         "Arcade",
-        "Retro",
-        "station-cabinet"
+        "Retro"
       ],
       "badgeIds": [
         "trending"
@@ -782,8 +781,7 @@
       "tags": [
         "Classic",
         "AI",
-        "Logic",
-        "station-pod"
+        "Logic"
       ],
       "aiSupportLevel": "Neural",
       "aiBriefing": "S.M.U.V.E. is analyzing the logic matrix for optimal number combination strategies.",
@@ -839,8 +837,7 @@
       "tags": [
         "Arcade",
         "Reflex",
-        "Rhythm",
-        "station-pod"
+        "Rhythm"
       ],
       "badgeIds": [
         "featured"
