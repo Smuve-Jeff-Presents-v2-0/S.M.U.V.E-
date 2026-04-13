@@ -4,6 +4,20 @@
     <div class="energy-grid"></div>
     <div class="ambient-glow"></div>
   </div>
+  <div class="hud-frame-overlay">
+    <div class="hud-corner top-left"></div>
+    <div class="hud-corner top-right"></div>
+    <div class="hud-corner bottom-left"></div>
+    <div class="hud-corner bottom-right"></div>
+    <div class="hud-side-line left"></div>
+    <div class="hud-side-line right"></div>
+
+    <div class="hud-system-status">
+      <div class="status-bit pulse"></div>
+      <span class="status-text">SYSTEM ACTIVE // UPLINK SECURE</span>
+    </div>
+  </div>
+
 
   <nav class="tactical-dock">
     <div class="dock-inner glass-v42">
@@ -42,7 +56,7 @@
   </nav>
 
   <main
-    class="hub-main"
+    class="hub-main custom-scrollbar"
     [class.room-transitioning]="isTransitioning()"
     [class.with-intel]="showIntelPanel()"
   >
@@ -84,6 +98,22 @@
           <span class="stat-value">{{ liveMetrics().liveTournaments }}</span>
         </div>
       </div>
+    <div class="tactical-console glass-v42">
+      <div class="console-header-mini">
+        <span class="label">COMMAND CONSOLE</span>
+        <span class="blink">_</span>
+      </div>
+      <div class="console-output custom-scrollbar">
+        <div class="log-entry">[SYS] Uplink established.</div>
+        <div class="log-entry">[AI] Neural Sync at {{ neuralSyncScore() }}%.</div>
+        <div class="log-entry">[SPOT] {{ liveMetrics().roomPlayers }} users on floor.</div>
+        <div class="log-entry success">[READY] Arena protocols active.</div>
+      </div>
+      <div class="console-input-area">
+        <span class="prompt">></span>
+        <input type="text" placeholder="Enter strategic command..." class="console-input">
+      </div>
+    </div>
     </header>
 
     <section class="discovery-shell glass-v42" data-testid="discovery-library">
