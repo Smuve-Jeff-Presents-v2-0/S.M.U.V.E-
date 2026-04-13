@@ -35,7 +35,7 @@ describe('HistoryService', () => {
   });
 
   it('should execute undo correctly', () => {
-    let value = 0;
+    const value = 0;
     service.pushAction({
       description: 'Increment',
       undo: () => {
@@ -55,7 +55,7 @@ describe('HistoryService', () => {
   });
 
   it('should execute redo correctly', () => {
-    let value = 0;
+    const value = 0;
     service.pushAction({
       description: 'Increment',
       undo: () => {
@@ -109,7 +109,7 @@ describe('HistoryService', () => {
   });
 
   it('should handle multiple actions in sequence', () => {
-    let value = 0;
+    const value = 0;
 
     service.pushAction({
       description: 'Add 5',
@@ -149,7 +149,7 @@ describe('HistoryService', () => {
   });
 
   it('should clear all history', () => {
-    let value = 0;
+    const value = 0;
 
     service.pushAction({
       description: 'Action',

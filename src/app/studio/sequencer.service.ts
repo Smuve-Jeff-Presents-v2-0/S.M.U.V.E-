@@ -1,9 +1,6 @@
 import { LoggingService } from '../services/logging.service';
 import { Injectable, signal, computed, inject } from '@angular/core';
-import {
-  InstrumentsService,
-  InstrumentPreset,
-} from '../services/instruments.service';
+import { InstrumentsService } from '../services/instruments.service';
 import { AudioEngineService } from '../services/audio-engine.service';
 
 export interface SequencerNote {

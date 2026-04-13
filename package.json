@@ -4,14 +4,14 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "ng serve",
-    "build": "ng build",
+    "dev": "npx ng serve",
+    "build": "npx ng build",
     "start": "serve -s Build/browser",
-    "preview": "ng serve --configuration=production",
+    "preview": "npx ng serve --configuration=production",
     "test": "jest",
     "lint": "eslint src setup-jest.ts",
     "format": "prettier --write .",
-    "deploy": "ng build --configuration=ghpages && cp Build/index.html Build/404.html && npx angular-cli-ghpages --dir=Build"
+    "deploy": "npx ng build --configuration=ghpages && cp Build/index.html Build/404.html && npx angular-cli-ghpages --dir=Build"
   },
   "dependencies": {
     "@angular-devkit/build-angular": "21.2.0",
@@ -31,7 +31,6 @@
     "@types/node": "^20.11.0",
     "animate.css": "^4.1.1",
     "autoprefixer": "^10.4.19",
-    "ng": "^0.0.0",
     "postcss": "^8.4.38",
     "rxjs": "^7.8.2",
     "serve": "^14.2.5",
