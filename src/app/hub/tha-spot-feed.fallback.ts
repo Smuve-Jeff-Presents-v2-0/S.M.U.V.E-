@@ -423,7 +423,7 @@ export const THA_SPOT_FALLBACK_FEED: ThaSpotFeed = {
       "campaignType": "arena",
       "gameIds": [
         "1",
-        "10",
+        "super-street-fighter",
         "13"
       ]
     },
