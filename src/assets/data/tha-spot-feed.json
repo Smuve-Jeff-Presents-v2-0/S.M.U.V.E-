@@ -421,7 +421,7 @@
       "campaignType": "arena",
       "gameIds": [
         "1",
-        "10",
+        "super-street-fighter",
         "13"
       ]
     },
@@ -935,10 +935,10 @@
       }
     },
     {
-      "id": "10",
-      "name": "Street Brawler V",
-      "url": "https://www.gamepix.com/play/street-fight",
-      "description": "Master classic combat in the world warrior tournament cabinet.",
+      "id": "super-street-fighter",
+      "name": "Super Street Fighter II",
+      "url": "https://www.retrogames.cc/embed/23550-super-street-fighter-ii-the-new-challengers-usa.html",
+      "description": "The legendary world warrior tournament returns with the New Challengers. Master the classic combat that defined a generation.",
       "genre": "Fighting",
       "rating": 4.7,
       "playersOnline": 4500,
@@ -946,8 +946,8 @@
       "tags": [
         "Combat",
         "Arcade",
-        "Versus",
-        "Multiplayer",
+        "Classic",
+        "Fighting",
         "station-cabinet"
       ],
       "badgeIds": [
@@ -955,12 +955,12 @@
       ],
       "queueEstimateMinutes": 2,
       "sessionObjectives": [
-        "Win one set without dropping a round",
-        "Land a clean punish combo"
+        "Defeat 4 opponents in arcade mode",
+        "Land a Super Combo finisher"
       ],
       "controlHints": [
-        "Block low on wake-up",
-        "Buffer inputs during jumps"
+        "Master the quarter-circle forward motion",
+        "Use heavy attacks to break high guards"
       ],
       "launchConfig": {
         "difficulty": "Bracket",
@@ -976,7 +976,7 @@
           "Versus"
         ],
         "inlinePolicy": "trusted",
-        "trustNote": "Allowlisted retro combat partner.",
+        "trustNote": "Executive-grade retro combat cabinet.",
         "embedMode": "inline",
         "approvedExternalUrl": "https://www.retrogames.cc/embed/23550-super-street-fighter-ii-the-new-challengers-usa.html",
         "approvedEmbedUrl": "https://www.retrogames.cc/embed/23550-super-street-fighter-ii-the-new-challengers-usa.html",
