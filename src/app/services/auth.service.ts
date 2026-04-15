@@ -250,14 +250,11 @@ export class AuthService {
       this.saveSession(newUser);
       this.securityService.clearRateLimit(rateLimitKey);
 
-      await this.profileService.updateProfile(
-        {
-          ...initialProfile,
-          id: newUser.id,
-          artistName: this.securityService.sanitizeInput(artistName),
-        } as any,
-        newUser.id
-      );
+      await this.profileService.updateProfile({
+        ...initialProfile,
+        id: newUser.id,
+        artistName: this.securityService.sanitizeInput(artistName),
+      });
 
       this.logger.info(`[MOCK EMAIL] Welcome to SMUVE 2.0. Your verification code is: ${newUser.verificationCode}`);
       await this.securityService.logEvent('ACCOUNT_CREATED', 'New artist account registered.', newUser.id);
