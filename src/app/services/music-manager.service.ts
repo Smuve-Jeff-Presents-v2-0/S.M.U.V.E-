@@ -134,8 +134,13 @@ export class MusicManagerService {
           color: armedTrack.color,
           audioUrl: rec.url
         };
-        armedTrack.clips.push(newClip);
-        this.tracks.set([...this.tracks()]);
+        this.tracks.update(tracks =>
+          tracks.map(t =>
+            t.id === armedTrack.id
+              ? { ...t, clips: [...t.clips, newClip] }
+              : t
+          )
+        );
       }
     });
     this.loadLastSession();
