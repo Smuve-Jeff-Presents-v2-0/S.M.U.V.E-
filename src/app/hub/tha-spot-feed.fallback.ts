@@ -79,7 +79,8 @@ export const THA_SPOT_FALLBACK_FEED: ThaSpotFeed = {
           "Multiplayer",
           "Versus"
         ],
-        "badgeIds": [
+
+      "badgeIds": [
           "tournament-live"
         ]
       }
@@ -169,7 +170,8 @@ export const THA_SPOT_FALLBACK_FEED: ThaSpotFeed = {
       "limitedTime": true,
       "spotlight": "Rotates with live events and staff promotions.",
       "rules": {
-        "badgeIds": [
+
+      "badgeIds": [
           "featured",
           "tournament-live"
         ]
@@ -614,6 +616,7 @@ export const THA_SPOT_FALLBACK_FEED: ThaSpotFeed = {
       "multiplayerType": "Server",
       "aiSupportLevel": "Advanced",
       "aiBriefing": "Establish dominance in the rap battle arena. Neural sync is tuned for rhythm precision.",
+
       "badgeIds": [
         "featured",
         "tournament-live"
@@ -628,7 +631,9 @@ export const THA_SPOT_FALLBACK_FEED: ThaSpotFeed = {
         "Save your boost for chorus clashes"
       ],
       "launchConfig": {
-        "difficulty": "Competitive",
+      "previewVideo": "https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-dj-playing-at-a-club-24545-large.mp4",
+      "bannerImage": "https://images.unsplash.com/photo-1514525253361-bee243870eb2?auto=format&fit=crop&w=1200&q=80",
+      "difficulty": "Competitive",
         "controls": [
           "Keyboard lanes",
           "Space to trigger boosts"
@@ -650,7 +655,9 @@ export const THA_SPOT_FALLBACK_FEED: ThaSpotFeed = {
         "telemetryMode": "frame-only"
       },
       "art": {
-        "eyebrow": "Hybrid",
+      "previewVideo": "https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-dj-playing-at-a-club-24545-large.mp4",
+      "bannerImage": "https://images.unsplash.com/photo-1514525253361-bee243870eb2?auto=format&fit=crop&w=1200&q=80",
+      "eyebrow": "Hybrid",
         "accentStart": "#10b981",
         "accentEnd": "#0f766e"
       }
@@ -673,6 +680,7 @@ export const THA_SPOT_FALLBACK_FEED: ThaSpotFeed = {
       "multiplayerType": "Server",
       "aiSupportLevel": "Neural",
       "aiBriefing": "Collaborative remix engine is live. S.M.U.V.E. is balancing the sonic stems.",
+
       "badgeIds": [
         "staff-pick"
       ],
@@ -686,7 +694,9 @@ export const THA_SPOT_FALLBACK_FEED: ThaSpotFeed = {
         "Watch teammate cue indicators"
       ],
       "launchConfig": {
-        "difficulty": "Crew",
+      "previewVideo": "https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-dj-playing-at-a-club-24545-large.mp4",
+      "bannerImage": "https://images.unsplash.com/photo-1514525253361-bee243870eb2?auto=format&fit=crop&w=1200&q=80",
+      "difficulty": "Crew",
         "controls": [
           "Keyboard",
           "Mouse"
@@ -707,7 +717,9 @@ export const THA_SPOT_FALLBACK_FEED: ThaSpotFeed = {
         "telemetryMode": "frame-only"
       },
       "art": {
-        "eyebrow": "Hybrid",
+      "previewVideo": "https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-dj-playing-at-a-club-24545-large.mp4",
+      "bannerImage": "https://images.unsplash.com/photo-1514525253361-bee243870eb2?auto=format&fit=crop&w=1200&q=80",
+      "eyebrow": "Hybrid",
         "accentStart": "#22c55e",
         "accentEnd": "#14b8a6"
       }
@@ -726,6 +738,7 @@ export const THA_SPOT_FALLBACK_FEED: ThaSpotFeed = {
         "Offline",
         "Reflex"
       ],
+
       "badgeIds": [
         "featured"
       ],
@@ -739,7 +752,9 @@ export const THA_SPOT_FALLBACK_FEED: ThaSpotFeed = {
         "Stay centered before boosts"
       ],
       "launchConfig": {
-        "difficulty": "Medium",
+      "previewVideo": "https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-dj-playing-at-a-club-24545-large.mp4",
+      "bannerImage": "https://images.unsplash.com/photo-1514525253361-bee243870eb2?auto=format&fit=crop&w=1200&q=80",
+      "difficulty": "Medium",
         "controls": [
           "Arrow keys"
         ],
@@ -758,7 +773,9 @@ export const THA_SPOT_FALLBACK_FEED: ThaSpotFeed = {
         "telemetryMode": "frame-only"
       },
       "art": {
-        "eyebrow": "Offline",
+      "previewVideo": "https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-dj-playing-at-a-club-24545-large.mp4",
+      "bannerImage": "https://images.unsplash.com/photo-1514525253361-bee243870eb2?auto=format&fit=crop&w=1200&q=80",
+      "eyebrow": "Offline",
         "accentStart": "#38bdf8",
         "accentEnd": "#6366f1"
       }
@@ -777,6 +794,7 @@ export const THA_SPOT_FALLBACK_FEED: ThaSpotFeed = {
         "Offline",
         "Memory"
       ],
+
       "badgeIds": [
         "staff-pick"
       ],
@@ -790,7 +808,9 @@ export const THA_SPOT_FALLBACK_FEED: ThaSpotFeed = {
         "Work outer lanes first"
       ],
       "launchConfig": {
-        "difficulty": "Accessible",
+      "previewVideo": "https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-dj-playing-at-a-club-24545-large.mp4",
+      "bannerImage": "https://images.unsplash.com/photo-1514525253361-bee243870eb2?auto=format&fit=crop&w=1200&q=80",
+      "difficulty": "Accessible",
         "controls": [
           "Mouse"
         ],
@@ -809,7 +829,9 @@ export const THA_SPOT_FALLBACK_FEED: ThaSpotFeed = {
         "telemetryMode": "frame-only"
       },
       "art": {
-        "eyebrow": "Offline",
+      "previewVideo": "https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-dj-playing-at-a-club-24545-large.mp4",
+      "bannerImage": "https://images.unsplash.com/photo-1514525253361-bee243870eb2?auto=format&fit=crop&w=1200&q=80",
+      "eyebrow": "Offline",
         "accentStart": "#f59e0b",
         "accentEnd": "#f97316"
       }
@@ -828,6 +850,7 @@ export const THA_SPOT_FALLBACK_FEED: ThaSpotFeed = {
         "Arcade",
         "Original"
       ],
+
       "badgeIds": [
         "new-drop"
       ],
@@ -841,7 +864,9 @@ export const THA_SPOT_FALLBACK_FEED: ThaSpotFeed = {
         "Trigger boosts on downbeats"
       ],
       "launchConfig": {
-        "difficulty": "Adaptive",
+      "previewVideo": "https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-dj-playing-at-a-club-24545-large.mp4",
+      "bannerImage": "https://images.unsplash.com/photo-1514525253361-bee243870eb2?auto=format&fit=crop&w=1200&q=80",
+      "difficulty": "Adaptive",
         "controls": [
           "Lane keys"
         ],
@@ -860,7 +885,9 @@ export const THA_SPOT_FALLBACK_FEED: ThaSpotFeed = {
         "telemetryMode": "frame-only"
       },
       "art": {
-        "eyebrow": "Offline",
+      "previewVideo": "https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-dj-playing-at-a-club-24545-large.mp4",
+      "bannerImage": "https://images.unsplash.com/photo-1514525253361-bee243870eb2?auto=format&fit=crop&w=1200&q=80",
+      "eyebrow": "Offline",
         "accentStart": "#34d399",
         "accentEnd": "#059669"
       }
@@ -879,6 +906,7 @@ export const THA_SPOT_FALLBACK_FEED: ThaSpotFeed = {
         "Arcade",
         "Retro"
       ],
+
       "badgeIds": [
         "trending"
       ],
@@ -892,7 +920,9 @@ export const THA_SPOT_FALLBACK_FEED: ThaSpotFeed = {
         "Keep two lanes open for recovery"
       ],
       "launchConfig": {
-        "difficulty": "Reflex",
+      "previewVideo": "https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-dj-playing-at-a-club-24545-large.mp4",
+      "bannerImage": "https://images.unsplash.com/photo-1514525253361-bee243870eb2?auto=format&fit=crop&w=1200&q=80",
+      "difficulty": "Reflex",
         "controls": [
           "Left / Right arrows"
         ],
@@ -914,7 +944,9 @@ export const THA_SPOT_FALLBACK_FEED: ThaSpotFeed = {
         ]
       },
       "art": {
-        "eyebrow": "Online",
+      "previewVideo": "https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-dj-playing-at-a-club-24545-large.mp4",
+      "bannerImage": "https://images.unsplash.com/photo-1514525253361-bee243870eb2?auto=format&fit=crop&w=1200&q=80",
+      "eyebrow": "Online",
         "accentStart": "#06b6d4",
         "accentEnd": "#2563eb"
       }
@@ -935,6 +967,7 @@ export const THA_SPOT_FALLBACK_FEED: ThaSpotFeed = {
       ],
       "aiSupportLevel": "Neural",
       "aiBriefing": "S.M.U.V.E. is analyzing the logic matrix for optimal number combination strategies.",
+
       "badgeIds": [
         "staff-pick"
       ],
@@ -948,7 +981,9 @@ export const THA_SPOT_FALLBACK_FEED: ThaSpotFeed = {
         "Avoid vertical resets too early"
       ],
       "launchConfig": {
-        "difficulty": "Thinking",
+      "previewVideo": "https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-dj-playing-at-a-club-24545-large.mp4",
+      "bannerImage": "https://images.unsplash.com/photo-1514525253361-bee243870eb2?auto=format&fit=crop&w=1200&q=80",
+      "difficulty": "Thinking",
         "controls": [
           "Arrow keys"
         ],
@@ -970,7 +1005,9 @@ export const THA_SPOT_FALLBACK_FEED: ThaSpotFeed = {
         ]
       },
       "art": {
-        "eyebrow": "Online",
+      "previewVideo": "https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-dj-playing-at-a-club-24545-large.mp4",
+      "bannerImage": "https://images.unsplash.com/photo-1514525253361-bee243870eb2?auto=format&fit=crop&w=1200&q=80",
+      "eyebrow": "Online",
         "accentStart": "#f97316",
         "accentEnd": "#ea580c"
       }
@@ -989,6 +1026,7 @@ export const THA_SPOT_FALLBACK_FEED: ThaSpotFeed = {
         "Reflex",
         "Rhythm"
       ],
+
       "badgeIds": [
         "featured"
       ],
@@ -1002,7 +1040,9 @@ export const THA_SPOT_FALLBACK_FEED: ThaSpotFeed = {
         "Use slides to reset timing"
       ],
       "launchConfig": {
-        "difficulty": "Fast",
+      "previewVideo": "https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-dj-playing-at-a-club-24545-large.mp4",
+      "bannerImage": "https://images.unsplash.com/photo-1514525253361-bee243870eb2?auto=format&fit=crop&w=1200&q=80",
+      "difficulty": "Fast",
         "controls": [
           "Keyboard"
         ],
@@ -1024,7 +1064,9 @@ export const THA_SPOT_FALLBACK_FEED: ThaSpotFeed = {
         ]
       },
       "art": {
-        "eyebrow": "Online",
+      "previewVideo": "https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-dj-playing-at-a-club-24545-large.mp4",
+      "bannerImage": "https://images.unsplash.com/photo-1514525253361-bee243870eb2?auto=format&fit=crop&w=1200&q=80",
+      "eyebrow": "Online",
         "accentStart": "#ec4899",
         "accentEnd": "#db2777"
       }
