@@ -193,8 +193,8 @@
        <header class="console-header">
         <div class="console-title">{{ active.name }}</div>
         <div class="console-actions">
-           <button class="icon-btn" (click)="reloadGame()"><span class="material-symbols-outlined">refresh</span></button>
-           <button class="icon-btn" (click)="closeGame()"><span class="material-symbols-outlined">close</span></button>
+           <button class="icon-btn" aria-label="Refresh game" (click)="reloadGame()"><span class="material-symbols-outlined">refresh</span></button>
+           <button class="icon-btn" aria-label="Close game" (click)="closeGame()"><span class="material-symbols-outlined">close</span></button>
         </div>
       </header>
       <div class="console-body">
