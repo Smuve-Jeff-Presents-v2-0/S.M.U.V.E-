@@ -499,7 +499,7 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
   }
 
   onGameClick(game: Game) {
-    this.launchGame(game);
+    this.openPreview(game);
   }
 
   isPlaying() {
