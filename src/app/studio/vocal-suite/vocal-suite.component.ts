@@ -8,6 +8,9 @@ import {
   OnDestroy,
   computed,
   effect,
+import { UplinkService } from "../../services/uplink.service";
+import { UplinkConsoleComponent } from "../../components/uplink-console/uplink-console.component";
+import { UserProfileService, UserProfile } from "../../services/user-profile.service";
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UIService } from '../../services/ui.service';
@@ -24,7 +27,7 @@ type PipelineStep = 'setup' | 'record' | 'edit' | 'master';
 @Component({
   selector: 'app-vocal-suite',
   standalone: true,
-  imports: [CommonModule, FormsModule, MicrophoneInterfaceComponent],
+  imports: [CommonModule, FormsModule, MicrophoneInterfaceComponent, UplinkConsoleComponent],
   templateUrl: './vocal-suite.component.html',
   styleUrls: ['./vocal-suite.component.css'],
 })
@@ -34,6 +37,9 @@ export class VocalSuiteComponent implements AfterViewInit, OnDestroy {
   public readonly mastering = inject(VocalMasteringService);
   public readonly vocalAi = inject(VocalAiService);
   public readonly aiService = inject(AiService);
+  private uplinkService = inject(UplinkService);
+  private profileService = inject(UserProfileService);
+  showUplink = signal(false);
 
   @ViewChild('spectrograph') spectrographRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('waveformCanvas') waveformRef!: ElementRef<HTMLCanvasElement>;
@@ -191,13 +197,21 @@ export class VocalSuiteComponent implements AfterViewInit, OnDestroy {
     this.waveformCtx.stroke();
   }
 
-  downloadRecording() {
+  async downloadRecording() {
     const blob = this.micService.recordedBlob();
     if (blob) {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `SMUVE_Vocal_${Date.now()}.webm`;
+      this.showUplink.set(true);
+      const success = await this.uplinkService.initiateUplink(this.profileService.profile());
+
+      if (success) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `SMUVE_Vocal_${Date.now()}.webm`;
+        a.click();
+      }
+    }
+  }
       a.click();
     }
   }

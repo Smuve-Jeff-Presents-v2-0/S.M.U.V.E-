@@ -1,6 +1,9 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { InteractionDialogService } from '../../services/interaction-dialog.service';
+import { UplinkService } from "../../services/uplink.service";
+import { UplinkConsoleComponent } from "../uplink-console/uplink-console.component";
+import { UserProfileService } from "../../services/user-profile.service";
 
 interface Task {
   id: number;
@@ -30,12 +33,14 @@ interface PlaybookStep extends PlaybookPhase {
 @Component({
   selector: 'app-projects',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, UplinkConsoleComponent],
   templateUrl: './projects.component.html',
   styleUrl: './projects.component.css',
 })
 export class ProjectsComponent {
   private dialog = inject(InteractionDialogService);
+  private uplinkService = inject(UplinkService);
+  showUplink = signal(false);
   projects = signal<Project[]>([]);
   selectedProject = signal<Project | null>(null);
   private playbookTemplate: PlaybookPhase[] = [
@@ -162,11 +167,20 @@ export class ProjectsComponent {
     this.selectedProject.set(newProject);
   }
 
-  finalizeReleaseCycle(): void {
+  async finalizeReleaseCycle() {
     const project = this.selectedProject();
     if (!project) return;
-    this.projects.update((list) =>
-      list.map((p) => (p.id === project.id ? { ...p, status: 'Completed' } : p))
+
+    this.showUplink.set(true);
+    const success = await this.uplinkService.initiateUplink(this.profileService.profile());
+
+    if (success) {
+      this.projects.update((list) =>
+        list.map((p) => (p.id === project.id ? { ...p, status: "Completed" } : p))
+      );
+      this.selectedProject.set({ ...project, status: "Completed" });
+    }
+  }
     );
     this.selectedProject.set({ ...project, status: 'Completed' });
   }
