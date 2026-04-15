@@ -94,6 +94,16 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
   );
 
   activeRoom = signal<string>('all');
+  featuredGame = computed(() => this.games().find(g => g.badgeIds?.includes("featured")) || this.games()[0]);
+  trendingGames = computed(() => this.games().filter(g => g.badgeIds?.includes("trending")));
+  newGames = computed(() => this.games().filter(g => g.badgeIds?.includes("new-drop")));
+  genreRails = computed(() => {
+    const genres = [...new Set(this.games().map(g => g.genre).filter(Boolean))];
+    return genres.map(genre => ({
+      title: genre,
+      games: this.games().filter(g => g.genre === genre)
+    }));
+  });
   searchQuery = signal('');
   sortMode = signal<GameSortMode>('Popular');
   libraryView = signal<LibraryViewMode>('grid');
@@ -489,11 +499,19 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
     return this.activeRoom() === 'all' ? 'All Games' : this.getActiveRoomName();
   }
 
+  onGameClick(game: Game) {
+    this.launchGame(game);
+  }
+
+  isPlaying() {
+    return !!this.currentGame();
+  }
+
   toggleIntel() {
     this.showIntelPanel.update((value) => !value);
   }
 
-  previewGame(game: Game) {
+  openPreview(game: Game) {
     this.selectedGame.set(game);
     this.launchWarning.set(
       this.canEmbedInline(game)
@@ -674,7 +692,15 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
     }
 
     if (entry.relationship === 'rival' && !this.showIntelPanel()) {
-      this.toggleIntel();
+      this.onGameClick(game: Game) {
+    this.launchGame(game);
+  }
+
+  isPlaying() {
+    return !!this.currentGame();
+  }
+
+  toggleIntel();
     }
   }
 
