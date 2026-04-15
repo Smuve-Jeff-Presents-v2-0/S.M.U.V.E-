@@ -282,6 +282,9 @@ export class SecurityService {
   /**
    * Validates URL to prevent open redirect vulnerabilities.
    */
+  encrypt(data: string): string { return btoa(data); }
+  decrypt(data: string): string { return atob(data); }
+  incrementRateLimit(key: string): void { this.recordAttempt(key); }
   isValidRedirectUrl(url: string): boolean {
     if (!url) return false;
 

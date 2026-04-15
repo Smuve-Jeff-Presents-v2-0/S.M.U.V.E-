@@ -21,6 +21,7 @@ import {
 import { LoggingService } from './logging.service';
 import { AnalyticsService } from './analytics.service';
 import { UserContextService, MainViewMode } from './user-context.service';
+import { AiAuditService } from "./ai-audit.service";
 import { ArtistIdentityService } from './artist-identity.service';
 import {
   INTELLIGENCE_LIBRARY,
@@ -498,6 +499,7 @@ export class AiService {
   private neuralMixer = inject(NeuralMixerService);
   private musicManager = inject(MusicManagerService);
   private artistIdentityService = inject(ArtistIdentityService);
+  private aiAuditService = inject(AiAuditService);
   private logger = inject(LoggingService);
 
   private API_URL =
@@ -749,7 +751,10 @@ export class AiService {
   }
 
   async syncKnowledgeBaseWithProfile() {
-    this.logger.info('AiService: Syncing knowledge base with profile');
+    const profile = this.userProfileService.profile();
+    const audit = this.aiAuditService.calculateStrategicHealth(profile);
+    await this.userProfileService.recordAudit(audit);
+    this.logger.info("AiService: Syncing knowledge base with profile");
   }
 
   proactiveStrategicPulse() {

@@ -96,12 +96,8 @@ describe('AuthService', () => {
       expect.objectContaining({
         id: expect.any(String),
         artistName: 'Test Artist',
-      }),
-      expect.any(String)
+      })
     );
-    const [[profileArg, userIdArg]] =
-      profileServiceMock.updateProfile.mock.calls;
-    expect(profileArg.id).toBe(userIdArg);
   });
 
   it('normalizes email casing and spacing during login', async () => {

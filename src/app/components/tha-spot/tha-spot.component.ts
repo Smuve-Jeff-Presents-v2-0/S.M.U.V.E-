@@ -1088,6 +1088,9 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
     };
   }
 
+  hasRail(railId: string): boolean {
+    return this.recommendationRails().some(r => r.id === railId);
+  }
   private formatDuration(durationMs: number) {
     const totalMinutes = Math.max(0, Math.floor(durationMs / 60000));
     if (totalMinutes === 0) {

@@ -421,6 +421,57 @@
           </div>
         </div>
 
+        <div *ngSwitchCase="'business'" class="space-y-10 animate-fade-in">
+          <header class="border-b border-white/5 pb-6">
+            <h2 class="text-3xl font-black italic uppercase text-brand-primary">Business & Financials</h2>
+          </header>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <article class="identity-card">
+              <span class="identity-label">Total Revenue</span>
+              <strong class="identity-score">{{ editableProfile().financials.totalRevenue | currency }}</strong>
+            </article>
+            <article class="identity-card">
+              <span class="identity-label">Pending Payouts</span>
+              <strong class="identity-score text-brand-primary">{{ editableProfile().financials.pendingPayouts | currency }}</strong>
+            </article>
+          </div>
+
+          <section class="identity-panel">
+            <h3 class="text-lg font-black uppercase text-white mb-6">Linked Accounts</h3>
+            <div class="space-y-3">
+              <div *ngFor="let acc of editableProfile().financials.accounts" class="connector-row">
+                <div>
+                  <h4 class="text-sm font-black uppercase text-white">{{ acc.provider }}</h4>
+                  <p class="text-[10px] text-slate-500 uppercase tracking-widest">{{ acc.accountName }} • {{ acc.status }}</p>
+                </div>
+                <span class="text-white font-bold">{{ acc.balance | currency }}</span>
+              </div>
+              <p *ngIf="editableProfile().financials.accounts.length === 0" class="text-xs text-slate-500 italic">No financial accounts linked.</p>
+            </div>
+          </section>
+        </div>
+
+        <div *ngSwitchCase="'team'" class="space-y-10 animate-fade-in">
+          <header class="border-b border-white/5 pb-6">
+            <h2 class="text-3xl font-black italic uppercase text-brand-primary">Professional Team</h2>
+          </header>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <article *ngFor="let member of editableProfile().team" class="identity-card">
+              <div class="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-user text-slate-400"></i>
+              </div>
+              <h4 class="text-white font-black uppercase tracking-tight">{{ member.name }}</h4>
+              <p class="text-[10px] text-brand-primary font-bold uppercase tracking-widest">{{ member.role }}</p>
+            </article>
+
+            <button class="border-2 border-dashed border-white/10 rounded-[2rem] p-8 flex flex-col items-center justify-center gap-3 hover:border-brand-primary/50 transition-all group">
+              <i class="fas fa-plus text-slate-600 group-hover:text-brand-primary"></i>
+              <span class="text-[10px] font-black uppercase tracking-widest text-slate-500 group-hover:text-white">Deploy Team Member</span>
+            </button>
+          </div>
+        </div>
         <div *ngSwitchDefault class="py-20 text-center">
           <p class="text-slate-600 uppercase text-xs tracking-[0.3em] italic">
             Section encrypted or under construction.
@@ -436,4 +487,5 @@
       </app-artist-questionnaire>
     </main>
   </div>
+<app-uplink-console *ngIf="showUplink()" (close)="showUplink.set(false)"></app-uplink-console>
 </div>
