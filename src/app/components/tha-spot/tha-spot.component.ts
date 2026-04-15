@@ -94,7 +94,6 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
   );
 
   activeRoom = signal<string>('all');
-  featuredGame = computed(() => this.games().find(g => g.badgeIds?.includes("featured")) || this.games()[0]);
   trendingGames = computed(() => this.games().filter(g => g.badgeIds?.includes("trending")));
   newGames = computed(() => this.games().filter(g => g.badgeIds?.includes("new-drop")));
   genreRails = computed(() => {
@@ -522,6 +521,10 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
     this.frameError.set(null);
   }
 
+  previewGame(game: Game) {
+    this.openPreview(game);
+  }
+
   closePreview() {
     this.selectedGame.set(null);
     this.launchWarning.set(null);
@@ -692,15 +695,7 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
     }
 
     if (entry.relationship === 'rival' && !this.showIntelPanel()) {
-      this.onGameClick(game: Game) {
-    this.launchGame(game);
-  }
-
-  isPlaying() {
-    return !!this.currentGame();
-  }
-
-  toggleIntel();
+      this.toggleIntel();
     }
   }
 
