@@ -482,7 +482,7 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
     else this.deckService.deckB.update((d) => ({ ...d, playbackRate: r }));
   }
 
-  setEq(deck: 'A' | 'B', band: 'high' | 'mid' | 'low', val: any) {
+  updateEq(deck: 'A' | 'B', band: 'high' | 'mid' | 'low', val: any) {
     const v = parseFloat(val);
     const d =
       deck === 'A' ? this.deckService.deckA() : this.deckService.deckB();
@@ -493,7 +493,7 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
     this.deckService.setDeckEq(deck, eqHigh, eqMid, eqLow);
   }
 
-  setFilter(deck: 'A' | 'B', val: any) {
+  updateFilter(deck: 'A' | 'B', val: any) {
     this.deckService.setDeckFilter(deck, parseFloat(val));
   }
 
@@ -511,7 +511,7 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
     this.engine.setMasterOutputLevel(v);
   }
 
-  startStopRecording() {
+  toggleRecording() {
     if (this.recording()) {
       this.sessionNotice.set('Finalizing live mix capture...');
       this.recorder?.stop();
@@ -811,7 +811,7 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  private formatDuration(durationMs: number) {
+  formatDuration(durationMs: number) {
     const totalSeconds = Math.max(0, Math.floor(durationMs / 1000));
     const minutes = Math.floor(totalSeconds / 60)
       .toString()
