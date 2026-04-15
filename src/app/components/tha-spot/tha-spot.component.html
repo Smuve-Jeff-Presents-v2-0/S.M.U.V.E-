@@ -11,7 +11,7 @@
     <div class="header-actions">
       <div class="search-executive">
         <span class="material-symbols-outlined">search</span>
-        <input type="text" placeholder="QUERY SIGNAL..." [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" />
+        <input type="text" aria-label="Search" placeholder="QUERY SIGNAL..." [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" />
       </div>
       <button class="intel-toggle" [class.active]="showIntelPanel()" (click)="showIntelPanel.set(!showIntelPanel())">
         <span class="material-symbols-outlined">analytics</span>
