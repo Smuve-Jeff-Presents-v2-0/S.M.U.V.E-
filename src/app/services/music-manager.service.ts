@@ -1,4 +1,4 @@
-import { AudioRecorderService } from "../studio/audio-recorder.service";
+import { AudioRecorderService } from '../studio/audio-recorder.service';
 import { Injectable, inject, signal, effect } from '@angular/core';
 import { LoggingService } from './logging.service';
 import { InstrumentsService } from './instruments.service';
