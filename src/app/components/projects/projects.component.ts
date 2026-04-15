@@ -40,6 +40,7 @@ interface PlaybookStep extends PlaybookPhase {
 export class ProjectsComponent {
   private dialog = inject(InteractionDialogService);
   private uplinkService = inject(UplinkService);
+  private profileService = inject(UserProfileService);
   showUplink = signal(false);
   projects = signal<Project[]>([]);
   selectedProject = signal<Project | null>(null);
@@ -86,7 +87,6 @@ export class ProjectsComponent {
 
   toggleTask(task: Task): void {
     task.completed = !task.completed;
-    // Potentially update project status if all tasks are completed
   }
 
   getProjectProgress(project: Project): number {
@@ -180,8 +180,5 @@ export class ProjectsComponent {
       );
       this.selectedProject.set({ ...project, status: "Completed" });
     }
-  }
-    );
-    this.selectedProject.set({ ...project, status: 'Completed' });
   }
 }

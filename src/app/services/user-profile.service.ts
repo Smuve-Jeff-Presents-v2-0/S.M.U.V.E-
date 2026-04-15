@@ -26,7 +26,7 @@ import {
   ProfileAuditLog
 } from '../types/profile.types';
 
-export {
+export type {
   UserProfile,
   AppSettings,
   CatalogItem,
@@ -132,12 +132,12 @@ export class UserProfileService {
     this.loadProfile();
   }
 
-  private async loadProfile() {
+  async loadProfile(userId: string = "current") {
     try {
-      const saved = await this.db.loadUserProfile('current');
+      const saved = await this.db.loadUserProfile(userId);
       if (saved) {
         this.profile.set(this.sanitizeProfile(saved));
-      } else {
+      } else if (userId === 'current') {
         await this.updateProfile(initialProfile);
       }
     } catch (err) {
@@ -153,6 +153,20 @@ export class UserProfileService {
       await this.db.saveUserProfile(next, 'current');
     } catch (err) {
       this.logger.error('Failed to save profile', err);
+    }
+  }
+
+  async acquireUpgrade(upgrade: { title: string; type: string; recommendationId?: string }) {
+    const next = this.buildUpgradeState(this.profile(), upgrade, 'acquired');
+    if (next) {
+      await this.updateProfile(next);
+    }
+  }
+
+  async completeUpgrade(upgrade: { title: string; type: string; recommendationId?: string }) {
+    const next = this.buildUpgradeState(this.profile(), upgrade, 'completed');
+    if (next) {
+      await this.updateProfile(next);
     }
   }
 
@@ -433,6 +447,63 @@ export class UserProfileService {
         profile.thaSpotProgression
       ),
     };
+  }
+
+  private buildUpgradeState(
+    current: UserProfile,
+    upgrade: { title: string; type: string; recommendationId?: string },
+    state: Extract<
+      NonNullable<UpgradeRecommendation['state']>,
+      'acquired' | 'completed'
+    >
+  ): UserProfile | null {
+    const title = upgrade.title?.trim() || '';
+    if (!title) {
+      return null;
+    }
+
+    const next: UserProfile = {
+      ...current,
+      equipment: [...(current.equipment || [])],
+      daw: [...(current.daw || [])],
+      services: [...(current.services || [])],
+      recommendationPreferences: {
+        ...(current.recommendationPreferences || {}),
+      },
+      recommendationHistory: [...(current.recommendationHistory || [])],
+    };
+
+    if (upgrade.type === 'Gear') {
+      if (!next.equipment.includes(title)) next.equipment.push(title);
+    } else if (upgrade.type === 'Software') {
+      if (!next.daw.includes(title)) next.daw.push(title);
+    } else if (upgrade.type === 'Service') {
+      if (!next.services.includes(title)) next.services.push(title);
+    } else {
+      return null;
+    }
+
+    if (upgrade.recommendationId) {
+      const preference =
+        next.recommendationPreferences[upgrade.recommendationId];
+      next.recommendationPreferences[upgrade.recommendationId] = {
+        state,
+        updatedAt: Date.now(),
+        actionCount: (preference?.actionCount || 0) + 1,
+      };
+      next.recommendationHistory = this.appendRecommendationHistory(
+        next.recommendationHistory,
+        {
+          recommendationId: upgrade.recommendationId,
+          title,
+          type: this.normalizeRecommendationType(upgrade.type),
+          state,
+          updatedAt: Date.now(),
+        }
+      );
+    }
+
+    return next;
   }
 
   private sanitizeGameStats(

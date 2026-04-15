@@ -1,10 +1,9 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService, AuthCredentials } from '../../services/auth.service';
-import { SecurityService } from '../../services/security.service';
-import { OnboardingService } from '../../services/onboarding.service';
+import { LoggingService } from '../../services/logging.service';
 
 @Component({
   selector: 'app-login',
@@ -13,81 +12,53 @@ import { OnboardingService } from '../../services/onboarding.service';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
-  private route = inject(ActivatedRoute);
-  private securityService = inject(SecurityService);
-  private onboarding = inject(OnboardingService);
+  private logger = inject(LoggingService);
 
   isRegistering = signal(false);
   isLoading = signal(false);
-  message = signal('');
-  isError = signal(false);
+  message = signal<string | null>(null);
 
   credentials: AuthCredentials = {
     email: '',
     password: '',
+    artistName: '',
   };
-  artistName = '';
-
-  ngOnInit() {
-    if (this.authService.isAuthenticated()) {
-      void this.navigateAfterAuth();
-    }
-  }
-
-  async onSubmit() {
-    this.isLoading.set(true);
-    this.message.set('');
-    this.isError.set(false);
-
-    try {
-      let result;
-      if (this.isRegistering()) {
-        result = await this.authService.register(
-          this.credentials,
-          this.artistName
-        );
-      } else {
-        result = await this.authService.login(this.credentials);
-      }
-
-      this.message.set(result.message);
-      if (result.success) {
-        setTimeout(() => {
-          void this.navigateAfterAuth();
-        }, 1500);
-      } else {
-        this.isError.set(true);
-      }
-    } catch (_err) {
-      this.isError.set(true);
-      this.message.set('An unexpected error occurred. System offline.');
-    } finally {
-      this.isLoading.set(false);
-    }
-  }
 
   toggleMode() {
     this.isRegistering.update((v) => !v);
-    this.message.set('');
+    this.message.set(null);
   }
 
-  private async navigateAfterAuth(): Promise<void> {
-    const requestedUrl = this.route.snapshot.queryParamMap.get('returnUrl');
-    if (requestedUrl && this.securityService.isValidRedirectUrl(requestedUrl)) {
-      await this.router.navigateByUrl(requestedUrl);
+  async onSubmit() {
+    if (!this.credentials.email || !this.credentials.password) {
+      this.message.set('Please fill in all required fields.');
       return;
     }
 
-    if (this.onboarding.shouldShow()) {
-      await this.router.navigate(['/hub'], {
-        queryParams: { onboarding: '1' },
-      });
-      return;
-    }
+    this.isLoading.set(true);
+    this.message.set(null);
 
-    await this.router.navigateByUrl('/hub');
+    try {
+      let result;
+      if (!this.isRegistering()) {
+        result = await this.authService.login(this.credentials);
+      } else {
+        result = await this.authService.register(this.credentials);
+      }
+
+      if (result.success) {
+        this.router.navigate(['/hub']);
+      } else {
+        this.message.set(result.message || 'Authentication failed.');
+      }
+    } catch (err) {
+      this.logger.error('Login error', err);
+      this.message.set('A system error occurred. Please try again.');
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 }

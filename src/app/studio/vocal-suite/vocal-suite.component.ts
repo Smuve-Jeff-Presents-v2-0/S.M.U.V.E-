@@ -8,9 +8,6 @@ import {
   OnDestroy,
   computed,
   effect,
-import { UplinkService } from "../../services/uplink.service";
-import { UplinkConsoleComponent } from "../../components/uplink-console/uplink-console.component";
-import { UserProfileService, UserProfile } from "../../services/user-profile.service";
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UIService } from '../../services/ui.service';
@@ -18,6 +15,9 @@ import { MicrophoneService } from '../../services/microphone.service';
 import { VocalMasteringService } from '../../services/vocal-mastering.service';
 import { VocalAiService } from '../../services/vocal-ai.service';
 import { AiService } from '../../services/ai.service';
+import { UplinkService } from "../../services/uplink.service";
+import { UserProfileService } from "../../services/user-profile.service";
+import { UplinkConsoleComponent } from "../../components/uplink-console/uplink-console.component";
 import { FormsModule } from '@angular/forms';
 import { MicrophoneInterfaceComponent } from '../microphone-interface/microphone-interface.component';
 
@@ -210,9 +210,6 @@ export class VocalSuiteComponent implements AfterViewInit, OnDestroy {
         a.download = `SMUVE_Vocal_${Date.now()}.webm`;
         a.click();
       }
-    }
-  }
-      a.click();
     }
   }
 }

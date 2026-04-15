@@ -57,7 +57,7 @@ export class ArtistQuestionnaireComponent {
     ...this.userProfileService.profile(),
     genreSpecificData:
       this.userProfileService.profile().genreSpecificData || {},
-    expertise: this.userProfileService.profile().expertise || {},
+    expertise: this.userProfileService.profile().expertise,
     strategicGoals: this.userProfileService.profile().strategicGoals || [],
   });
 
