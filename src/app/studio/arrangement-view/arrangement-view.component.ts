@@ -124,10 +124,4 @@ export class ArrangementViewComponent {
   isClipSelected(clipId: string): boolean {
     return this.selectedClipId() === clipId;
   }
-  toggleArm(id: number) {
-    this.tracks.update(tracks => tracks.map(t => ({
-      ...t,
-      armed: t.id === id ? !t.armed : false
-    })));
-  }
 }
