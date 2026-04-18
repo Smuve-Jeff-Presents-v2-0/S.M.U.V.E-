@@ -369,7 +369,11 @@ export class AudioEngineService {
     const nodes = this.deckNodes.get(id)!;
     nodes.gain.gain.setTargetAtTime(gain, this.ctx!.currentTime, 0.05);
   }
-public setMasterOutputLevel(vol: any) { if (this.masterGain) this.masterGain.gain.setTargetAtTime(vol, 0, 0.1); }
+  public setMasterOutputLevel(vol: any) {
+    if (!this.masterGain || !this.ctx) return;
+    const safeVol = Math.max(0, Math.min(1, Number.isFinite(Number(vol)) ? Number(vol) : 0));
+    this.masterGain.gain.setTargetAtTime(safeVol, this.ctx.currentTime, 0.1);
+  }
   public getMasteringTargets(): any { return { lufs: -14, truePeak: -1 }; }
   public setMasteringTargets(targets: any) {}
   public configureCompressor(cfg: any) {}
