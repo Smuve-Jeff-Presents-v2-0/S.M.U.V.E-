@@ -260,8 +260,9 @@ export class MusicManagerService {
   rotatePatternLane(trackId: number, shift = 1) {
     this.getTrackSignal(trackId).update(t => {
       const len = 64;
-      const nextSteps = [...t.steps.slice(-shift), ...t.steps.slice(0, -shift)];
-      const nextNotes = t.notes.map(n => ({ ...n, step: n.step < 64 ? (n.step + shift) % 64 : n.step }));
+      const normalizedShift = ((shift % len) + len) % len;
+      const nextSteps = [...t.steps.slice(-normalizedShift), ...t.steps.slice(0, -normalizedShift)];
+      const nextNotes = t.notes.map(n => ({ ...n, step: n.step < len ? (n.step + normalizedShift) % len : n.step }));
       return { ...t, steps: nextSteps, notes: nextNotes };
     });
   }
