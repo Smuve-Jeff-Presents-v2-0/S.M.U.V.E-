@@ -645,7 +645,7 @@ export class AudioEngineService {
     osc.frequency.value = freq;
     osc.connect(filter).connect(vca).connect(p).connect(this.masterGain);
     osc.start(when);
-    osc.stop(when + duration + 2.0);
+    osc.stop(when + duration + r * 5);
   }
 
   playBuffer(
@@ -982,10 +982,12 @@ export class AudioEngineService {
 
   seekDeck(id: DeckId, seconds: number) {
     const deck = this.getDeck(id);
+    const dur = deck.buffer?.duration || 0;
+    const clamped = Math.max(0, Math.min(seconds, dur));
     const wasPlaying = deck.isPlaying;
     this.stopDeckSource(deck);
-    deck.pauseOffset = seconds;
-    if (wasPlaying) this.startDeckSource(deck, seconds);
+    deck.pauseOffset = clamped;
+    if (wasPlaying) this.startDeckSource(deck, clamped);
   }
   getMasterStream(): MediaStreamAudioDestinationNode {
     if (!this.recordingDestination) {

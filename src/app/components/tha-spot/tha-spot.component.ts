@@ -250,8 +250,13 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
     // constructor body
   }
 
+  private messageHandler = (event: MessageEvent) => this.onMessage(event);
+
   ngOnInit() {
     this.loadFeed();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('message', this.messageHandler);
+    }
   }
 
   ngOnDestroy() {
@@ -259,6 +264,9 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
     if (this.feedRefreshId) clearInterval(this.feedRefreshId);
     if (this.matchmakingTimerId) clearTimeout(this.matchmakingTimerId);
     this.feedSubscription?.unsubscribe();
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('message', this.messageHandler);
+    }
   }
 
   setActiveRoom(roomId: string) {

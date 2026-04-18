@@ -269,7 +269,7 @@ export class HubComponent implements OnInit, OnDestroy, AfterViewInit {
       }
       this.animFrame = requestAnimationFrame(update);
     };
-    update();
+    this.animFrame = requestAnimationFrame(update);
   }
 
   ngOnDestroy() {
