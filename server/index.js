@@ -74,6 +74,14 @@ const loginEmailLimiter = rateLimit({
   message: { success: false, error: 'Too many requests. Try again later.' },
 });
 
+const aiAnalyzeLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many AI requests. Try again later.' },
+});
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
@@ -293,11 +301,14 @@ app.get('/api/security/logs/:userId', authenticateToken, authorizeUser, async (r
 });
 
 app.post('/api/security/log', authenticateToken, authorizeUser, async (req, res) => {
+  if (!isNonEmptyString(req.body.eventType)) {
+    return res.status(400).json({ error: "eventType is required." });
+  }
   try {
     const { userId, eventType, description, ipAddress, userAgent } = req.body;
     await pool.query(
       'INSERT INTO security_logs (user_id, event_type, description, ip_address, user_agent) VALUES ($1, $2, $3, $4, $5)',
-      [userId, eventType, description, ipAddress, userAgent]
+      [userId, eventType, description || '', ipAddress || '', userAgent || '']
     );
     res.json({ success: true });
   } catch (err) {
@@ -319,11 +330,14 @@ app.get('/api/security/sessions/:userId', authenticateToken, authorizeUser, asyn
 });
 
 app.post('/api/security/session', authenticateToken, authorizeUser, async (req, res) => {
+  if (!isNonEmptyString(req.body.sessionId)) {
+    return res.status(400).json({ error: "sessionId is required." });
+  }
   try {
     const { sessionId, userId, deviceName, location } = req.body;
     await pool.query(
       'INSERT INTO user_sessions (session_id, user_id, device_name, location) VALUES ($1, $2, $3, $4) ON CONFLICT (session_id) DO UPDATE SET last_active = CURRENT_TIMESTAMP',
-      [sessionId, userId, deviceName, location]
+      [sessionId, userId, deviceName || '', location || '']
     );
     res.json({ success: true });
   } catch (err) {
@@ -525,6 +539,9 @@ app.get('/api/identity/:userId', authenticateToken, authorizeUser, async (req, r
 });
 
 app.post('/api/identity', authenticateToken, authorizeUser, async (req, res) => {
+  if (!isObject(req.body.identity)) {
+    return res.status(400).json({ error: "Identity data is required." });
+  }
   try {
     const { userId, identity, profileData } = req.body;
     await pool.query(
@@ -557,8 +574,12 @@ app.post(
   async (req, res) => {
     try {
       const { userId, connectorId } = req.params;
+      if (!isNonEmptyString(connectorId) || connectorId.length > 80) {
+        return res.status(400).json({ error: "Invalid connector ID." });
+      }
       const { trigger = 'manual', payload = {} } = req.body || {};
-      const jobId = `job_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      const crypto = require('node:crypto');
+      const jobId = `job_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
 
       await pool.query(
         'INSERT INTO connector_jobs (job_id, user_id, connector_id, status, trigger_type, payload, updated_at) VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP)',
@@ -573,7 +594,10 @@ app.post(
 );
 
 // AI Analyze Proxy
-app.post('/api/ai/analyze', authenticateToken, async (req, res) => {
+app.post('/api/ai/analyze', aiAnalyzeLimiter, authenticateToken, async (req, res) => {
+  if (!isNonEmptyString(req.body.prompt)) {
+    return res.status(400).json({ error: "A non-empty prompt is required." });
+  }
   try {
     const { prompt } = req.body;
     const response = await genAI.models.generateContent({

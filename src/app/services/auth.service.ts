@@ -525,9 +525,7 @@ export class AuthService {
     const user = this._currentUser();
     if (!user) return { success: false, message: 'No active session.' };
 
-    user.verificationCode = Math.floor(
-      100000 + Math.random() * 900000
-    ).toString();
+    user.verificationCode = (100000 + this.secureRandomInt(900000)).toString();
     this._currentUser.set({ ...user });
 
     // Update stored user data
