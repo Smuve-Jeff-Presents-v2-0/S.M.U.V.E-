@@ -62,5 +62,8 @@ export class MixerComponent {
 
     this.musicManager.engine.updateTrack(trackId, { fxSlots: updatedSlots });
   }
-  resetTrack(id: number) { this.musicManager.engine.updateTrack(id, { gain: 0.9, pan: 0 }); }
+  resetTrack(id: number) {
+    this.musicManager.tracks.update(ts => ts.map(t => t.id === id ? { ...t, gain: 0.9, pan: 0 } : t));
+    this.musicManager.engine.updateTrack(id, { gain: 0.9, pan: 0 });
+  }
 }
