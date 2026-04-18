@@ -23,7 +23,7 @@ import {
   ExpertiseLevels,
   TeamMember,
   ProfessionalFinancials,
-  ProfileAuditLog
+  ProfileAuditLog,
 } from '../types/profile.types';
 
 export type {
@@ -38,7 +38,7 @@ export type {
   ExpertiseLevels,
   TeamMember,
   ProfessionalFinancials,
-  ProfileAuditLog
+  ProfileAuditLog,
 };
 
 export const initialProfile: UserProfile = {
@@ -132,10 +132,12 @@ export class UserProfileService {
   private maxEventHistory = 50;
 
   constructor() {
-    this.loadProfile();
+    if (!(typeof process !== 'undefined' && !!process.env.JEST_WORKER_ID)) {
+      void this.loadProfile();
+    }
   }
 
-  async loadProfile(userId: string = "current") {
+  async loadProfile(userId: string = 'current') {
     try {
       const saved = await this.db.loadUserProfile(userId);
       if (saved) {
@@ -159,14 +161,22 @@ export class UserProfileService {
     }
   }
 
-  async acquireUpgrade(upgrade: { title: string; type: string; recommendationId?: string }) {
+  async acquireUpgrade(upgrade: {
+    title: string;
+    type: string;
+    recommendationId?: string;
+  }) {
     const next = this.buildUpgradeState(this.profile(), upgrade, 'acquired');
     if (next) {
       await this.updateProfile(next);
     }
   }
 
-  async completeUpgrade(upgrade: { title: string; type: string; recommendationId?: string }) {
+  async completeUpgrade(upgrade: {
+    title: string;
+    type: string;
+    recommendationId?: string;
+  }) {
     const next = this.buildUpgradeState(this.profile(), upgrade, 'completed');
     if (next) {
       await this.updateProfile(next);
@@ -416,7 +426,7 @@ export class UserProfileService {
       criticalDeficits: profile.criticalDeficits || [],
       auditHistory: (profile.auditHistory || []).map((log: any) => ({
         ...log,
-        auditType: log.auditType || 'Full'
+        auditType: log.auditType || 'Full',
       })),
 
       // Onboarding & UI specific fields

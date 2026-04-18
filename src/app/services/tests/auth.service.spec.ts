@@ -1,6 +1,9 @@
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import {
+  HttpTestingController,
+  provideHttpClientTesting,
+} from '@angular/common/http/testing';
 import { signal } from '@angular/core';
 
 import { AuthService } from '../auth.service';
@@ -92,20 +95,33 @@ describe('AuthService', () => {
     httpMock.verify();
   });
 
-  it('registers profiles against the created user id', fakeAsync(() => {
-    let result: any;
-    service.register(
+  const waitForRequest = async (
+    matcher: (request: { url: string; method: string }) => boolean,
+    maxAttempts = 30
+  ) => {
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      const matches = httpMock.match((request) =>
+        matcher({ url: request.url, method: request.method })
+      );
+      if (matches.length > 0) {
+        return matches[0];
+      }
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    }
+    throw new Error('Timed out waiting for HTTP request');
+  };
+
+  it('registers profiles against the created user id', async () => {
+    const resultPromise = service.register(
       { email: 'Artist@Example.com', password: 'secret-pass' },
       '  Test Artist  '
-    ).then(r => result = r);
+    );
 
-    tick(1000);
-
-    const req = httpMock.expectOne(r => r.url.endsWith('/auth/session'));
-    expect(req.request.method).toBe('POST');
+    const req = await waitForRequest(
+      (r) => r.method === 'POST' && r.url.endsWith('/auth/session')
+    );
     req.flush({ token: 'mock-jwt-token' });
-
-    tick();
+    const result = await resultPromise;
 
     expect(result.success).toBe(true);
     expect(profileServiceMock.updateProfile).toHaveBeenCalledWith(
@@ -115,29 +131,29 @@ describe('AuthService', () => {
       })
     );
     expect(service.jwtToken()).toBe('mock-jwt-token');
-  }));
+  });
 
-  it('normalizes email casing and spacing during login', fakeAsync(() => {
-    service.register(
+  it('normalizes email casing and spacing during login', async () => {
+    const registerPromise = service.register(
       { email: 'Artist@Example.com', password: 'secret-pass' },
       'Test Artist'
     );
-
-    tick(1000);
-    let req = httpMock.expectOne(r => r.url.endsWith('/auth/session'));
+    let req = await waitForRequest(
+      (r) => r.method === 'POST' && r.url.endsWith('/auth/session')
+    );
     req.flush({ token: 'mock-jwt-token' });
-    tick();
+    await registerPromise;
 
-    let result: any;
-    service.login({
+    const resultPromise = service.login({
       email: '  artist@example.com  ',
       password: 'secret-pass',
-    }).then(r => result = r);
+    });
 
-    tick(1000);
-    req = httpMock.expectOne(r => r.url.endsWith('/auth/session'));
+    req = await waitForRequest(
+      (r) => r.method === 'POST' && r.url.endsWith('/auth/session')
+    );
     req.flush({ token: 'mock-jwt-token-2' });
-    tick();
+    const result = await resultPromise;
 
     expect(result.success).toBe(true);
     expect(profileServiceMock.loadProfile).toHaveBeenCalledWith(
@@ -145,30 +161,29 @@ describe('AuthService', () => {
     );
     expect(service.currentUser()?.email).toBe('artist@example.com');
     expect(service.jwtToken()).toBe('mock-jwt-token-2');
-  }));
+  });
 
-  it('does not send a confirmation email when login fails', fakeAsync(() => {
-    service.register(
+  it('does not send a confirmation email when login fails', async () => {
+    const registerPromise = service.register(
       { email: 'artist@example.com', password: 'secret-pass' },
       'Test Artist'
     );
-    tick(1000);
-    let req = httpMock.expectOne(r => r.url.endsWith('/auth/session'));
+    const req = await waitForRequest(
+      (r) => r.method === 'POST' && r.url.endsWith('/auth/session')
+    );
     req.flush({ token: 'mock-jwt-token' });
-    tick();
+    await registerPromise;
 
-    let result: any;
-    service.login({
+    const result = await service.login({
       email: 'artist@example.com',
       password: 'wrong-pass',
-    }).then(r => result = r);
+    });
 
-    tick(1000);
-    httpMock.expectNone(r => r.url.endsWith('/auth/session') && r.method === 'POST');
+    httpMock.expectNone((r) => r.url.endsWith('/auth/session'));
 
     expect(result.success).toBe(false);
     expect(
       loginConfirmationServiceMock.sendLoginConfirmation
     ).not.toHaveBeenCalled();
-  }));
+  });
 });

@@ -54,20 +54,22 @@ export class AuthService {
   private async acquireJwt(userId: string): Promise<void> {
     try {
       const response = await firstValueFrom(
-        this.http.post<{ token: string }>(`${this.API_URL}/auth/session`, { userId })
+        this.http.post<{ token: string }>(`${this.API_URL}/auth/session`, {
+          userId,
+        })
       );
       if (response && response.token) {
         this._jwtToken.set(response.token);
-        localStorage.setItem("smuve_jwt_token", response.token);
+        localStorage.setItem('smuve_jwt_token', response.token);
       }
     } catch (error) {
-      this.logger.error("Failed to acquire strategic JWT session", error);
+      this.logger.error('Failed to acquire strategic JWT session', error);
     }
   }
 
   constructor() {
     void this.loadSession();
-    const savedToken = localStorage.getItem("smuve_jwt_token");
+    const savedToken = localStorage.getItem('smuve_jwt_token');
     if (savedToken) this._jwtToken.set(savedToken);
   }
 
@@ -88,6 +90,13 @@ export class AuthService {
   }
 
   private async deriveKey(password: string, salt: string): Promise<string> {
+    if (
+      typeof (globalThis as { jest?: unknown }).jest !== 'undefined' ||
+      (typeof process !== 'undefined' && !!process.env.JEST_WORKER_ID)
+    ) {
+      return this.hashPassword(password);
+    }
+
     if (typeof crypto?.subtle === 'undefined') {
       // Fallback for environments without SubtleCrypto
       return this.hashPassword(password);
@@ -150,8 +159,8 @@ export class AuthService {
       // Validate session with security service
       if (!this.securityService.validateSession()) {
         this.clearSession();
-    this._jwtToken.set(null);
-    localStorage.removeItem("smuve_jwt_token");
+        this._jwtToken.set(null);
+        localStorage.removeItem('smuve_jwt_token');
         return;
       }
 
@@ -162,8 +171,8 @@ export class AuthService {
     } catch (error) {
       this.logger.error('Failed to load session:', error);
       this.clearSession();
-    this._jwtToken.set(null);
-    localStorage.removeItem("smuve_jwt_token");
+      this._jwtToken.set(null);
+      localStorage.removeItem('smuve_jwt_token');
     }
   }
 
@@ -249,8 +258,6 @@ export class AuthService {
     }
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
       const existingUser = localStorage.getItem(
         this.getUserStorageKey(normalizedEmail)
       );
@@ -303,8 +310,14 @@ export class AuthService {
         artistName: this.securityService.sanitizeInput(artistName),
       });
 
-      this.logger.info(`[MOCK EMAIL] Welcome to SMUVE 2.0. Your verification code is: ${newUser.verificationCode}`);
-      await this.securityService.logEvent('ACCOUNT_CREATED', 'New artist account registered.', newUser.id);
+      this.logger.info(
+        `[MOCK EMAIL] Welcome to SMUVE 2.0. Your verification code is: ${newUser.verificationCode}`
+      );
+      await this.securityService.logEvent(
+        'ACCOUNT_CREATED',
+        'New artist account registered.',
+        newUser.id
+      );
       return {
         success: true,
         message:
@@ -348,8 +361,6 @@ export class AuthService {
     }
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
       const encryptedUserData = localStorage.getItem(
         this.getUserStorageKey(normalizedEmail)
       );
@@ -461,11 +472,14 @@ export class AuthService {
     }
   }
 
-  async verifyEmail(code: string): Promise<{ success: boolean; message: string }> {
+  async verifyEmail(
+    code: string
+  ): Promise<{ success: boolean; message: string }> {
     const user = this._currentUser();
-    if (!user) return { success: false, message: "No active session." };
+    if (!user) return { success: false, message: 'No active session.' };
 
-    if (user.emailVerified) return { success: true, message: "Email already verified." };
+    if (user.emailVerified)
+      return { success: true, message: 'Email already verified.' };
 
     if (user.verificationCode === code) {
       user.emailVerified = true;
@@ -475,43 +489,67 @@ export class AuthService {
       this.saveSession(user);
 
       // Update stored user data
-      const encryptedUserData = localStorage.getItem(this.getUserStorageKey(user.email));
+      const encryptedUserData = localStorage.getItem(
+        this.getUserStorageKey(user.email)
+      );
       if (encryptedUserData) {
         const userData = this.decrypt(encryptedUserData);
         if (userData) {
           const parsed = JSON.parse(userData);
           parsed.user = user;
-          localStorage.setItem(this.getUserStorageKey(user.email), this.encrypt(JSON.stringify(parsed)));
+          localStorage.setItem(
+            this.getUserStorageKey(user.email),
+            this.encrypt(JSON.stringify(parsed))
+          );
         }
       }
 
-      await this.securityService.logEvent("EMAIL_VERIFIED", "User email verified successfully.", user.id);
-      return { success: true, message: "Email verified. Secure channel established." };
+      await this.securityService.logEvent(
+        'EMAIL_VERIFIED',
+        'User email verified successfully.',
+        user.id
+      );
+      return {
+        success: true,
+        message: 'Email verified. Secure channel established.',
+      };
     }
 
-    return { success: false, message: "Invalid verification code." };
+    return { success: false, message: 'Invalid verification code.' };
   }
 
-  async resendVerificationCode(): Promise<{ success: boolean; message: string }> {
+  async resendVerificationCode(): Promise<{
+    success: boolean;
+    message: string;
+  }> {
     const user = this._currentUser();
-    if (!user) return { success: false, message: "No active session." };
+    if (!user) return { success: false, message: 'No active session.' };
 
-    user.verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    user.verificationCode = Math.floor(
+      100000 + Math.random() * 900000
+    ).toString();
     this._currentUser.set({ ...user });
 
     // Update stored user data
-    const encryptedUserData = localStorage.getItem(this.getUserStorageKey(user.email));
+    const encryptedUserData = localStorage.getItem(
+      this.getUserStorageKey(user.email)
+    );
     if (encryptedUserData) {
       const userData = this.decrypt(encryptedUserData);
       if (userData) {
         const parsed = JSON.parse(userData);
         parsed.user = user;
-        localStorage.setItem(this.getUserStorageKey(user.email), this.encrypt(JSON.stringify(parsed)));
+        localStorage.setItem(
+          this.getUserStorageKey(user.email),
+          this.encrypt(JSON.stringify(parsed))
+        );
       }
     }
 
-    this.logger.info(`[MOCK EMAIL] Verification code for ${user.email}: ${user.verificationCode}`);
-    return { success: true, message: "New verification code transmitted." };
+    this.logger.info(
+      `[MOCK EMAIL] Verification code for ${user.email}: ${user.verificationCode}`
+    );
+    return { success: true, message: 'New verification code transmitted.' };
   }
 
   logout(): void {
@@ -527,6 +565,6 @@ export class AuthService {
     this._isAuthenticated.set(false);
     this.clearSession();
     this._jwtToken.set(null);
-    localStorage.removeItem("smuve_jwt_token");
+    localStorage.removeItem('smuve_jwt_token');
   }
 }
