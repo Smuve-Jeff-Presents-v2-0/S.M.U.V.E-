@@ -59,10 +59,13 @@ export class AiService {
   isAIDrummerActive = signal(false);
   isAIKeyboardistActive = signal(false);
 
-  systemStatus = signal({
+  systemStatus = signal<AiSystemStatus>({
     neuralSync: 98.4,
     cpuLoad: 12.2,
     memoryUsage: 45.1,
+    latency: 0,
+    marketVelocity: 0,
+    activeProcesses: 0,
   });
 
   marketAlerts = signal<any[]>(MARKET_ALERTS);
