@@ -604,12 +604,12 @@ export class DjDeckComponent implements OnInit, OnDestroy, AfterViewInit {
     if (deckState.isPlaying) this.engine.pauseDeck(deck);
   }
 
-  @HostListener('window:mousemove', [''])
+  @HostListener('window:mousemove', ['$event'])
   onPlatterMove(event: MouseEvent) {
     this.handlePlatterMove(event);
   }
 
-  @HostListener('window:touchmove', [''])
+  @HostListener('window:touchmove', ['$event'])
   onPlatterTouchMove(event: TouchEvent) {
     this.handlePlatterMove(event);
   }

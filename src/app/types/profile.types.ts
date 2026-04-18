@@ -217,6 +217,7 @@ export interface UserProfile {
 
   // Onboarding & UI specific fields
   skills: string[];
+  productionStyles?: string[];
   brandVoices: string[];
   strategicGoals: string[];
   performancesPerYear: string;
