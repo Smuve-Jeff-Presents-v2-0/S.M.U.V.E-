@@ -301,8 +301,8 @@ app.get('/api/security/logs/:userId', authenticateToken, authorizeUser, async (r
 });
 
 app.post('/api/security/log', authenticateToken, authorizeUser, async (req, res) => {
-  if (!isNonEmptyString(req.body.userId) || !isNonEmptyString(req.body.eventType)) {
-    return res.status(400).json({ error: "userId and eventType are required." });
+  if (!isNonEmptyString(req.body.eventType)) {
+    return res.status(400).json({ error: "eventType is required." });
   }
   try {
     const { userId, eventType, description, ipAddress, userAgent } = req.body;
