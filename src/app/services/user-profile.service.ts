@@ -104,6 +104,7 @@ export const initialProfile: UserProfile = {
 
   // Onboarding & UI specific fields
   skills: [],
+  productionStyles: [],
   brandVoices: [],
   strategicGoals: [],
   performancesPerYear: 'None',

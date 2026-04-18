@@ -628,7 +628,7 @@ export class PianoRollComponent implements AfterViewInit, OnDestroy {
     this.soundBrowserOpen.update((v) => !v);
   }
 
-  @HostListener('window:keydown', [''])
+  @HostListener('window:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
     const track = this.selectedTrack();
     if (!track) return;

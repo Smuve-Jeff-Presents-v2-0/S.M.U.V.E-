@@ -286,8 +286,8 @@ export class ArtistQuestionnaireComponent {
     if (p.primaryGenre) score += 5;
     if (p.strategicGoals && p.strategicGoals.length > 0) score += 10;
     if (p.brandVoices && p.brandVoices.length > 1) score += 5;
-    if (p.expertise && p.expertise.technical_mastery > 7) score += 10;
-    if (p.expertise && p.expertise.catalyst) score += 5;
+    if ((p.expertise?.technical_mastery || 0) > 7) score += 10;
+    if (p.expertise?.catalyst) score += 5;
     return Math.min(100, score);
   }
 

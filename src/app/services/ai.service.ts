@@ -135,6 +135,11 @@ type UpgradeBlueprint = Omit<
   >;
 };
 
+type RankedUpgradeRecommendation = UpgradeRecommendation &
+  Pick<UpgradeBlueprint, 'preferredViews' | 'rank' | 'buildDetails'> & {
+    rankScore: number;
+  };
+
 const UPGRADE_BLUEPRINTS: UpgradeBlueprint[] = [
   {
     id: 'upg-room-calibration',
@@ -1011,10 +1016,11 @@ export class AiService {
     const growth = this.analyticsService.overallGrowth();
     const preferences = profile.recommendationPreferences || {};
     const context = this.buildRecommendationContext(profile);
-    const recommendations = UPGRADE_BLUEPRINTS.map((blueprint) => {
+    const recommendations: RankedUpgradeRecommendation[] = UPGRADE_BLUEPRINTS.map(
+      (blueprint) => {
       const preference = preferences[blueprint.id];
       const acquired = this.isUpgradeAcquired(profile, blueprint);
-      const state =
+      const state: NonNullable<UpgradeRecommendation['state']> =
         preference?.state === 'completed'
           ? 'completed'
           : acquired
@@ -1053,7 +1059,8 @@ export class AiService {
         historySummary: this.getRecommendationHistorySummary(preference),
         rankScore,
       };
-    })
+    }
+    )
       .filter(
         (recommendation) =>
           !['dismissed', 'not-relevant'].includes(recommendation.state || '')
@@ -1068,7 +1075,7 @@ export class AiService {
         return b.rankScore - a.rankScore;
       });
 
-    return Array.from(
+    return Array.from<RankedUpgradeRecommendation>(
       new Map(
         recommendations.map((recommendation) => [
           recommendation.id,
