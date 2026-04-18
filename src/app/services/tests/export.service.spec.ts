@@ -121,4 +121,31 @@ describe('ExportService', () => {
     const blob = await result;
     expect(blob.type).toBe('audio/webm');
   });
+
+  it('merges master audio tracks into video export capture', async () => {
+    const audioTrack = { id: 'master-track' } as MediaStreamTrack;
+    const addTrack = jest.fn();
+    audioEngineMock.getMasterStream.mockReturnValue({
+      stream: {
+        getAudioTracks: jest.fn().mockReturnValue([audioTrack]),
+      },
+    });
+    const canvas = {
+      captureStream: jest.fn().mockReturnValue({
+        addTrack,
+      }),
+    } as any as HTMLCanvasElement;
+
+    const { recorder, result } = await service.startVideoExport(canvas);
+
+    expect(audioEngineMock.resume).toHaveBeenCalled();
+    expect(addTrack).toHaveBeenCalledWith(audioTrack);
+    expect(recorder.options).toEqual({
+      mimeType: 'video/webm',
+      videoBitsPerSecond: 8000000,
+    });
+    recorder.stop();
+    const blob = await result;
+    expect(blob.type).toBe(recorder.mimeType);
+  });
 });
