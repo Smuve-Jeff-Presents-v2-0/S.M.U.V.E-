@@ -486,7 +486,8 @@ app.get('/api/identity/:userId', authenticateToken, authorizeUser, async (req, r
       updatedAt: rows[0].updated_at,
     });
   } catch (err) {
-    return console.error("Internal Server Error:", err); res.status(500).json({ error: "Strategic anomaly detected. Secure operations compromised." });
+    console.error("Internal Server Error:", err);
+    return res.status(500).json({ error: "Strategic anomaly detected. Secure operations compromised." });
   }
 });
 
