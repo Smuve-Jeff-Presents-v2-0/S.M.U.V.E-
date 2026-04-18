@@ -114,11 +114,206 @@ export class AiService {
   syncKnowledgeBaseWithProfile() { return Promise.resolve(); }
 
   getUpgradeRecommendations(): UpgradeRecommendation[] {
-    return [{
-        id: 'upg-dsp-promotion', title: 'DSP Promotion', type: 'Service',
-        description: 'Accelerate reach.', cost: '$49/mo', url: '#', impact: 'High', rationale: 'Critical mass.',
-        targetArea: 'Marketing', priority: 'High', prerequisites: [], actionLabel: 'Deploy'
-    }];
+    const profile = this.userProfileService.profile() as (UserProfile & {
+      recommendationPreferences?: RecommendationPreference[];
+      recommendationHistory?: RecommendationHistoryEntry[];
+      upgradeRecommendationHistory?: RecommendationHistoryEntry[];
+      releases?: any[];
+      tracks?: any[];
+      socialLinks?: Record<string, string>;
+      links?: Record<string, string>;
+      branding?: { artworkReady?: boolean; pressPhotosReady?: boolean; bioReady?: boolean };
+      assets?: { artworkReady?: boolean; epkReady?: boolean };
+      verification?: { email?: boolean };
+      distribution?: { configured?: boolean };
+      production?: { mixesReviewed?: boolean; mastered?: boolean };
+      marketing?: { pixelConfigured?: boolean; campaignReady?: boolean };
+      audience?: { mailingListConnected?: boolean };
+    }) | null;
+
+    const history = [
+      ...(((profile as any)?.recommendationHistory ?? []) as RecommendationHistoryEntry[]),
+      ...(((profile as any)?.upgradeRecommendationHistory ?? []) as RecommendationHistoryEntry[]),
+    ];
+
+    const preferences = new Set<RecommendationPreference>(
+      (((profile as any)?.recommendationPreferences ?? []) as RecommendationPreference[])
+    );
+
+    const isHistoryState = (id: string, state: string): boolean =>
+      history.some((entry: any) => entry?.recommendationId === id && String(entry?.state ?? '').toLowerCase() === state);
+
+    const hasRelease = Boolean(((profile as any)?.releases?.length ?? 0) > 0 || ((profile as any)?.tracks?.length ?? 0) > 0);
+    const hasArtwork = Boolean(
+      (profile as any)?.branding?.artworkReady ||
+      (profile as any)?.assets?.artworkReady
+    );
+    const hasPressKit = Boolean(
+      (profile as any)?.assets?.epkReady ||
+      ((profile as any)?.branding?.pressPhotosReady && (profile as any)?.branding?.bioReady)
+    );
+    const emailVerified = Boolean((profile as any)?.verification?.email || (profile as any)?.emailVerified);
+    const distributionReady = Boolean((profile as any)?.distribution?.configured);
+    const mixesReviewed = Boolean((profile as any)?.production?.mixesReviewed || (profile as any)?.production?.mastered);
+    const socialLinksCount = Object.keys(((profile as any)?.socialLinks ?? (profile as any)?.links ?? {})).filter(
+      key => Boolean((((profile as any)?.socialLinks ?? (profile as any)?.links ?? {})[key] ?? '').toString().trim())
+    ).length;
+    const campaignReady = Boolean(
+      (profile as any)?.marketing?.campaignReady ||
+      (profile as any)?.marketing?.pixelConfigured ||
+      (profile as any)?.audience?.mailingListConnected
+    );
+
+    type RankedRecommendation = UpgradeRecommendation & {
+      state: 'ready' | 'blocked' | 'active' | 'completed' | 'dismissed';
+      whyNow: string;
+      nextStep: string;
+      score: number;
+      preference?: RecommendationPreference;
+      enabled: boolean;
+    };
+
+    const candidates: RankedRecommendation[] = [
+      {
+        id: 'upg-profile-verification',
+        title: 'Verify Email & Artist Identity',
+        type: 'Upgrade',
+        description: 'Unlock distribution and support workflows by completing account verification.',
+        cost: 'Free',
+        url: '#/profile/security',
+        impact: 'High',
+        rationale: 'Verification is a dependency for several downstream growth actions.',
+        targetArea: 'Profile',
+        priority: 'Critical',
+        prerequisites: [],
+        actionLabel: 'Verify Now',
+        state: emailVerified ? 'completed' : 'ready',
+        whyNow: emailVerified ? 'Your account is already verified.' : 'This is the fastest unblocker for release and promotion activity.',
+        nextStep: emailVerified ? 'No action required.' : 'Confirm your email address and complete any pending identity checks.',
+        score: emailVerified ? -100 : 120,
+        preference: 'Career Growth' as RecommendationPreference,
+        enabled: !emailVerified
+      },
+      {
+        id: 'upg-release-readiness',
+        title: 'Prepare Release Assets',
+        type: 'Service',
+        description: 'Finalize artwork, metadata, and delivery requirements before launch.',
+        cost: '$19',
+        url: '#/releases/new',
+        impact: 'High',
+        rationale: 'A release cannot perform if the packaging and metadata are incomplete.',
+        targetArea: 'Distribution',
+        priority: 'High',
+        prerequisites: emailVerified ? [] : ['Account verification'],
+        actionLabel: hasArtwork ? 'Review Assets' : 'Complete Assets',
+        state: !emailVerified ? 'blocked' : hasArtwork && hasRelease ? 'active' : 'ready',
+        whyNow: hasRelease
+          ? 'You already have music ready, so improving release readiness can move you to market faster.'
+          : 'Preparing assets now reduces delays when your next track is ready.',
+        nextStep: hasArtwork
+          ? 'Review title, metadata, and delivery settings for the next release.'
+          : 'Upload release artwork and verify your metadata checklist.',
+        score: (hasRelease ? 95 : 70) + (emailVerified ? 10 : -30),
+        preference: 'Distribution' as RecommendationPreference,
+        enabled: !distributionReady || !hasArtwork
+      },
+      {
+        id: 'upg-mix-feedback',
+        title: 'Professional Mix Feedback',
+        type: 'Service',
+        description: 'Get a targeted review to improve clarity, translation, and competitiveness.',
+        cost: '$29',
+        url: '#/production/mix-review',
+        impact: 'Medium',
+        rationale: 'Production quality compounds the impact of every later marketing step.',
+        targetArea: 'Production',
+        priority: 'Medium',
+        prerequisites: hasRelease ? [] : ['At least one track uploaded'],
+        actionLabel: 'Request Review',
+        state: !hasRelease ? 'blocked' : mixesReviewed ? 'completed' : 'ready',
+        whyNow: mixesReviewed
+          ? 'Your recent tracks have already been reviewed.'
+          : hasRelease
+            ? 'You have music available, so feedback can improve the next release cycle immediately.'
+            : 'Upload a draft track to unlock actionable production feedback.',
+        nextStep: mixesReviewed
+          ? 'Apply the latest review notes to your current project.'
+          : hasRelease
+            ? 'Submit your strongest draft for a focused mix analysis.'
+            : 'Add a track or draft release before requesting review.',
+        score: hasRelease ? (mixesReviewed ? -50 : 80) : 20,
+        preference: 'Production' as RecommendationPreference,
+        enabled: hasRelease && !mixesReviewed
+      },
+      {
+        id: 'upg-press-kit',
+        title: 'Build Electronic Press Kit',
+        type: 'Upgrade',
+        description: 'Create a sharable EPK with bio, visuals, and links for pitching.',
+        cost: '$15',
+        url: '#/profile/epk',
+        impact: 'High',
+        rationale: 'A polished pitch package improves conversion with curators and collaborators.',
+        targetArea: 'Branding',
+        priority: 'High',
+        prerequisites: hasArtwork ? [] : ['Release artwork'],
+        actionLabel: hasPressKit ? 'Update EPK' : 'Create EPK',
+        state: !hasArtwork ? 'blocked' : hasPressKit ? 'active' : 'ready',
+        whyNow: socialLinksCount > 0
+          ? 'You already have discoverability signals in place, so an EPK can improve pitch conversion.'
+          : 'Setting up an EPK early gives you a reusable foundation for future campaigns.',
+        nextStep: hasPressKit
+          ? 'Refresh your bio, links, and hero image before your next outreach push.'
+          : 'Add your bio, press photo, and key links to publish your first EPK.',
+        score: (hasArtwork ? 75 : 25) + (socialLinksCount > 0 ? 10 : 0),
+        preference: 'Branding' as RecommendationPreference,
+        enabled: hasArtwork && !hasPressKit
+      },
+      {
+        id: 'upg-dsp-promotion',
+        title: 'DSP Promotion',
+        type: 'Service',
+        description: 'Accelerate reach with playlist, audience, and release-campaign support.',
+        cost: '$49/mo',
+        url: '#',
+        impact: 'High',
+        rationale: 'Promotion performs best once the release foundation is already in place.',
+        targetArea: 'Marketing',
+        priority: 'High',
+        prerequisites: hasRelease ? [] : ['Released music'],
+        actionLabel: 'Deploy',
+        state: !hasRelease ? 'blocked' : campaignReady ? 'active' : 'ready',
+        whyNow: hasRelease
+          ? 'You have music available now, so campaign spend can convert into measurable listener growth.'
+          : 'Promotion should follow a release-ready catalog to avoid wasted spend.',
+        nextStep: hasRelease
+          ? 'Launch a focused campaign around your strongest release and track performance weekly.'
+          : 'Publish or schedule a release before starting paid promotion.',
+        score: hasRelease ? 110 : 15,
+        preference: 'Marketing' as RecommendationPreference,
+        enabled: hasRelease
+      }
+    ];
+
+    return candidates
+      .map((candidate) => {
+        if (isHistoryState(candidate.id, 'completed')) {
+          return { ...candidate, state: 'completed', enabled: false, score: -100 };
+        }
+        if (isHistoryState(candidate.id, 'dismissed')) {
+          return { ...candidate, state: 'dismissed', enabled: false, score: -100 };
+        }
+        return candidate;
+      })
+      .filter(candidate => candidate.state !== 'completed' && candidate.state !== 'dismissed')
+      .filter(candidate => candidate.enabled)
+      .filter(candidate => preferences.size === 0 || !candidate.preference || preferences.has(candidate.preference))
+      .sort((a, b) => {
+        const stateWeight = (value: string) => value === 'ready' ? 3 : value === 'active' ? 2 : value === 'blocked' ? 1 : 0;
+        return (b.score + stateWeight(b.state) * 10) - (a.score + stateWeight(a.state) * 10);
+      })
+      .map(({ score, enabled, preference, ...recommendation }) => recommendation as UpgradeRecommendation);
   }
 
   async getStrategicRecommendations(): Promise<StrategicRecommendationType[]> {
