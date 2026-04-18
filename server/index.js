@@ -330,8 +330,8 @@ app.get('/api/security/sessions/:userId', authenticateToken, authorizeUser, asyn
 });
 
 app.post('/api/security/session', authenticateToken, authorizeUser, async (req, res) => {
-  if (!isNonEmptyString(req.body.sessionId) || !isNonEmptyString(req.body.userId)) {
-    return res.status(400).json({ error: "sessionId and userId are required." });
+  if (!isNonEmptyString(req.body.sessionId)) {
+    return res.status(400).json({ error: "sessionId is required." });
   }
   try {
     const { sessionId, userId, deviceName, location } = req.body;
