@@ -17,9 +17,11 @@ jest.mock('express-rate-limit', () =>
   jest.fn(() => (_req, _res, next) => next())
 );
 
-jest.mock('@google/generative-ai', () => ({
-  GoogleGenerativeAI: jest.fn(() => ({
-    getGenerativeModel: jest.fn(),
+jest.mock('@google/genai', () => ({
+  GoogleGenAI: jest.fn(() => ({
+    models: {
+      generateContent: jest.fn(),
+    },
   })),
 }));
 

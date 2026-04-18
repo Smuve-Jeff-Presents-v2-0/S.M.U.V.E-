@@ -12,4 +12,22 @@ module.exports = {
     '<rootDir>/src/test.ts',
     '<rootDir>/tests/',
   ],
+  projects: [
+    {
+      displayName: 'angular',
+      testEnvironment: 'jsdom',
+      testMatch: ['<rootDir>/src/**/*.spec.ts'],
+      ...createCjsPreset({
+        tsconfig: '<rootDir>/tsconfig.spec.json',
+        stringifyContentPathRegex: '\\.html$',
+      }),
+      setupFilesAfterEnv: ['<rootDir>/setup-jest.ts'],
+    },
+    {
+      displayName: 'server',
+      testEnvironment: 'node',
+      testMatch: ['<rootDir>/server/**/*.spec.js'],
+      transform: {},
+    },
+  ],
 };
