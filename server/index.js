@@ -251,14 +251,19 @@ app.post('/api/profile', authenticateToken, authorizeUser, async (req, res) => {
   }
 });
 
-app.post("/api/auth/session", (req, res) => {
-  const { userId } = req.body;
-  if (!userId) {
-    return res.status(400).json({ error: "userId is required." });
+app.post("/api/auth/session", authenticateToken, (req, res) => {
+  const requestedUserId = req.body && req.body.userId;
+  const authenticatedUserId = req.user && req.user.userId;
+
+  if (!authenticatedUserId) {
+    return res.status(401).json({ error: "Authentication required." });
   }
-  // In a real app, you would verify the user exists or validate a temporary code.
-  // Here we issue a token for the valid userId.
-  const token = jwt.sign({ userId }, JWT_SECRET, { expiresIn: "1h" });
+
+  if (requestedUserId && requestedUserId !== authenticatedUserId) {
+    return res.status(403).json({ error: "Cannot create a session for another user." });
+  }
+
+  const token = jwt.sign({ userId: authenticatedUserId }, JWT_SECRET, { expiresIn: "1h" });
   res.json({ token });
 });
 
