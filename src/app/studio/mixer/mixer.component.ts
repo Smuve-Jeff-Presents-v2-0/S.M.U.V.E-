@@ -51,7 +51,16 @@ export class MixerComponent {
   panPercent(t: TrackModel) { return Math.round((t.pan || 0) * 100); }
   isSelected(t: TrackModel) { return this.selectedTrackId() === t.id; }
   toggleFxSlot(trackId: number, slotId: string) {
-    this.musicManager.tracks.update(ts => ts.map(t => t.id === trackId ? { ...t, fxSlots: t.fxSlots.map(s => s.id === slotId ? { ...s, enabled: !s.enabled } : s) } : t));
+    const track = this.musicManager.tracks().find(t => t.id === trackId);
+    if (!track) return;
+
+    const updatedSlots = track.fxSlots.map(s => s.id === slotId ? { ...s, enabled: !s.enabled } : s);
+
+    this.musicManager.tracks.update(ts =>
+      ts.map(t => t.id === trackId ? { ...t, fxSlots: updatedSlots } : t)
+    );
+
+    this.musicManager.engine.updateTrack(trackId, { fxSlots: updatedSlots });
   }
   resetTrack(id: number) { this.musicManager.engine.updateTrack(id, { gain: 0.9, pan: 0 }); }
 }
