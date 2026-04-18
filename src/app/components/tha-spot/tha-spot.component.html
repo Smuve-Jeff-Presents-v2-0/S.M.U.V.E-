@@ -100,7 +100,9 @@
     <!-- Browse View: Dedicated Browse with Advanced Filters -->
     <div class="browse-view" *ngIf="isBrowseView()">
       <div class="filter-sidebar glass-v42">
-        <div class="filter-group"><label>GENRE SECTOR</label><select [ngModel]="activeGenre()" (ngModelChange)="setActiveGenre($event)"><option value="all">ALL SECTORS</option><option *ngFor="let g of allCategories()" [value]="g">{{ g | uppercase }}</option></select></div><div class="filter-group">
+        <div class="filter-group"><label>GENRE SECTOR</label><select [ngModel]="activeGenre()" (ngModelChange)="setActiveGenre($event)"><option value="all">ALL SECTORS</option><option *ngFor="let g of allCategories()" [value]="g">{{ g | uppercase }}</option></select></div>
+
+        <div class="filter-group">
           <label>SEARCH CABINETS</label>
           <div class="search-input-wrapper">
             <span class="material-symbols-outlined">search</span>
@@ -108,7 +110,7 @@
           </div>
         </div>
 
-        <div class="filter-group"><label>GENRE SECTOR</label><select [ngModel]="activeGenre()" (ngModelChange)="setActiveGenre($event)"><option value="all">ALL SECTORS</option><option *ngFor="let g of allCategories()" [value]="g">{{ g | uppercase }}</option></select></div><div class="filter-group">
+        <div class="filter-group">
           <label>QUICK FILTERS</label>
           <div class="filter-pills">
             <button *ngFor="let f of quickFilterOptions"
@@ -119,7 +121,7 @@
           </div>
         </div>
 
-        <div class="filter-group"><label>GENRE SECTOR</label><select [ngModel]="activeGenre()" (ngModelChange)="setActiveGenre($event)"><option value="all">ALL SECTORS</option><option *ngFor="let g of allCategories()" [value]="g">{{ g | uppercase }}</option></select></div><div class="filter-group">
+        <div class="filter-group">
           <label>SORT MODE</label>
           <select [ngModel]="sortMode()" (ngModelChange)="setSortMode($event)">
             <option value="Popular">POPULARITY</option>
@@ -139,6 +141,7 @@
             <div class="card-art">
               <img [src]="game.image" [alt]="game.name" />
               <div class="card-badge elite" *ngIf="game.badgeIds?.includes('elite')">ELITE</div>
+              <div class="card-badge new" *ngIf="game.badgeIds?.includes('new-drop')">NEW</div>
             </div>
             <div class="card-info">
               <h4>{{ game.name }}</h4>
