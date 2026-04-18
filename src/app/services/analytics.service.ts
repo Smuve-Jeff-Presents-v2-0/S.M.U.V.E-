@@ -45,4 +45,8 @@ export class AnalyticsService {
       { name: 'Other', percentage: 10 },
     ];
   }
+
+  trackEvent(name: string, properties?: any) {
+    console.log(`[Analytics] Event: ${name}`, properties);
+  }
 }

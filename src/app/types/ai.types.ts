@@ -186,8 +186,10 @@ export interface AdvisorAdvice {
   title: string;
   content: string;
   type: string;
-  priority: 'URGENT' | 'HIGH' | 'MEDIUM' | 'LOW';
+  priority?: 'URGENT' | 'HIGH' | 'MEDIUM' | 'LOW';
+  impact?: string;
   persona: AdvisorPersona;
+  actionLabel?: string;
 }
 
 export type ArtistTier =

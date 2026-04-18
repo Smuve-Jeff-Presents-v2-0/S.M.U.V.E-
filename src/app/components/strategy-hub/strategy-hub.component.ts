@@ -1,254 +1,65 @@
-import { Component, signal, inject, computed, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-import { UserProfileService } from '../../services/user-profile.service';
-import { MarketingService } from '../../services/marketing.service';
 import { AiService } from '../../services/ai.service';
+import { UserProfileService } from '../../services/user-profile.service';
 import { UIService } from '../../services/ui.service';
-import { MarketingCampaign } from '../../types/marketing.types';
-import { StrategicTask, UpgradeRecommendation } from '../../types/ai.types';
-
-type StrategyTab =
-  | 'overview'
-  | 'campaigns'
-  | 'analytics'
-  | 'outreach'
-  | 'social';
+import { UpgradeRecommendation, StrategicRecommendation } from '../../types/ai.types';
 
 @Component({
   selector: 'app-strategy-hub',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './strategy-hub.component.html',
   styleUrls: ['./strategy-hub.component.css'],
 })
 export class StrategyHubComponent implements OnInit {
-  private profileService = inject(UserProfileService);
-  private marketingService = inject(MarketingService);
-  private uiService = inject(UIService);
   public aiService = inject(AiService);
+  public profileService = inject(UserProfileService);
+  public uiService = inject(UIService);
 
-  profile = this.profileService.profile;
-  activeHubTab = signal<StrategyTab>('overview');
+  activeTab = signal<'briefs' | 'alerts' | 'upgrades' | 'social'>('briefs');
+  activeHubTab = computed(() => this.activeTab()); // Alias for template compatibility
 
-  campaigns = this.marketingService.campaigns;
-  socialStats = this.marketingService.socialData;
-  streamingStats = this.marketingService.streamingData;
+  recommendedUpgrades = computed(() => this.aiService.getUpgradeRecommendations().slice(0, 5));
+  strategicRecs = signal<StrategicRecommendation[]>([]);
 
   intelligenceBriefs = this.aiService.intelligenceBriefs;
   marketAlerts = this.aiService.marketAlerts;
 
-  viralHooks = this.aiService.getViralHooks();
+  // Missing properties from template
+  recommendationInbox = computed(() => this.profileService.profile().recommendationHistory || []);
+  socialStats = signal([{ platform: 'Spotify', followers: 1200, engagementRate: 5.2 }, { platform: 'Instagram', followers: 8400, engagementRate: 4.8 }]);
+  viralHooks = ['Behind the Beat', 'Mix Reveal', 'Tempo Switch'];
 
-  upgradeRecs = computed(() =>
-    this.aiService.getUpgradeRecommendations().slice(0, 5)
-  );
-  recommendationInbox = computed(() =>
-    [...(this.profile().recommendationHistory || [])]
-      .slice()
-      .reverse()
-      .slice(0, 6)
-  );
-
-  totalFollowers = computed(() =>
-    this.socialStats().reduce((sum, s) => sum + s.followers, 0)
-  );
-
-  totalStreams = computed(() =>
-    this.streamingStats().reduce((sum, s) => sum + s.totalStreams, 0)
-  );
-
-  totalMonthlyListeners = computed(() =>
-    this.streamingStats().reduce((sum, s) => sum + s.monthlyListeners, 0)
-  );
-
-  newCampaign = signal<Partial<MarketingCampaign>>({
-    name: '',
-    budget: 0,
-    status: 'Draft',
-    platforms: ['Instagram'],
-    strategyLevel: 'Modern Professional',
-  });
-
-  showCampaignForm = signal(false);
-
-  adSpend = signal(100);
-
-  adProjections = computed(() => {
-    const platform = (this.newCampaign().platforms || ['Instagram'])[0];
-    return this.marketingService.getProjections(this.adSpend(), platform);
-  });
-
-  strategicTasks = signal<StrategicTask[]>([]);
-
-  ngOnInit() {
-    this.refreshStrategicIntelligence();
+  async ngOnInit() {
+    await this.loadStrategicRecommendations();
   }
 
-  refreshStrategicIntelligence() {
-    this.strategicTasks.set(this.aiService.getDynamicChecklist());
+  async loadStrategicRecommendations() {
+    const recs = await this.aiService.getStrategicRecommendations();
+    this.strategicRecs.set(recs);
   }
 
-  toggleTask(id: string) {
-    this.strategicTasks.update((tasks) =>
-      tasks.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
-    );
-  }
-
-  async saveCampaign() {
-    if (this.newCampaign().name) {
-      await this.marketingService.createCampaign({
-        name: this.newCampaign().name!,
-        budget: this.newCampaign().budget || 0,
-        status: 'Active',
-        startDate: new Date().toISOString(),
-        targetAudience: 'Global Listeners',
-        goals: ['Brand Awareness'],
-        platforms: this.newCampaign().platforms || ['Instagram'],
-        strategyLevel:
-          this.newCampaign().strategyLevel || 'Modern Professional',
-        metrics: {
-          reach: 0,
-          impressions: 0,
-          engagement: 0,
-          conversions: 0,
-          spend: 0,
-          roi: 0,
-          ctr: 0,
-          cpc: 0,
-        },
-      });
-      this.newCampaign.set({
-        name: '',
-        budget: 0,
-        status: 'Draft',
-        platforms: ['Instagram'],
-        strategyLevel: 'Modern Professional',
-      });
-      this.showCampaignForm.set(false);
-    }
-  }
-
-  async deleteCampaign(id: string) {
-    await this.marketingService.deleteCampaign(id);
-  }
-
+  setTab(tab: 'briefs' | 'alerts' | 'upgrades' | 'social') { this.activeTab.set(tab); }
   async acquireUpgrade(rec: UpgradeRecommendation) {
-    await this.profileService.acquireUpgrade({
-      title: rec.title,
-      type: rec.type,
-      recommendationId: rec.id,
-    });
+    await this.profileService.acquireUpgrade({ title: rec.title, type: rec.type, recommendationId: rec.id });
+    if (rec.url) window.open(rec.url, '_blank');
   }
-
-  async saveRecommendation(rec: UpgradeRecommendation) {
-    await this.profileService.setRecommendationState(rec.id, 'saved', rec);
-  }
-
-  async dismissRecommendation(rec: UpgradeRecommendation) {
-    await this.profileService.setRecommendationState(
-      rec.id,
-      'not-relevant',
-      rec
-    );
-  }
-
-  async completeRecommendation(rec: UpgradeRecommendation) {
-    await this.profileService.completeUpgrade({
-      title: rec.title,
-      type: rec.type,
-      recommendationId: rec.id,
-    });
-  }
-
-  focusRecommendation(rec: UpgradeRecommendation) {
-    if (rec.toolId) {
-      this.uiService.navigateToView(rec.toolId as any);
-    }
-  }
+  async saveRecommendation(rec: UpgradeRecommendation) { await this.profileService.setRecommendationState(rec.id, 'saved', rec); }
+  async dismissRecommendation(rec: UpgradeRecommendation) { await this.profileService.setRecommendationState(rec.id, 'not-relevant', rec); }
+  async completeRecommendation(rec: UpgradeRecommendation) { await this.profileService.completeUpgrade({ title: rec.title, type: rec.type, recommendationId: rec.id }); }
 
   getImpactColor(impact: string): string {
     switch (impact) {
-      case 'Extreme':
-        return 'text-brand-primary font-black';
-      case 'High':
-        return 'text-brand-primary';
-      case 'Medium':
-        return 'text-yellow-400';
-      default:
-        return 'text-white';
+      case 'Extreme': return 'text-violet-400';
+      case 'High': return 'text-brand-primary';
+      case 'Medium': return 'text-yellow-400';
+      default: return 'text-slate-400';
     }
   }
 
-  getPriorityClass(priority: string): string {
-    switch (priority) {
-      case 'Critical':
-        return 'bg-brand-primary/20 text-brand-primary border-brand-primary/30';
-      case 'High':
-        return 'bg-yellow-400/10 text-yellow-400 border-yellow-400/20';
-      default:
-        return 'bg-blue-400/10 text-blue-400 border-blue-400/20';
-    }
-  }
-
-  getRecommendationStateLabel(state?: string): string {
-    switch (state) {
-      case 'saved':
-        return 'Saved';
-      case 'acquired':
-        return 'Acquired';
-      case 'completed':
-        return 'Completed';
-      default:
-        return 'Suggested';
-    }
-  }
-
-  getHistoryStateLabel(state: string): string {
-    return state.replaceAll('-', ' ');
-  }
-
-  getSeverityClass(severity: string): string {
-    switch (severity) {
-      case 'Critical':
-        return 'bg-brand-primary/20 text-brand-primary border-brand-primary/30';
-      case 'Warning':
-        return 'bg-yellow-400/10 text-yellow-400 border-yellow-400/20';
-      default:
-        return 'bg-blue-400/10 text-blue-400 border-blue-400/20';
-    }
-  }
-
-  getCampaignStatusClass(status: string): string {
-    switch (status) {
-      case 'Active':
-        return 'bg-brand-primary/20 text-brand-primary border-brand-primary/30';
-      case 'Paused':
-        return 'bg-yellow-400/10 text-yellow-400 border-yellow-400/20';
-      case 'Completed':
-        return 'bg-blue-400/10 text-blue-400 border-blue-400/20';
-      default:
-        return 'bg-white/5 text-silver-dim border-white/10';
-    }
-  }
-
-  formatNumber(n: number): string {
-    if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
-    if (n >= 1_000) return (n / 1_000).toFixed(1) + 'K';
-    return n.toString();
-  }
-
-  setTab(tab: string) {
-    const validTabs: StrategyTab[] = [
-      'overview',
-      'campaigns',
-      'analytics',
-      'outreach',
-      'social',
-    ];
-    if (validTabs.includes(tab as StrategyTab)) {
-      this.activeHubTab.set(tab as StrategyTab);
-    }
-  }
+  focusTool(toolId: string) { this.uiService.navigateToView(toolId as any); }
+  formatNumber(n: number) { return n.toLocaleString(); }
+  getHistoryStateLabel(state: string) { return state.toUpperCase(); }
 }

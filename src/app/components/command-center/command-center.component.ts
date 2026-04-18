@@ -1,19 +1,9 @@
-import {
-  Component,
-  inject,
-  signal,
-  computed,
-  OnInit,
-  OnDestroy,
-} from '@angular/core';
+import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UIService } from '../../services/ui.service';
 import { AiService } from '../../services/ai.service';
 import { UserProfileService } from '../../services/user-profile.service';
-import {
-  UpgradeRecommendation,
-  StrategicRecommendation,
-} from '../../types/ai.types';
+import { UpgradeRecommendation, StrategicRecommendation } from '../../types/ai.types';
 
 interface TerminalLog {
   timestamp: number;
@@ -34,24 +24,13 @@ export class CommandCenterComponent implements OnInit, OnDestroy {
   public uiService = inject(UIService);
 
   recommendations = computed(() =>
-    this.aiService
-      .getUpgradeRecommendations()
-      .filter(
-        (recommendation) =>
-          !['dismissed', 'not-relevant'].includes(recommendation.state || '')
-      )
-      .slice(0, 2)
+    this.aiService.getUpgradeRecommendations().slice(0, 2)
   );
   recommendationHistory = computed(() =>
-    [...(this.profileService.profile().recommendationHistory || [])]
-      .slice()
-      .reverse()
-      .slice(0, 4)
+    [...(this.profileService.profile().recommendationHistory || [])].reverse().slice(0, 4)
   );
   strategicRecs = signal<StrategicRecommendation[]>([]);
   isPoweringUp = signal(false);
-
-  // Terminal state
   terminalLogs = signal<TerminalLog[]>([]);
   private intervalId: any;
 
@@ -65,34 +44,20 @@ export class CommandCenterComponent implements OnInit, OnDestroy {
     this.strategicRecs.set(recs);
   }
 
-  ngOnDestroy() {
-    if (this.intervalId) clearInterval(this.intervalId);
-  }
+  ngOnDestroy() { if (this.intervalId) clearInterval(this.intervalId); }
 
   private startTerminalSimulation() {
-    // Wait for decrees to be available
     const checkDecrees = setInterval(() => {
       const decrees = this.aiService.strategicDecrees();
       if (decrees.length > 0) {
         clearInterval(checkDecrees);
-
         this.terminalLogs.set([]);
-
         let currentLine = 0;
         this.intervalId = setInterval(() => {
           if (currentLine < decrees.length) {
-            this.terminalLogs.update((logs) => [
-              ...logs,
-              {
-                timestamp: Date.now(),
-                type: 'system',
-                message: decrees[currentLine],
-              },
-            ]);
+            this.terminalLogs.update((logs) => [...logs, { timestamp: Date.now(), type: 'system', message: decrees[currentLine] }]);
             currentLine++;
-          } else {
-            clearInterval(this.intervalId);
-          }
+          } else { clearInterval(this.intervalId); }
         }, 800);
       }
     }, 500);
@@ -100,111 +65,39 @@ export class CommandCenterComponent implements OnInit, OnDestroy {
 
   async handleCommand(command: string) {
     if (!command.trim()) return;
-
-    this.terminalLogs.update((logs) => [
-      ...logs,
-      {
-        timestamp: Date.now(),
-        type: 'command',
-        message: command.toUpperCase(),
-      },
-    ]);
-
+    this.terminalLogs.update((logs) => [...logs, { timestamp: Date.now(), type: 'command', message: command.toUpperCase() }]);
     const response = await this.aiService.processCommand(command);
-
     setTimeout(() => {
-      this.terminalLogs.update((logs) => [
-        ...logs,
-        {
-          timestamp: Date.now(),
-          type: 'response',
-          message: response,
-        },
-      ]);
+      this.terminalLogs.update((logs) => [...logs, { timestamp: Date.now(), type: 'response', message: response }]);
     }, 400);
   }
 
   async acquireUpgrade(rec: UpgradeRecommendation) {
     this.isPoweringUp.set(true);
-
-    await this.profileService.acquireUpgrade({
-      title: rec.title,
-      type: rec.type,
-      recommendationId: rec.id,
-    });
-
-    this.terminalLogs.update((logs) => [
-      ...logs,
-      {
-        timestamp: Date.now(),
-        type: 'system',
-        message: `ALERT: INTEGRATING ${rec.title.toUpperCase()}. SYNCING NEURAL PATHWAYS.`,
-      },
-    ]);
-
+    await this.profileService.acquireUpgrade({ title: rec.title, type: rec.type, recommendationId: rec.id });
+    this.terminalLogs.update((logs) => [...logs, { timestamp: Date.now(), type: 'system', message: `ALERT: INTEGRATING ${rec.title.toUpperCase()}.` }]);
     setTimeout(() => {
       this.isPoweringUp.set(false);
-      if (rec.url) {
-        window.open(rec.url, '_blank');
-      }
+      if (rec.url) window.open(rec.url, '_blank');
     }, 1200);
   }
 
-  async saveRecommendation(rec: UpgradeRecommendation) {
-    await this.profileService.setRecommendationState(rec.id, 'saved', rec);
-  }
-
-  async dismissRecommendation(rec: UpgradeRecommendation) {
-    await this.profileService.setRecommendationState(
-      rec.id,
-      'not-relevant',
-      rec
-    );
-  }
-
-  async completeRecommendation(rec: UpgradeRecommendation) {
-    await this.profileService.completeUpgrade({
-      title: rec.title,
-      type: rec.type,
-      recommendationId: rec.id,
-    });
-  }
-
-  focusRecommendation(rec: UpgradeRecommendation) {
-    if (rec.toolId) {
-      this.uiService.navigateToView(rec.toolId as any);
-    }
-  }
-
+  async saveRecommendation(rec: UpgradeRecommendation) { await this.profileService.setRecommendationState(rec.id, 'saved', rec); }
+  async dismissRecommendation(rec: UpgradeRecommendation) { await this.profileService.setRecommendationState(rec.id, 'not-relevant', rec); }
+  async completeRecommendation(rec: UpgradeRecommendation) { await this.profileService.completeUpgrade({ title: rec.title, type: rec.type, recommendationId: rec.id }); }
+  focusRecommendation(rec: UpgradeRecommendation) { if (rec.toolId) this.uiService.navigateToView(rec.toolId as any); }
   initializeOperation(srec: StrategicRecommendation) {
-    this.terminalLogs.update((logs) => [
-      ...logs,
-      {
-        timestamp: Date.now(),
-        type: 'system',
-        message: `INITIALIZING OPERATION: ${srec.action.toUpperCase()}...`,
-      },
-    ]);
-
-    setTimeout(() => {
-      if (srec.toolId) {
-        this.uiService.navigateToView(srec.toolId as any);
-      }
-    }, 800);
+    this.terminalLogs.update((logs) => [...logs, { timestamp: Date.now(), type: 'system', message: `INITIALIZING OPERATION: ${srec.action.toUpperCase()}...` }]);
+    setTimeout(() => { if (srec.toolId) this.uiService.navigateToView(srec.toolId as any); }, 800);
   }
 
   getImpactColor(impact: string): string {
     switch (impact) {
-      case 'Extreme':
-        return 'text-violet-400 animate-pulse-subtle font-black';
-      case 'High':
-        return 'text-brand-primary';
-      case 'Medium':
-        return 'text-yellow-400';
-      case 'Low':
-        return 'text-slate-400';
-      default:
-        return 'text-white';
+      case 'Extreme': return 'text-violet-400 animate-pulse-subtle font-black';
+      case 'High': return 'text-brand-primary';
+      case 'Medium': return 'text-yellow-400';
+      case 'Low': return 'text-slate-400';
+      default: return 'text-white';
     }
   }
 }
