@@ -141,9 +141,17 @@ export class AudioEngineService {
   public setMetronomeVolume(vol: number) { this.metronomeVolume.set(vol); }
   public getMasterAnalyser() { if (!this.ctx) this.initAudio(); return this.masterAnalyser; }
   public getAnalyser() { return this.getMasterAnalyser(); }
-  public getMasterStream() { if (!this.ctx) this.initAudio(); const dest = this.ctx!.createMediaStreamDestination(); this.masterAnalyser?.connect(dest); return dest; }
+  public getMasterStream() {
+    if (!this.ctx) this.initAudio();
+    if (!this.masterStreamDestination) {
+      this.masterStreamDestination = this.ctx!.createMediaStreamDestination();
+      this.masterAnalyser?.connect(this.masterStreamDestination);
+    }
+    return this.masterStreamDestination;
+  }
 
 
+  private masterStreamDestination: MediaStreamAudioDestinationNode | null = null;
   private deckNodes = new Map<string, {
     source: AudioBufferSourceNode | null,
     gain: GainNode,
