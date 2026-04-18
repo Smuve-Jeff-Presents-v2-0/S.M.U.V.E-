@@ -2,7 +2,7 @@ const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { GoogleGenAI } = require('@google/genai');
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
@@ -81,7 +81,7 @@ const pool = new Pool({
   },
 });
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 const escapeHtml = (value = '') =>
   String(value)
@@ -576,10 +576,11 @@ app.post(
 app.post('/api/ai/analyze', authenticateToken, async (req, res) => {
   try {
     const { prompt } = req.body;
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    res.json({ text: response.text() });
+    const response = await genAI.models.generateContent({
+      model: 'gemini-1.5-pro',
+      contents: prompt,
+    });
+    res.json({ text: response.text });
   } catch (err) {
     console.error("Internal Server Error:", err); res.status(500).json({ error: "Strategic anomaly detected. Secure operations compromised." });
   }
