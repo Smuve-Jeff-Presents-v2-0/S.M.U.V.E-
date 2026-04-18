@@ -445,7 +445,12 @@ export class SecurityService {
   }
 
   getSecurityAudit(): { score: number; status: string; alerts: string[] } {
-    const authService = this.injector.get(AuthService, null);
+    let authService: AuthService | null = null;
+    try {
+      authService = this.injector.get(AuthService, null);
+    } catch {
+      authService = null;
+    }
     const profile = this.profileService.profile();
     const user = authService?.currentUser();
 

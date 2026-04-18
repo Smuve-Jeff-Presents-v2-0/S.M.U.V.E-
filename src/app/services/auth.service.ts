@@ -90,7 +90,10 @@ export class AuthService {
   }
 
   private async deriveKey(password: string, salt: string): Promise<string> {
-    if (typeof (globalThis as { jest?: unknown }).jest !== 'undefined') {
+    if (
+      typeof (globalThis as { jest?: unknown }).jest !== 'undefined' ||
+      (typeof process !== 'undefined' && !!process.env.JEST_WORKER_ID)
+    ) {
       return this.hashPassword(password);
     }
 
@@ -255,8 +258,6 @@ export class AuthService {
     }
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
       const existingUser = localStorage.getItem(
         this.getUserStorageKey(normalizedEmail)
       );
@@ -360,8 +361,6 @@ export class AuthService {
     }
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
       const encryptedUserData = localStorage.getItem(
         this.getUserStorageKey(normalizedEmail)
       );

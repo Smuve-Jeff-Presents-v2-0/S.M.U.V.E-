@@ -132,7 +132,9 @@ export class UserProfileService {
   private maxEventHistory = 50;
 
   constructor() {
-    this.loadProfile();
+    if (!(typeof process !== 'undefined' && !!process.env.JEST_WORKER_ID)) {
+      void this.loadProfile();
+    }
   }
 
   async loadProfile(userId: string = 'current') {

@@ -137,7 +137,10 @@ export class StudioComponent implements OnInit, OnDestroy, AfterViewInit {
         }
 
         // Auto-focus on editors regardless of view
-        if (this.uiService.autoPianoRoll() || this.uiService.isCompactMobile()) {
+        if (
+          this.uiService.autoPianoRoll() ||
+          this.uiService.isCompactMobile()
+        ) {
           this.showPianoRoll.set(true);
         } else if (!this.showPianoRoll()) {
           this.notificationService.show(
