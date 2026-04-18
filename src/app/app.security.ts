@@ -5,7 +5,15 @@ interface SmuveEnv {
   API_URL?: string;
 }
 
-const env = ((window as any).env as SmuveEnv) || {};
+const env: SmuveEnv =
+  typeof window !== 'undefined' ? ((window as any).env as SmuveEnv) || {} : {};
+
+if (!env.AUTH_SALT || !env.ENCRYPTION_KEY) {
+  console.warn(
+    '[SECURITY] AUTH_SALT and/or ENCRYPTION_KEY not provided via window.env. ' +
+      'Using built-in defaults. Configure these values for production deployments.'
+  );
+}
 
 export const APP_SECURITY_CONFIG = {
   auth_salt: env.AUTH_SALT || 'SMUVE_SALT_V4_SECURE_HASH',
