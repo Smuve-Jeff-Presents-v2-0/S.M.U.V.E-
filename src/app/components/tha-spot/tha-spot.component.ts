@@ -292,6 +292,7 @@ export class ThaSpotComponent implements OnInit, OnDestroy {
   confirmLaunch() {
     const game = this.selectedGame();
     if (!game) return;
+    if (this.isMatchmaking()) return;
 
     if (game.launchConfig?.embedMode === 'external-only') {
       const launchUrl =
