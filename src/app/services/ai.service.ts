@@ -156,8 +156,21 @@ export class AiService {
 
   public async generateAiResponse(prompt: string): Promise<string> {
     try {
-      const response = await firstValueFrom(this.http.post<{ response: string }>('/api/ai/chat', { prompt }));
-      return response.response;
+      const authService = (this as any)['authService'] as AuthService | undefined;
+      const token =
+        (authService as any)?.getToken?.() ??
+        (authService as any)?.getJwtToken?.() ??
+        (authService as any)?.getAccessToken?.();
+
+      const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
+      const response = await firstValueFrom(
+        this.http.post<{ text: string }>(
+          '/api/ai/analyze',
+          { text: prompt },
+          { headers }
+        )
+      );
+      return response.text;
     } catch (e) { return 'SYSTEM OFFLINE'; }
   }
 }
