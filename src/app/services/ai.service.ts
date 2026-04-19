@@ -514,7 +514,7 @@ export class AiService {
   private logger = inject(LoggingService);
 
   private getHeaders() {
-    const token = this.injector.get(AuthService).jwtToken();
+    const token = this.authService.jwtToken();
     return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
   }
 
