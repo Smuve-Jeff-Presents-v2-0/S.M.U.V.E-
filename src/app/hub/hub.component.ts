@@ -67,6 +67,8 @@ export class HubComponent implements OnInit, OnDestroy, AfterViewInit {
     primaryGenre: 'Hip Hop',
   });
 
+  private pulseInterval: ReturnType<typeof setInterval> | null = null;
+
   genres = ['Hip Hop', 'R&B', 'Pop', 'Electronic', 'Rock', 'Jazz', 'Classical'];
   labelStats = [
     {
@@ -246,15 +248,15 @@ export class HubComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.uiService.isCompactMobile()) {
       this.aiService.proactiveStrategicPulse();
     }
+    this.pulseInterval = setInterval(() => {
+      this.currentBeat.update((v) => v + 1);
+    }, 3000);
   }
 
   ngAfterViewInit() {
     this.startVisualizer();
   }
 
-  ngOnDestroy() {
-    if (this.animFrame) cancelAnimationFrame(this.animFrame);
-  }
   private startVisualizer() {
     const update = () => {
       if (this.playerService.isPlaying()) {
@@ -283,6 +285,40 @@ export class HubComponent implements OnInit, OnDestroy, AfterViewInit {
     this.animFrame = requestAnimationFrame(update);
   }
 
+  ngOnDestroy() {
+    if (this.animFrame) cancelAnimationFrame(this.animFrame);
+    if (this.pulseInterval) clearInterval(this.pulseInterval);
+  }
+
+  // Quick Start Actions
+  onQuickStart() {
+    if (!this.quickProfile().artistName) {
+      this.notificationService.show(
+        'Please enter your Artist Name to begin!',
+        'warning'
+      );
+      return;
+    }
+
+    const current = this.profileService.profile();
+    this.profileService.updateProfile({
+      ...current,
+      artistName: this.quickProfile().artistName,
+      primaryGenre: this.quickProfile().primaryGenre,
+    });
+
+    this.notificationService.show('Profile Created Successfully!', 'success');
+    this.router.navigate(['/profile']);
+  }
+
+  // AI Jam Actions
+  toggleAIBassist() {
+    if (this.aiService.isAIBassistActive()) {
+      this.aiService.stopAIBassist();
+    } else {
+      this.aiService.startAIBassist();
+    }
+  }
 
   toggleAIDrummer() {
     if (this.aiService.isAIDrummerActive()) {
