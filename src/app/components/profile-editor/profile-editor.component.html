@@ -159,10 +159,10 @@
                 ]" class="bg-black/40 p-3 rounded-xl border border-white/5 flex flex-col gap-1">
                   <span class="text-[8px] font-black text-slate-500 uppercase">{{ item.label }}</span>
                   <div class="flex items-center justify-between">
-                    <span class="text-xs font-black text-white">{{ (editableProfile().expertise)[item.key] || 0 }}.0</span>
+                    <span class="text-xs font-black text-white">{{ (editableProfile().expertise)[$any(item.key)] || 0 }}.0</span>
                     <div class="flex gap-0.5">
                       <div *ngFor="let i of [1,2,3,4,5]" class="w-1.5 h-3 rounded-sm border border-white/10"
-                           [class.bg-brand-secondary]="((editableProfile().expertise)[item.key] || 0) >= (i * 2)"></div>
+                           [class.bg-brand-secondary]="((editableProfile().expertise)[$any(item.key)] || 0) >= (i * 2)"></div>
                     </div>
                   </div>
                 </div>
