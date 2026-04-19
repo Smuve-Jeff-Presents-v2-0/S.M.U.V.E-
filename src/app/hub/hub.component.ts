@@ -67,12 +67,6 @@ export class HubComponent implements OnInit, OnDestroy, AfterViewInit {
     primaryGenre: 'Hip Hop',
   });
 
-  globalStudioPulse = signal<string[]>([
-    'Session active — monitoring mix bus',
-    'Neural sync calibrated',
-    'Mastering chain online',
-  ]);
-  currentBeat = signal(0);
   private pulseInterval: ReturnType<typeof setInterval> | null = null;
 
   genres = ['Hip Hop', 'R&B', 'Pop', 'Electronic', 'Rock', 'Jazz', 'Classical'];
@@ -263,9 +257,6 @@ export class HubComponent implements OnInit, OnDestroy, AfterViewInit {
     this.startVisualizer();
   }
 
-  ngOnDestroy() {
-    if (this.animFrame) cancelAnimationFrame(this.animFrame);
-  }
   private startVisualizer() {
     const update = () => {
       if (this.playerService.isPlaying()) {

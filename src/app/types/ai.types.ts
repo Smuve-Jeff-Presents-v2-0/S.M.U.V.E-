@@ -189,7 +189,6 @@ export interface AdvisorAdvice {
   priority: 'URGENT' | 'HIGH' | 'MEDIUM' | 'LOW';
   persona: AdvisorPersona;
   actionLabel?: string;
-  actionLabel?: string;
 }
 
 export type ArtistTier =

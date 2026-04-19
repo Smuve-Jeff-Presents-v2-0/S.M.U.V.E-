@@ -60,8 +60,8 @@ export class CommandCenterComponent implements OnInit, OnDestroy {
     this.loadStrategicRecommendations();
   }
 
-  loadStrategicRecommendations() {
-    const recs = this.aiService.getStrategicRecommendations();
+  async loadStrategicRecommendations() {
+    const recs = await this.aiService.getStrategicRecommendations();
     this.strategicRecs.set(recs);
   }
 

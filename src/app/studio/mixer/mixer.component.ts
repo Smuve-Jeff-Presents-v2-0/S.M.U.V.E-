@@ -51,10 +51,6 @@ export class MixerComponent {
     this.showVocalSuite.update((v) => !v);
   }
 
-  toggleVisualRouting() {
-    this.showVisualRouting.update((v) => !v);
-  }
-
   updateMasterVolume(newVolume: number): void {
     this.audioSession.updateMasterVolume(newVolume);
   }
