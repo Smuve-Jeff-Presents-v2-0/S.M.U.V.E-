@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
 
+if [[ $# -lt 2 ]]; then
+    echo "Usage: $0 <client_id> <private_key_path>"
+    exit 1
+fi
+
 client_id=$1
 private_key_path=$2
 
 if [[ ! -f "$private_key_path" ]]; then
-    echo "Error: Private key file not found."
+    echo "Error: Private key file not found: $private_key_path"
     exit 1
 fi
 
@@ -34,6 +39,6 @@ signature=$(printf '%s' "${header_payload}" | \
             b64enc)
 
 # 4. Final JWT
-JWT="${header_payload}.${signature}"
+jwt="${header_payload}.${signature}"
 
-printf 'JWT: %s\n' "$JWT"
+printf 'JWT: %s\n' "$jwt"
